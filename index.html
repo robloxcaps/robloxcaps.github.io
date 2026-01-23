@@ -1,96 +1,57 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" id="www-roblox-com">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>ROBLOX</title>
-<link rel="icon" href="img/FaviIcon.ico" type="image/x-icon">   
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<meta name="author" content="ROBLOX Corporation"/>
-<meta name="description" content="ROBLOX is SAFE for kids! ROBLOX is a FREE casual virtual world with fully constructible/desctructible environments and immersive physics. Build, battle, chat, or just hang out."/>
-<meta name="keywords" content="game, video game, building game, contstruction game, online game, LEGO game, LEGO, MMO, MMORPG, virtual world, avatar chat"/>
-<meta name="robots" content="all"/>
+<meta charset="UTF-8">
+<title>ROBLOX CLASSIC ASSET PACKS</title>
+<link rel="icon" href="img/FaviIcon.ico" type="image/x-icon">
+<meta name="author" content="OGMelodii & Jakyro">
+<meta name="description" content="Contains all packs made by OGMelodii & Jakyro.">
+<meta name="keywords" content="Roblox, Retro, Roblox Pack, Sandbox">
+<meta name="robots" content="all">
 
-<style type="text/css">
-/* ============================================
-   EASY CUSTOMIZATION VARIABLES
-   Change these values to customize the site
-   ============================================ */
+<style>
 :root {
-    /* COLORS */
-    --primary-color: #0054a6;          /* Main blue color */
-    --secondary-color: #47a3ff;        /* Darker blue for nav */
-    --accent-color: #f9a825;           /* Yellow/gold accent */
-    --text-color: #333;                /* Default text color */
-    --white-text: #ffffff;             /* White text for dark backgrounds */
-    --container-bg: #ffffff;           /* Main container background */
-    --dark-overlay: rgba(0, 0, 0, 0.7); /* Dark overlay opacity */
-    
-    /* FONTS */
+    --primary-color: #0054a6;
+    --secondary-color: #47a3ff;
+    --accent-color: #f9a825;
+    --text-color: #333;
+    --white-text: #fff;
+    --container-bg: #fff;
     --main-font: 'Comic Sans MS', 'Comic Sans', cursive;
-    --font-size-small: 12px;
     --font-size-normal: 14px;
-    --font-size-large: 16px;
-    --font-size-xlarge: 24px;
-    
-    /* SIZES */
+    --font-size-small: 12px;
     --container-width: 960px;
-    --sidebar-width: 250px;
     --banner-height: 90px;
-    --border-radius: 0px;              /* Set to 0 for sharp corners */
-    
-    /* SPACING */
     --padding-small: 5px;
-    --padding-normal: 10px;
     --padding-large: 20px;
-    --margin-small: 5px;
-    --margin-normal: 10px;
-    --margin-large: 20px;
+    --margin-small: 10px;
 }
 
-/* ============================================
-   BASIC RESET & GLOBAL STYLES
-   ============================================ */
-body, div, span, h1, h2, h3, h4, h5, h6, p, a, img, ul, li, form, label, input {
+/* Flex layout for sticky footer */
+html, body {
+    height: 100%;
     margin: 0;
-    padding: 0;
-    border: 0;
-    font-family: var(--main-font);
-    color: var(--text-color);
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--main-font);
+    color: var(--text-color);
     background: #fff;
 }
 
-/* ============================================
-   BACKGROUND & OVERLAY
-   ============================================ */
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--dark-overlay);
-    z-index: -1;
-}
-
-/* ============================================
-   MAIN CONTAINER
-   ============================================ */
 #Container {
+    flex: 1;
     width: var(--container-width);
     margin: 0 auto;
-    background-color: var(--container-bg);
-    overflow: hidden;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
 }
 
-/* ============================================
-   HEADER SECTION
-   ============================================ */
+/* HEADER */
 #Header {
     background-color: var(--container-bg);
-    color: var(--text-color);
     padding-bottom: var(--padding-small);
 }
 
@@ -100,32 +61,12 @@ body {
     text-align: center;
 }
 
-#Options {
-    position: absolute;
-    top: var(--padding-small);
-    right: var(--padding-small);
-    font-size: var(--font-size-small);
-    z-index: 10;
-}
-
-#Options a {
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-#Options a:hover {
-    text-decoration: underline;
-}
-
 #MainBanner {
     width: 100%;
     height: var(--banner-height);
     object-fit: cover;
 }
 
-/* ============================================
-   NAVIGATION BAR
-   ============================================ */
 #Navigation {
     background-color: var(--secondary-color);
     padding: var(--padding-small) 0;
@@ -148,94 +89,11 @@ body {
     margin: 0 var(--margin-small);
 }
 
-/* ============================================
-   MAIN CONTENT AREA
-   ============================================ */
-#Body {
-    padding: var(--padding-large);
-    display: flex;
-}
-
-#MainContent {
-    flex: 1;
-    padding-right: var(--padding-large);
-}
-
-/* ============================================
-   LOGIN SECTION
-   ============================================ */
-#SplashContainer {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-#SignInPane {
-    width: var(--sidebar-width);
-    margin-right: var(--padding-large);
-}
-
-#LoginView {
-    background-color: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: var(--padding-normal);
-}
-
-#LoginView h5 {
-    margin-bottom: var(--margin-normal);
-    color: var(--white-text);
-}
-
-.AspNet-Login-UserPanel, .AspNet-Login-PasswordPanel {
-    margin-bottom: var(--margin-normal);
-}
-
-.Label {
-    display: block;
-    margin-bottom: 3px;
-    font-weight: bold;
-}
-
-.Text {
-    width: 100%;
-    padding: 3px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--white-text);
-}
-
-.Button {
-    display: inline-block;
-    background-color: var(--primary-color);
-    color: var(--white-text);
-    padding: var(--padding-small) var(--padding-normal);
-    text-decoration: none;
-    margin-top: var(--margin-small);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.Button:hover {
-    background-color: var(--secondary-color);
-}
-
-.AspNet-Login-PasswordRecoveryPanel {
-    margin-top: var(--margin-small);
-}
-
-.AspNet-Login-PasswordRecoveryPanel a {
-    color: var(--white-text);
-    font-size: var(--font-size-small);
-}
-
-#Figure {
-    margin-top: var(--padding-large);
-    text-align: center;
-}
-
-/* ============================================
-   MAIN CONTENT TEXT
-   ============================================ */
+/* MAIN CONTENT */
 #RobloxAtAGlance {
     flex: 1;
+    padding: var(--padding-large);
+    text-align: center;
 }
 
 #RobloxAtAGlance h2 {
@@ -248,132 +106,22 @@ body {
     margin-bottom: var(--padding-large);
 }
 
-#ThingsToDo {
-    list-style-type: none;
-    margin-bottom: var(--padding-large);
+#PlaceholderImage img {
+    display: block;
+    margin: 0 auto;
 }
 
-#ThingsToDo li {
-    margin-bottom: var(--padding-large);
-}
-
-#ThingsToDo h3 {
-    color: var(--primary-color);
-    margin-bottom: var(--margin-small);
-}
-
-#Showcase {
-    margin-bottom: var(--padding-large);
-}
-
-/* ============================================
-   DOWNLOAD SECTION
-   ============================================ */
-#Install {
-    display: flex;
-    align-items: center;
-    margin-bottom: var(--padding-large);
-}
-
-#CompatibilityNote {
-    margin-right: var(--padding-large);
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: var(--padding-normal);
-    text-align: center;
-    font-weight: bold;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-#ForParents {
-    text-align: center;
-}
-
-/* ============================================
-   COOL PLACES SECTION
-   ============================================ */
-#UserPlacesPane {
+/* FOOTER aligned with banner width */
+#FooterWrapper {
     width: 100%;
-    margin-top: var(--padding-large);
-}
-
-#UserPlaces_Header {
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: var(--padding-normal);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-bottom: none;
-}
-
-#UserPlaces_Header h3 {
-    color: var(--white-text);
-    margin-bottom: var(--margin-small);
-}
-
-#UserPlaces_Content {
-    background-color: rgba(255, 255, 255, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: var(--padding-normal);
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: center;
+    background-color: transparent; /* optional */
 }
 
-.UserPlace {
-    width: 180px;
-    margin-bottom: var(--margin-normal);
-    text-align: center;
-}
-
-.UserPlace img {
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    width: 170px;
-    height: 100px;
-}
-
-/* ============================================
-   SIDEBAR WITH SCROLLABLE LIST
-   ============================================ */
-#Sidebar {
-    width: var(--sidebar-width);
-    background-color: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 15px;
-    height: 400px;
-    overflow-y: auto;
-}
-
-#Sidebar h3 {
-    color: var(--white-text);
-    margin-top: 0;
-    text-align: center;
-    margin-bottom: var(--margin-normal);
-}
-
-#Sidebar ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-#Sidebar li {
-    margin-bottom: 8px;
-    padding: var(--padding-small);
-    background-color: rgba(0, 84, 166, 0.5);
-}
-
-#Sidebar a {
-    color: var(--white-text);
-    text-decoration: none;
-    font-size: var(--font-size-normal);
-}
-
-#Sidebar a:hover {
-    text-decoration: underline;
-}
-
-/* ============================================
-   FOOTER SECTION
-   ============================================ */
 #Footer {
-    background-color: rgba(0, 0, 0, 0.5);
+    width: var(--container-width); /* matches banner/container width */
+    background-color: rgba(0,0,0,0.5);
     padding: var(--padding-large);
     text-align: center;
     font-size: var(--font-size-small);
@@ -389,202 +137,59 @@ body {
     text-decoration: underline;
 }
 
-.Legalese {
-    line-height: 1.5;
-}
-
 hr {
     border: none;
     border-top: 1px solid rgba(255, 255, 255, 0.3);
     margin-bottom: var(--padding-large);
 }
 
-/* ============================================
-   PLACEHOLDER IMAGE SECTION
-   ============================================ */
-#PlaceholderImage {
-    text-align: center;
-    margin: var(--padding-large) 0;
+.Legalese {
+    line-height: 1.5;
 }
 </style>
 </head>
 <body>
 
-<form name="aspnetForm" method="post" action="default.aspx" id="aspnetForm">
 <div id="Container">
-    <!-- ============================================
-         HEADER SECTION
-         ============================================ -->
+    <!-- HEADER -->
     <div id="Header">
         <div id="Banner">
-            <div id="Options">
-                <div id="Settings">
-                    <span id="ctl00_lSettings"></span>
-                </div>
-            </div>
-            <!-- Banner Image - Change src to your image -->
-            <img id="MainBanner" src="img/2007NoLogoBanner.png" alt="ROBLOX Banner" />
+            <div id="Options"></div>
+            <img id="MainBanner" src="img/2007NoLogoBanner.png" alt="ROBLOX Banner">
         </div>
         <div id="Navigation">
-            <span><a id="ctl00_hlMyRoblox" class="MenuItem" href="User.aspx">Packs</a></span>
+            <span><a href="subpages/infoPage/index.html">Info</a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_hlGames" class="MenuItem" href="MP/Default.aspx">Credits</a></span> 
+            <span><a href="subpages/packsPage/index.html">Packs</a></span>
+            <span class="Separator">&nbsp;|&nbsp;</span>
+            <span><a href="subpages/creditsPage/index.html">Credits</a></span>
         </div>
     </div>
-    
-    <!-- ============================================
-         PLACEHOLDER IMAGE - Change src to your image
-         ============================================ -->
+
+    <!-- PLACEHOLDER IMAGE -->
     <div id="PlaceholderImage">
-        <img src="https://picsum.photos/seed/placeholder/500/200.jpg" alt="Placeholder" />
+        <img src="https://picsum.photos/seed/placeholder/500/200.jpg" alt="Placeholder">
     </div>
-    
-    <!-- ============================================
-         MAIN CONTENT AREA
-         ============================================ -->
-    <div id="Body">
-        <div id="MainContent">
-            <div id="SplashContainer">
-                    <div id="Figure">
-                        <!-- Change src to your figure image -->
-                        <img src="https://picsum.photos/seed/robloxfigure/115/130.jpg" alt="ROBLOX Figure" />
-                    </div>
-                </div>
-                
-                <!-- Main Content Text -->
-                <div id="RobloxAtAGlance">
-                    <h2>ROBLOX Virtual Playworld</h2>
-                    <h3>ROBLOX is Free!</h3>
-                    <ul id="ThingsToDo">
-                        <li id="Point1">
-                            <h3>Build your personal Place</h3>
-                            <div>Create buildings, vehicles, scenery, and traps with thousands of virtual bricks.</div>
-                        </li>
-                        <li id="Point2">
-                            <h3>Meet new friends online</h3>
-                            <div>Visit your friend's place, chat in 3D, and build together.</div>
-                        </li>
-                        <li id="Point3">
-                            <h3>Battle in the Brick Arenas</h3>
-                            <div>Play with the slingshot, rocket, or other brick battle tools. Be careful not to get "bloxxed".</div>
-                        </li>
-                    </ul>
-                    <div id="Showcase">
-                        <!-- Change src to your video/image -->
-                        <img src="https://picsum.photos/seed/robloxvideo/400/326.jpg" alt="ROBLOX Video" />
-                    </div>
-                    <div id="Install">
-                        <div id="CompatibilityNote">
-                            Works with your<br/>Windows PC!
-                        </div>
-                        <div id="DownloadAndPlay">
-                            <!-- Change src to your download button -->
-                            <a id="DownloadAndPlay" href="Login/New.aspx">
-                                <img src="https://picsum.photos/seed/downloadandplay/200/50.jpg" alt="FREE - Download and Play!" />
-                            </a>
-                        </div>
-                    </div>
-                    <div id="ForParents">
-                        <!-- Change src to your kid safe image -->
-                        <a id="KidSafe" title="ROBLOX is kid-safe!" href="Parents.aspx">
-                            <img title="ROBLOX is kid-safe!" src="https://picsum.photos/seed/kidsafe/150/150.jpg" alt="Kid Safe" />
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Cool Places Section -->
-            <div id="UserPlacesPane">
-                <div id="UserPlaces_Header">
-                    <h3>Cool Places</h3>
-                    <p>Check out some of our favorite ROBLOX places!</p>
-                </div>
-                <div id="UserPlaces_Content">
-                    <!-- Add or modify place items here -->
-                    <div class="UserPlace">
-                        <a href="User.aspx?id=169">
-                            <img src="https://picsum.photos/seed/pirateship/120/70.jpg" alt="Pirate Ship" />
-                        </a>
-                        <p>Pirate Ship</p>
-                    </div>
-                    <div class="UserPlace">
-                        <a href="User.aspx?id=1151">
-                            <img src="https://picsum.photos/seed/stairway/120/70.jpg" alt="Stairway to Heaven" />
-                        </a>
-                        <p>Stairway to Heaven</p>
-                    </div>
-                    <div class="UserPlace">
-                        <a href="User.aspx?id=7300">
-                            <img src="https://picsum.photos/seed/grenades/120/70.jpg" alt="Grenades and Oranges" />
-                        </a>
-                        <p>Grenades and Oranges</p>
-                    </div>
-                    <div class="UserPlace">
-                        <a href="User.aspx?id=8378">
-                            <img src="https://picsum.photos/seed/robloxopolis/120/70.jpg" alt="Robloxopolis" />
-                        </a>
-                        <p>Robloxopolis</p>
-                    </div>
-                    <div class="UserPlace">
-                        <a href="User.aspx?id=12330">
-                            <img src="https://picsum.photos/seed/fantasykingdom/120/70.jpg" alt="FANTASY KINGDOM" />
-                        </a>
-                        <p>FANTASY KINGDOM</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ============================================
-             SIDEBAR - Add or modify links here
-             ============================================ -->
-        <div id="Sidebar">
-            <h3>Popular Games</h3>
-            <ul>
-                <li><a href="#">Crossroads</a></li>
-                <li><a href="#">The Streets</a></li>
-                <li><a href="#">Glass Houses</a></li>
-                <li><a href="#">Rocket Arena</a></li>
-                <li><a href="#">Chaos Canyon</a></li>
-                <li><a href="#">Dodgeball</a></li>
-                <li><a href="#">Paintball CTF</a></li>
-                <li><a href="#">Base Wars</a></li>
-                <li><a href="#">Build to Survive</a></li>
-                <li><a href="#">Sword Fight on the Heights</a></li>
-                <li><a href="#">Ultimate Build</a></li>
-                <li><a href="#">Zombie Tower Defense</a></li>
-                <li><a href="#">Tycoon Games</a></li>
-                <li><a href="#">Obstacle Courses</a></li>
-                <li><a href="#">Battle Royale</a></li>
-                <li><a href="#">Roleplaying Games</a></li>
-                <li><a href="#">Racing Games</a></li>
-                <li><a href="#">Adventure Games</a></li>
-                <li><a href="#">Simulator Games</a></li>
-                <li><a href="#">Fighting Games</a></li>
-            </ul>
-        </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="RobloxAtAGlance">
+        <h2>Welcome!</h2>
+        <h2>Roblox Classic Asset Packs, aka (Roblox's CAP). A place where Roblox meshes and hats are stored.</h2>
+        <h3>Mostly all of these packs are made by OGMelodii or Jakyro.</h3>
+        <h2>Guide!</h2>
+        <h2>If you look up, you can see the "Header" section. Use the Packs button to see the packs, and the Credits button for credits.</h2>
     </div>
-    
-    <!-- ============================================
-         FOOTER SECTION
-         ============================================ -->
+</div>
+
+<!-- FOOTER -->
+<div id="FooterWrapper">
     <div id="Footer">
-        <hr/>
+        <hr>
         <p class="Legalese">
-            ROBLOX, "Online Building Toy", characters, logos, names, and all related indicia
-            are trademarks of
-            <a href="info/About.aspx">ROBLOX Corporation</a>,
-            ©2007. Patents pending.<br/>
-            Use of this site signifies your acceptance of the
-            <a href="info/TermsOfService.aspx">Terms and Conditions</a>.<br/>
-            <a href="info/Privacy.aspx">Privacy Policy</a>
-            &nbsp;|&nbsp; <a href="mailto:info@roblox.com">Contact Us</a> &nbsp;|&nbsp;
-            <a href="info/About.aspx">About Us</a>
-            &nbsp;|&nbsp;
-            <a href="info/Jobs.aspx">Jobs</a>
+            "Roblox Classic Asset Packs is protected under the GPL-3.0 License, Any websites which look the same, function the same or are a straight copy are not allowed."
         </p>
     </div>
 </div>
-</form>
+
 </body>
 </html>
