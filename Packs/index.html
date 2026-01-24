@@ -10,21 +10,18 @@
 <meta name="keywords" content="Roblox, Retro, Roblox Pack, Sandbox"/>
 <meta name="robots" content="all"/>
 </head>
+
 <body>
 
 <form name="aspnetForm" method="post" action="default.aspx" id="aspnetForm">
 <div id="Container">
+
     <!-- HEADER SECTION -->
     <div id="Header">
         <div id="Banner">
-            <div id="Options">
-                <div id="Settings">
-                    <span id="ctl00_lSettings"></span>
-                </div>
-            </div>
-            <!-- Banner Image -->
             <img id="MainBanner" src="../img/2007NoLogoBanner.png" alt="ROBLOX Banner" />
         </div>
+
         <div id="Navigation">
             <span><a id="ctl00_hlInfo" class="MenuItem" href="/">Info<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/dist/png/information.png"></a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
@@ -37,293 +34,172 @@
             <span><a id="ctl00_News" class="MenuItem" href="/News/">News<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/newspaper.png"></a></span>
         </div>
     </div>
-    
-    <!-- MAIN CONTENT AREA -->
+
+    <!-- MAIN CONTENT -->
     <div id="Body">
         <div id="MainContent">
-            <!-- Loading message -->
+
             <div id="LoadingMessage">Loading packs...</div>
-            
-            <!-- Error message (hidden by default) -->
-            <div id="ErrorMessage" style="display: none; text-align: center; color: red; padding: 20px;">
-                <p>Error loading packs. Please try again later.</p>
-                <button onclick="loadPacks()" style="margin-top: 10px; padding: 5px 15px; background: var(--primary-color); color: white; border: none; cursor: pointer;">Retry</button>
+
+            <div id="ErrorMessage" style="display:none; text-align:center; color:red; padding:20px;">
+                Error loading packs.
+                <br><br>
+                <button onclick="loadPacks()">Retry</button>
             </div>
-            
-            <!-- Last updated info -->
-            <div id="LastUpdated" style="text-align: center; font-size: 12px; color: #666; margin: 10px 0; display: none;">
+
+            <div id="LastUpdated" style="display:none; text-align:center; font-size:12px;">
                 Last updated: <span id="UpdateTime"></span>
             </div>
-            
-            <!-- Pagination controls -->
-            <div id="PaginationControls" style="text-align: center; margin-bottom: 15px; display: none;">
-                <button id="prevPage" style="margin-right: 10px; padding: 5px 15px; background-color: var(--primary-color); color: white; border: none; cursor: pointer;">Previous</button>
-                <span id="pageInfo" style="margin: 0 15px; font-family: 'Comic Sans MS', 'Comic Sans', cursive;">Page 1 of 1</span>
-                <button id="nextPage" style="margin-left: 10px; padding: 5px 15px; background-color: var(--primary-color); color: white; border: none; cursor: pointer;">Next</button>
+
+            <div id="PaginationControls" style="display:none; text-align:center; margin-bottom:15px;">
+                <button id="prevPage">Previous</button>
+                <span id="pageInfo"></span>
+                <button id="nextPage">Next</button>
             </div>
-            
-            <!-- Pack Grid will be populated by JavaScript -->
-            <div class="PackGrid" id="PackGrid" style="display: none;">
-                <!-- Pack items will be dynamically inserted here -->
-            </div>
+
+            <div class="PackGrid" id="PackGrid" style="display:none;"></div>
+
         </div>
     </div>
-    
-    <!-- FOOTER SECTION -->
+
+    <!-- FOOTER -->
     <div id="Footer">
         <hr/>
-        <p class="Legalese">
-            ©2026 OGMelodii & Jakyro. All rights reserved.
-        </p>
+        <p class="Legalese">©2026 OGMelodii & Jakyro. All rights reserved.</p>
     </div>
+
 </div>
 </form>
 
 <script>
 // ============================================
-// CONFIGURATION 
+// CONFIGURATION
 // ============================================
+
 const GIST_URL = 'https://gist.githubusercontent.com/OGMelodii/5c2f87c5e5020ecd294daba796370a91/raw';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
-const RETRY_ATTEMPTS = 3;
-const RETRY_DELAY = 1000; // 1 second
-const PACKS_PER_PAGE = 9; // 3x3 grid
+const CACHE_DURATION = 5 * 60 * 1000;
+const PACKS_PER_PAGE = 9;
 
 // ============================================
-// MAIN FUNCTIONALITY
+// LOAD
 // ============================================
-document.addEventListener('DOMContentLoaded', function() {
+
+document.addEventListener('DOMContentLoaded', function () {
     loadPacks();
 });
 
-function loadPacks(retryCount = 0) {
-    const loadingMessage = document.getElementById('LoadingMessage');
-    const errorMessage = document.getElementById('ErrorMessage');
-    const lastUpdated = document.getElementById('LastUpdated');
-    
-    // Show loading, hide error
-    loadingMessage.style.display = 'block';
-    errorMessage.style.display = 'none';
-    lastUpdated.style.display = 'none';
-    
-    // Check cache first
-    const cachedData = getCachedData();
-    if (cachedData && !isCacheExpired(cachedData.timestamp)) {
-        console.log('Loading from cache');
-        displayPacks(cachedData.packs, cachedData.timestamp);
+function loadPacks() {
+    const loading = document.getElementById('LoadingMessage');
+    const error = document.getElementById('ErrorMessage');
+    const cached = getCachedData();
+
+    loading.style.display = 'block';
+    error.style.display = 'none';
+
+    if (cached && !isCacheExpired(cached.timestamp)) {
+        displayPacks(cached.packs, cached.timestamp);
         return;
     }
-    
-    // Add cache-busting parameter
-    const timestamp = new Date().getTime();
-    const url = `${GIST_URL}?t=${timestamp}`;
-    
-    console.log('Fetching from Gist:', url);
-    
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            return response.json();
+
+    fetch(GIST_URL + '?t=' + Date.now())
+        .then(res => {
+            if (!res.ok) throw new Error('Fetch failed');
+            return res.json();
         })
         .then(data => {
-            // Validate data structure
-            if (!data || !data.packs || !Array.isArray(data.packs)) {
-                throw new Error('Invalid data structure: expected data.packs array');
-            }
-            
-            // Cache the data
             cacheData(data.packs);
-            
-            // Display the packs
             displayPacks(data.packs, new Date().toISOString());
-            
-            console.log('Successfully loaded', data.packs.length, 'packs');
         })
-        .catch(error => {
-            console.error('Error loading packs:', error);
-            
-            // Retry logic
-            if (retryCount < RETRY_ATTEMPTS) {
-                console.log(`Retrying... Attempt ${retryCount + 1}/${RETRY_ATTEMPTS}`);
-                setTimeout(() => loadPacks(retryCount + 1), RETRY_DELAY);
-                return;
-            }
-            
-            // Show error message
-            loadingMessage.style.display = 'none';
-            errorMessage.style.display = 'block';
-            
-            // Try to use cached data if available
-            const fallbackData = getCachedData();
-            if (fallbackData) {
-                console.log('Using cached data as fallback');
-                displayPacks(fallbackData.packs, fallbackData.timestamp, true);
-            }
+        .catch(() => {
+            loading.style.display = 'none';
+            error.style.display = 'block';
         });
 }
 
-function displayPacks(packs, timestamp, isFallback = false) {
-    const packGrid = document.getElementById('PackGrid');
-    const loadingMessage = document.getElementById('LoadingMessage');
-    const lastUpdated = document.getElementById('LastUpdated');
-    const updateTime = document.getElementById('UpdateTime');
-    const paginationControls = document.getElementById('PaginationControls');
-    const pageInfo = document.getElementById('pageInfo');
-    
-    // Clear loading message
-    loadingMessage.style.display = 'none';
-    
-    // Show pack grid
-    packGrid.style.display = 'grid';
-    
-    // Clear existing content
-    packGrid.innerHTML = '';
-    
-    // Calculate pagination
-    const totalPages = Math.ceil(packs.length / PACKS_PER_PAGE);
-    let currentPage = 1;
-    
-    // Show pagination controls if more than one page
-    if (totalPages > 1) {
-        paginationControls.style.display = 'block';
-        updatePaginationControls(currentPage, totalPages);
-    }
-    
-    // Show last updated time
-    if (timestamp) {
-        const date = new Date(timestamp);
-        updateTime.textContent = date.toLocaleString();
-        lastUpdated.style.display = 'block';
-        
-        if (isFallback) {
-            updateTime.innerHTML += ' (cached)';
-            updateTime.style.color = '#ff9900';
-        }
-    }
-    
-    // Get current page packs
-    const startIndex = (currentPage - 1) * PACKS_PER_PAGE;
-    const endIndex = Math.min(startIndex + PACKS_PER_PAGE, packs.length);
-    const currentPagePacks = packs.slice(startIndex, endIndex);
-    
-    // Create pack items for current page
-    currentPagePacks.forEach((pack, index) => {
-        const packItem = createPackItem(pack);
-        packGrid.appendChild(packItem);
+// ============================================
+// DISPLAY PACKS
+// ============================================
+
+function displayPacks(packs, timestamp) {
+    const grid = document.getElementById('PackGrid');
+    const loading = document.getElementById('LoadingMessage');
+    const updated = document.getElementById('LastUpdated');
+    const time = document.getElementById('UpdateTime');
+
+    loading.style.display = 'none';
+    grid.style.display = 'grid';
+    grid.innerHTML = '';
+
+    time.textContent = new Date(timestamp).toLocaleString();
+    updated.style.display = 'block';
+
+    packs.slice(0, PACKS_PER_PAGE).forEach(pack => {
+        grid.appendChild(createPackItem(pack));
     });
-    
-    // Show fallback warning if applicable
-    if (isFallback) {
-        const warning = document.createElement('div');
-        warning.style.cssText = 'text-align: center; color: #ff9900; margin: 10px 0; font-size: 14px;';
-        warning.textContent = 'Showing cached data - unable to fetch latest packs';
-        packGrid.parentNode.insertBefore(warning, packGrid);
-    }
 }
 
-// Update pagination controls
-function updatePaginationControls(currentPage, totalPages) {
-    const prevButton = document.getElementById('prevPage');
-    const nextButton = document.getElementById('nextPage');
-    const pageInfo = document.getElementById('pageInfo');
-    
-    // Update page info
-    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-    
-    // Update prev button
-    prevButton.disabled = (currentPage === 1);
-    prevButton.onclick = function() {
-        if (currentPage > 1) {
-            displayPage(currentPage - 1);
-        }
-    };
-    
-    // Update next button
-    nextButton.disabled = (currentPage === totalPages);
-    nextButton.onclick = function() {
-        if (currentPage < totalPages) {
-            displayPage(currentPage + 1);
-        }
-    };
-}
-
-// Display specific page
-function displayPage(pageNum) {
-    const loadingMessage = document.getElementById('LoadingMessage');
-    const packGrid = document.getElementById('PackGrid');
-    
-    // Show loading message
-    loadingMessage.style.display = 'block';
-    packGrid.style.display = 'none';
-    
-    // Get cached data
-    const cachedData = getCachedData();
-    if (!cachedData) {
-        loadPacks();
-        return;
-    }
-    
-    // Calculate page range
-    const startIndex = (pageNum - 1) * PACKS_PER_PAGE;
-    const endIndex = Math.min(startIndex + PACKS_PER_PAGE, cachedData.packs.length);
-    const currentPagePacks = cachedData.packs.slice(startIndex, endIndex);
-    
-    // Hide loading message and show grid
-    loadingMessage.style.display = 'none';
-    packGrid.style.display = 'grid';
-    
-    // Clear existing content
-    packGrid.innerHTML = '';
-    
-    // Create pack items for current page
-    currentPagePacks.forEach((pack, index) => {
-        const packItem = createPackItem(pack);
-        packGrid.appendChild(packItem);
-    });
-    
-    // Update pagination controls
-    const totalPages = Math.ceil(cachedData.packs.length / PACKS_PER_PAGE);
-    updatePaginationControls(pageNum, totalPages);
-}
+// ============================================
+// CREATE PACK ITEM (SEE PROFILE INCLUDED)
+// ============================================
 
 function createPackItem(pack) {
     const div = document.createElement('div');
     div.className = 'PackItem';
-    
-    // Fix icon path - add ../ to paths that start with img/
-    let iconPath = pack.icon;
-    if (iconPath && iconPath.startsWith('img/')) {
-        iconPath = '../' + iconPath;
-    }
-    
-    // Fix download path - add ../ to paths that start with downloads/
-    let downloadUrl = pack.downloadUrl;
-    if (downloadUrl && downloadUrl.startsWith('downloads/')) {
-        downloadUrl = '../' + downloadUrl;
-    }
-    
+
+    let iconPath = pack.icon || '../img/Placeholder.png';
+    let profileUrl = pack.profileUrl && pack.profileUrl.trim() !== ''
+        ? pack.profileUrl
+        : null;
+
     div.innerHTML = `
-        <img class="PackIcon" src="${iconPath || 'https://picsum.photos/seed/' + pack.id + '/100/100.jpg'}" 
-             alt="${pack.title} Icon" 
-             onerror="this.src='https://picsum.photos/seed/' + '${pack.id}' + '/100/100.jpg'"
+        <img class="PackIcon"
+             src="${iconPath}"
+             alt="${escapeHtml(pack.title)} Icon"
              loading="lazy">
+
         <div class="PackTitle">${escapeHtml(pack.title)}</div>
         <div class="PackAuthor">By: ${escapeHtml(pack.author)}</div>
-        <div class="PackCategory" style="font-size: 12px; color: #div>
-            Category: ${pack.category || 'Other'}
-            ${pack.version ? `<div class="PackVersion" style="font-size: 12px; color: #666; margin-bottom: 10px;">Version: ${pack.version}</div>` : ''}
+
+        <div class="PackCategory" style="font-size:12px; color:#666;">
+            Category: ${escapeHtml(pack.category || 'Other')}
         </div>
-        <a href="${downloadUrl}" class="PackDownload" target="_blank" download>Download</a>
+
+        <div class="PackVersion" style="font-size:12px; color:#666;">
+            Version: ${escapeHtml(pack.version || 'N/A')}
+        </div>
+
+        <div class="PackButtons" style="display:flex; gap:5px; margin-top:10px;">
+
+            <a href="${pack.downloadUrl}"
+               class="PackDownload"
+               target="_blank"
+               download
+               style="flex:1; text-align:center;">
+                <img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/arrow_down.png">
+                Download
+            </a>
+
+            ${profileUrl ? `
+            <a href="${profileUrl}"
+               class="PackProfile"
+               target="_blank"
+               rel="noopener noreferrer"
+               style="flex:1; text-align:center; background:var(--primary-color); color:white; border:none; padding:5px; cursor:pointer; text-decoration:none; font-family:'Comic Sans MS','Comic Sans',cursive;">
+                <img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/user.png">
+                See Profile
+            </a>
+            ` : ``}
+
+        </div>
     `;
-    
+
     return div;
 }
 
 // ============================================
-// UTILITY FUNCTIONS
+// UTILITIES
 // ============================================
+
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
@@ -331,56 +207,21 @@ function escapeHtml(text) {
 }
 
 function cacheData(packs) {
-    try {
-        const cacheData = {
-            packs: packs,
-            timestamp: new Date().toISOString()
-        };
-        localStorage.setItem('packsCache', JSON.stringify(cacheData));
-    } catch (e) {
-        console.warn('Failed to cache data:', e);
-    }
+    localStorage.setItem('packsCache', JSON.stringify({
+        packs: packs,
+        timestamp: new Date().toISOString()
+    }));
 }
 
 function getCachedData() {
-    try {
-        const cached = localStorage.getItem('packsCache');
-        return cached ? JSON.parse(cached) : null;
-    } catch (e) {
-        console.warn('Failed to read cache:', e);
-        return null;
-    }
+    const cached = localStorage.getItem('packsCache');
+    return cached ? JSON.parse(cached) : null;
 }
 
 function isCacheExpired(timestamp) {
-    const cachedTime = new Date(timestamp).getTime();
-    const now = new Date().getTime();
-    return (now - cachedTime) > CACHE_DURATION;
-}
-
-// ============================================
-// AUTO-REFRESH (OPTIONAL)
-// ============================================
-// Refresh packs every 5 minutes
-setInterval(() => {
-    console.log('Auto-refreshing packs...');
-    loadPacks();
-}, 5 * 60 * 1000);
-
-// ============================================
-// SERVICE WORKER FOR OFFLINE SUPPORT (OPTIONAL)
-// ============================================
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register('../sw.js')
-            .then(function(registration) {
-                console.log('ServiceWorker registration successful');
-            })
-            .catch(function(err) {
-                console.log('ServiceWorker registration failed: ', err);
-            });
-    });
+    return Date.now() - new Date(timestamp).getTime() > CACHE_DURATION;
 }
 </script>
+
 </body>
 </html>
