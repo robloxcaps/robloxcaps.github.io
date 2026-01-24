@@ -2,8 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" id="www-roblox-com">
 <head>
 <title>PACKS</title>
-<link rel="icon" href="../img/FaviIcon.ico" type="image/x-icon"> 
-<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="/img/FaviIcon.ico" type="image/x-icon"> 
+<link rel="stylesheet" href="/style.css">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta name="author" content="OGMelodii & Jakyro"/>
 <meta name="description" content="Contains all packs made by OGMelodii & Jakyro."/>
@@ -22,15 +22,15 @@
                     <span id="ctl00_lSettings"></span>
                 </div>
             </div>
-            <!-- Banner Image - Fixed path to go up one directory -->
-            <img id="MainBanner" src="../img/2007NoLogoBanner.png" alt="ROBLOX Banner" />
+            <!-- Banner Image -->
+            <img id="MainBanner" src="/img/2007NoLogoBanner.png" alt="ROBLOX Banner" />
         </div>
         <div id="Navigation">
-            <span><a id="ctl00_hlInfo" class="MenuItem" href="../">Info</a></span>
+            <span><a id="ctl00_hlInfo" class="MenuItem" href="/">Info</a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_Packs" class="MenuItem" href="../Packs/">Packs</a></span>
+            <span><a id="ctl00_Packs" class="MenuItem" href="/Packs/">Packs</a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_Credits" class="MenuItem" href="../Credits/">Credits</a></span>
+            <span><a id="ctl00_Credits" class="MenuItem" href="/Credits/">Credits</a></span>
         </div>
     </div>
     
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadPacks() {
-    fetch('../packs.json')  // Fixed path to go up one directory
+    fetch('/packs.json')  // Use absolute path
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -106,8 +106,8 @@ function createPackItem(pack) {
     const div = document.createElement('div');
     div.className = 'PackItem';
     
-    // Fix icon path if it's a relative path
-    const iconPath = pack.icon.startsWith('http') ? pack.icon : '../' + pack.icon;
+    // Use absolute paths for icons if they're relative
+    const iconPath = pack.icon.startsWith('http') ? pack.icon : '/' + pack.icon;
     
     div.innerHTML = `
         <img class="PackIcon" src="${iconPath || 'https://picsum.photos/seed/' + pack.id + '/100/100.jpg'}" alt="${pack.title} Icon">
