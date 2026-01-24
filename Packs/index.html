@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" id="www-roblox-com">
+<head>
+<title>Oops!</title>
+<link rel="icon" href="img/FaviIcon.ico" type="image/x-icon">   
+<link rel="stylesheet" href="style.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="author" content="OGMelodii & Jakyro"/>
+<meta name="description" content="Contains all packs made by OGMelodii & Jakyro."/>
+<meta name="keywords" content="Roblox, Retro, Roblox Pack, Sandbox"/>
+<meta name="robots" content="all"/>
+</head>
+<body>
+
+<form name="aspnetForm" method="post" action="default.aspx" id="aspnetForm">
+<div id="Container">
+    <!-- HEADER SECTION -->
+    <div id="Header">
+        <div id="Banner">
+            <div id="Options">
+                <div id="Settings">
+                    <span id="ctl00_lSettings"></span>
+                </div>
+            </div>
+            <!-- Banner Image - Change src to your image -->
+            <img id="MainBanner" src="img/2007NoLogoBanner.png" alt="ROBLOX Banner" />
+        </div>
+        <div id="Navigation">
+            <span><a id="ctl00_hlInfo" class="MenuItem" href="/">Info</a></span>
+            <span class="Separator">&nbsp;|&nbsp;</span>
+            <span><a id="ctl00_Packs" class="MenuItem" href="/Packs/">Packs</a></span>
+            <span class="Separator">&nbsp;|&nbsp;</span>
+            <span><a id="ctl00_Credits" class="MenuItem" href="/Credits/">Credits</a></span>
+        </div>
+    </div>
+    
+    <!-- MAIN CONTENT AREA -->
+    <div id="Body">
+        <div id="MainContent">
+            <!-- Loading message -->
+            <div id="LoadingMessage">Loading packs...</div>
+            
+            <!-- Pack Grid will be populated by JavaScript -->
+            <div class="PackGrid" id="PackGrid" style="display: none;">
+                <!-- Pack items will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- FOOTER SECTION -->
+    <div id="Footer">
+        <hr/>
+        <p class="Legalese">
+            ©2023 OGMelodii & Jakyro. All rights reserved.<br/>
+            <a href="/Terms/">Terms of Service</a>
+            &nbsp;|&nbsp; <a href="/Privacy/">Privacy Policy</a>
+            &nbsp;|&nbsp; <a href="/Contact/">Contact Us</a>
+        </p>
+    </div>
+</div>
+</form>
+
+<script>
+// ============================================
+// LOAD PACKS FROM JSON
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    loadPacks();
+});
+
+function loadPacks() {
+    fetch('packs.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(packs => {
+            displayPacks(packs);
+        })
+        .catch(error => {
+            console.error('Error loading packs:', error);
+            document.getElementById('LoadingMessage').textContent = 'Error loading packs. Please try again later.';
+        });
+}
+
+function displayPacks(packs) {
+    const packGrid = document.getElementById('PackGrid');
+    const loadingMessage = document.getElementById('LoadingMessage');
+    
+    // Clear loading message
+    loadingMessage.style.display = 'none';
+    
+    // Show pack grid
+    packGrid.style.display = 'grid';
+    
+    // Clear existing content
+    packGrid.innerHTML = '';
+    
+    // Create pack items
+    packs.forEach(pack => {
+        const packItem = createPackItem(pack);
+        packGrid.appendChild(packItem);
+    });
+}
+
+function createPackItem(pack) {
+    const div = document.createElement('div');
+    div.className = 'PackItem';
+    
+    div.innerHTML = `
+        <img class="PackIcon" src="${pack.icon || 'https://picsum.photos/seed/' + pack.id + '/100/100.jpg'}" alt="${pack.title} Icon">
+        <div class="PackTitle">${pack.title}</div>
+        <div class="PackAuthor">By: ${pack.author}</div>
+        <a href="${pack.downloadUrl}" class="PackDownload" target="_blank">Download</a>
+    `;
+    
+    return div;
+}
+</script>
+</body>
+</html>

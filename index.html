@@ -4,153 +4,15 @@
 <meta charset="UTF-8">
 <title>ROBLOX CLASSIC ASSET PACKS</title>
 <link rel="icon" href="img/FaviIcon.ico" type="image/x-icon">
+<link rel="stylesheet" href="style.css">
 <meta name="author" content="OGMelodii & Jakyro">
 <meta name="description" content="Contains all packs made by OGMelodii & Jakyro.">
 <meta name="keywords" content="Roblox, Retro, Roblox Pack, Sandbox">
 <meta name="robots" content="all">
-
-<style>
-:root {
-    --primary-color: #0054a6;
-    --secondary-color: #47a3ff;
-    --accent-color: #f9a825;
-    --text-color: #333;
-    --white-text: #fff;
-    --container-bg: #fff;
-    --main-font: 'Comic Sans MS', 'Comic Sans', cursive;
-    --font-size-normal: 14px;
-    --font-size-small: 12px;
-    --container-width: 960px;
-    --banner-height: 90px;
-    --padding-small: 5px;
-    --padding-large: 20px;
-    --margin-small: 10px;
-}
-
-/* Flex layout for sticky footer */
-html, body {
-    height: 100%;
-    margin: 0;
-}
-
-body {
-    display: flex;
-    flex-direction: column;
-    font-family: var(--main-font);
-    color: var(--text-color);
-    background: #fff;
-}
-
-#Container {
-    flex: 1;
-    width: var(--container-width);
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-}
-
-/* HEADER */
-#Header {
-    background-color: var(--container-bg);
-    padding-bottom: var(--padding-small);
-}
-
-#Banner {
-    height: var(--banner-height);
-    position: relative;
-    text-align: center;
-}
-
-#MainBanner {
-    width: 100%;
-    height: var(--banner-height);
-    object-fit: cover;
-}
-
-#Navigation {
-    background-color: var(--secondary-color);
-    padding: var(--padding-small) 0;
-    text-align: center;
-}
-
-#Navigation a {
-    color: var(--white-text);
-    text-decoration: none;
-    margin: 0 var(--margin-small);
-    font-size: var(--font-size-normal);
-}
-
-#Navigation a:hover {
-    text-decoration: underline;
-}
-
-.Separator {
-    color: #8bb8e8;
-    margin: 0 var(--margin-small);
-}
-
-/* MAIN CONTENT */
-#RobloxAtAGlance {
-    flex: 1;
-    padding: var(--padding-large);
-    text-align: center;
-}
-
-#RobloxAtAGlance h2 {
-    color: var(--primary-color);
-    margin-bottom: var(--margin-small);
-}
-
-#RobloxAtAGlance h3 {
-    color: var(--accent-color);
-    margin-bottom: var(--padding-large);
-}
-
-#PlaceholderImage img {
-    display: block;
-    margin: 0 auto;
-}
-
-/* FOOTER aligned with banner width */
-#FooterWrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    background-color: transparent; /* optional */
-}
-
-#Footer {
-    width: var(--container-width); /* matches banner/container width */
-    background-color: rgba(0,0,0,0.5);
-    padding: var(--padding-large);
-    text-align: center;
-    font-size: var(--font-size-small);
-    color: var(--white-text);
-}
-
-#Footer a {
-    color: var(--white-text);
-    text-decoration: none;
-}
-
-#Footer a:hover {
-    text-decoration: underline;
-}
-
-hr {
-    border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-    margin-bottom: var(--padding-large);
-}
-
-.Legalese {
-    line-height: 1.5;
-}
-</style>
 </head>
 <body>
 
-<div id="Container">
+<div id="Container" class="main-page">
     <!-- HEADER -->
     <div id="Header">
         <div id="Banner">
