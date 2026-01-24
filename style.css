@@ -48,6 +48,8 @@ body, div, span, h1, h2, h3, h4, h5, h6, p, a, img, ul, li, form, label, input {
 /* Sticky footer setup */
 html {
     height: 100%;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    max-width: 100%;
 }
 
 body {
@@ -55,6 +57,10 @@ body {
     display: flex;
     flex-direction: column;
     background: #fff;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 /* ============================================
@@ -80,6 +86,7 @@ body {
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     flex: 1; /* This makes the container grow to fill available space */
+    box-sizing: border-box;
 }
 
 /* For main page with sticky footer */
@@ -161,6 +168,7 @@ body {
     padding: var(--padding-large);
     width: 100%;
     flex: 1; /* This makes the body grow to fill available space */
+    box-sizing: border-box;
 }
 
 #MainContent {
@@ -351,12 +359,17 @@ body {
     grid-template-columns: repeat(3, 1fr);
     gap: var(--padding-large);
     margin-top: var(--padding-large);
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .PackItem {
     border: 1px solid #ccc;
     padding: var(--padding-normal);
     text-align: center;
+    box-sizing: border-box;
 }
 
 /* Removed hover animations */
@@ -453,6 +466,7 @@ body {
     width: var(--container-width);  /* Match header width */
     margin: 0 auto;  /* Center the footer */
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);  /* Match header shadow */
+    box-sizing: border-box;
 }
 
 #Footer a {
@@ -505,4 +519,57 @@ hr {
     padding: var(--padding-large);
     font-size: var(--font-size-xlarge);
     color: var(--primary-color);
+}
+
+/* ============================================
+   RESPONSIVE FIXES & OVERFLOW PREVENTION
+   ============================================ */
+
+/* Responsive adjustments */
+@media (max-width: 1000px) {
+    #Container, #Footer {
+        width: 95%;
+        max-width: 960px;
+        min-width: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .PackGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    #Container, #Footer {
+        width: 98%;
+        padding: 0 1%;
+    }
+    
+    #Body {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .PackGrid {
+        grid-template-columns: 1fr;
+    }
+    
+    #Container, #Footer {
+        width: 100%;
+        box-shadow: none;
+    }
+    
+    #Body {
+        padding: 10px;
+    }
+    
+    .PackItem {
+        padding: 10px;
+    }
+    
+    .PackIcon {
+        width: 80px;
+        height: 80px;
+    }
 }
