@@ -77,7 +77,7 @@ function loadPacks() {
     const debugDiv = document.getElementById('DebugInfo');
     debugDiv.innerHTML += '<br>Fetching ../packs.json';
     
-    fetch('../packs.json')  // Use relative path like CSS
+    fetch('../packs.json')
         .then(response => {
             debugDiv.innerHTML += '<br>Response received: ' + response.status;
             if (!response.ok) {
@@ -85,9 +85,15 @@ function loadPacks() {
             }
             return response.json();
         })
-        .then(packs => {
-            debugDiv.innerHTML += '<br>Packs loaded: ' + packs.length + ' items';
-            displayPacks(packs);
+        .then(data => {
+            debugDiv.innerHTML += '<br>JSON parsed successfully';
+            // Check if data has packs array
+            if (data && data.packs && Array.isArray(data.packs)) {
+                debugDiv.innerHTML += '<br>Packs loaded: ' + data.packs.length + ' items';
+                displayPacks(data.packs);
+            } else {
+                throw new Error('Invalid JSON structure - expected data.packs array');
+            }
         })
         .catch(error => {
             debugDiv.innerHTML += '<br>Error: ' + error.message;
@@ -129,14 +135,24 @@ function createPackItem(pack) {
     const div = document.createElement('div');
     div.className = 'PackItem';
     
-    // Fix icon path if it's a relative path
-    const iconPath = pack.icon.startsWith('http') ? pack.icon : '../' + pack.icon;
+    // Fix icon path - add ../ to paths that start with img/
+    let iconPath = pack.icon;
+    if (iconPath && iconPath.startsWith('img/')) {
+        iconPath = '../' + iconPath;
+    }
+    
+    // Fix download path - add ../ to paths that start with downloads/
+    let downloadUrl = pack.downloadUrl;
+    if (downloadUrl && downloadUrl.startsWith('downloads/')) {
+        downloadUrl = '../' + downloadUrl;
+    }
     
     div.innerHTML = `
-        <img class="PackIcon" src="${iconPath || 'https://picsum.photos/seed/' + pack.id + '/100/100.jpg'}" alt="${pack.title} Icon">
+        <img class="PackIcon" src="${iconPath || 'https://picsum.photos/seed/' + pack.id + '/100/100.jpg'}" alt="${pack.title} Icon" 
+             onerror="this.src='https://picsum.photos/seed/' + '${pack.id}' + '/100/100.jpg'">
         <div class="PackTitle">${pack.title}</div>
         <div class="PackAuthor">By: ${pack.author}</div>
-        <a href="${pack.downloadUrl}" class="PackDownload" target="_blank">Download</a>
+        <a href="${downloadUrl}" class="PackDownload" target="_blank">Download</a>
     `;
     
     return div;
