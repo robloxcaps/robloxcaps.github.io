@@ -4,42 +4,42 @@
       "id": "classic-roblox",
       "title": "Classic Roblox Pack",
       "author": "OGMelodii",
-      "icon": "img/packs/classic-roblox.png",
+      "icon": "img/Placeholder.png",
       "downloadUrl": "downloads/classic-roblox.zip"
     },
     {
       "id": "retro-builders",
       "title": "Retro Builders Pack",
       "author": "Jakyro",
-      "icon": "img/packs/retro-builders.png",
+      "icon": "img/Placeholder.png",
       "downloadUrl": "downloads/retro-builders.zip"
     },
     {
       "id": "vintage-assets",
       "title": "Vintage Assets Pack",
       "author": "OGMelodii",
-      "icon": "img/packs/vintage-assets.png",
+      "icon": "img/Placeholder.png",
       "downloadUrl": "downloads/vintage-assets.zip"
     },
     {
       "id": "old-school-tools",
       "title": "Old School Tools Pack",
       "author": "Jakyro",
-      "icon": "img/packs/old-school-tools.png",
+      "icon": "img/Placeholder.png",
       "downloadUrl": "downloads/old-school-tools.zip"
     },
     {
       "id": "classic-hats",
       "title": "Classic Hats Pack",
       "author": "OGMelodii",
-      "icon": "img/packs/classic-hats.png",
+      "icon": "img/Placeholder.png",
       "downloadUrl": "downloads/classic-hats.zip"
     },
     {
       "id": "retro-faces",
       "title": "Retro Faces Pack",
       "author": "Jakyro",
-      "icon": "img/packs/retro-faces.png",
+      "icon": "img/Placeholder.png",
       "downloadUrl": "downloads/retro-faces.zip"
     }
   ]

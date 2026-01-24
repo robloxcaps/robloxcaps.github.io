@@ -45,21 +45,15 @@ body, div, span, h1, h2, h3, h4, h5, h6, p, a, img, ul, li, form, label, input {
     color: var(--text-color);
 }
 
-body {
-    background: #fff;
-}
-
-/* Flex layout for sticky footer */
-html, body {
+/* Sticky footer setup */
+html {
     height: 100%;
-    margin: 0;
 }
 
 body {
+    min-height: 100%;
     display: flex;
     flex-direction: column;
-    font-family: var(--main-font);
-    color: var(--text-color);
     background: #fff;
 }
 
@@ -85,15 +79,16 @@ body {
     background-color: var(--container-bg);
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    flex: 1; /* This makes the container grow to fill available space */
 }
 
 /* For main page with sticky footer */
 #Container.main-page {
-    flex: 1;
     width: var(--container-width);
     margin: 0 auto;
     display: flex;
     flex-direction: column;
+    flex: 1;
 }
 
 /* ============================================
@@ -165,6 +160,7 @@ body {
 #Body {
     padding: var(--padding-large);
     width: 100%;
+    flex: 1; /* This makes the body grow to fill available space */
 }
 
 #MainContent {
@@ -361,14 +357,9 @@ body {
     border: 1px solid #ccc;
     padding: var(--padding-normal);
     text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.PackItem:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
+/* Removed hover animations */
 .PackIcon {
     width: 100px;
     height: 100px;
@@ -395,9 +386,9 @@ body {
     color: var(--white-text);
     padding: var(--padding-small) var(--padding-normal);
     text-decoration: none;
-    transition: background-color 0.2s;
 }
 
+/* Removed hover animation */
 .PackDownload:hover {
     background-color: var(--secondary-color);
 }
@@ -459,6 +450,9 @@ body {
     text-align: center;
     font-size: var(--font-size-small);
     color: var(--white-text);
+    width: var(--container-width);  /* Match header width */
+    margin: 0 auto;  /* Center the footer */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);  /* Match header shadow */
 }
 
 #Footer a {
@@ -496,6 +490,7 @@ hr {
     display: flex;
     justify-content: center;
     background-color: transparent;
+    margin-top: auto;  /* This pushes the footer to the bottom */
 }
 
 #FooterWrapper #Footer {

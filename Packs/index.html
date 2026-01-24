@@ -40,9 +40,6 @@
             <!-- Loading message -->
             <div id="LoadingMessage">Loading packs...</div>
             
-            <!-- Debug info -->
-            <div id="DebugInfo" style="background: #f0f0f0; padding: 10px; margin: 10px 0; display: none;"></div>
-            
             <!-- Pack Grid will be populated by JavaScript -->
             <div class="PackGrid" id="PackGrid" style="display: none;">
                 <!-- Pack items will be dynamically inserted here -->
@@ -65,38 +62,26 @@
 // LOAD PACKS FROM JSON
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Show debug info
-    const debugDiv = document.getElementById('DebugInfo');
-    debugDiv.style.display = 'block';
-    debugDiv.innerHTML = 'Attempting to load packs...';
-    
     loadPacks();
 });
 
 function loadPacks() {
-    const debugDiv = document.getElementById('DebugInfo');
-    debugDiv.innerHTML += '<br>Fetching ../packs.json';
-    
     fetch('../packs.json')
         .then(response => {
-            debugDiv.innerHTML += '<br>Response received: ' + response.status;
             if (!response.ok) {
                 throw new Error('Network response was not ok: ' + response.status);
             }
             return response.json();
         })
         .then(data => {
-            debugDiv.innerHTML += '<br>JSON parsed successfully';
             // Check if data has packs array
             if (data && data.packs && Array.isArray(data.packs)) {
-                debugDiv.innerHTML += '<br>Packs loaded: ' + data.packs.length + ' items';
                 displayPacks(data.packs);
             } else {
                 throw new Error('Invalid JSON structure - expected data.packs array');
             }
         })
         .catch(error => {
-            debugDiv.innerHTML += '<br>Error: ' + error.message;
             console.error('Error loading packs:', error);
             document.getElementById('LoadingMessage').textContent = 'Error loading packs: ' + error.message;
         });
@@ -105,9 +90,6 @@ function loadPacks() {
 function displayPacks(packs) {
     const packGrid = document.getElementById('PackGrid');
     const loadingMessage = document.getElementById('LoadingMessage');
-    const debugDiv = document.getElementById('DebugInfo');
-    
-    debugDiv.innerHTML += '<br>Displaying ' + packs.length + ' packs';
     
     // Clear loading message
     loadingMessage.style.display = 'none';
@@ -120,15 +102,9 @@ function displayPacks(packs) {
     
     // Create pack items
     packs.forEach((pack, index) => {
-        debugDiv.innerHTML += '<br>Creating pack ' + index + ': ' + pack.title;
         const packItem = createPackItem(pack);
         packGrid.appendChild(packItem);
     });
-    
-    // Hide debug after 5 seconds
-    setTimeout(() => {
-        debugDiv.style.display = 'none';
-    }, 5000);
 }
 
 function createPackItem(pack) {
