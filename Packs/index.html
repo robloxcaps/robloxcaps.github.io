@@ -2,8 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" id="www-roblox-com">
 <head>
 <title>PACKS</title>
-<link rel="icon" href="/img/FaviIcon.ico" type="image/x-icon"> 
-<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="../img/FaviIcon.ico" type="image/x-icon"> 
+<link rel="stylesheet" href="../style.css">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta name="author" content="OGMelodii & Jakyro"/>
 <meta name="description" content="Contains all packs made by OGMelodii & Jakyro."/>
@@ -23,14 +23,14 @@
                 </div>
             </div>
             <!-- Banner Image -->
-            <img id="MainBanner" src="/img/2007NoLogoBanner.png" alt="ROBLOX Banner" />
+            <img id="MainBanner" src="../img/2007NoLogoBanner.png" alt="ROBLOX Banner" />
         </div>
         <div id="Navigation">
-            <span><a id="ctl00_hlInfo" class="MenuItem" href="/">Info</a></span>
+            <span><a id="ctl00_hlInfo" class="MenuItem" href="../">Info</a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_Packs" class="MenuItem" href="/Packs/">Packs</a></span>
+            <span><a id="ctl00_Packs" class="MenuItem" href="../Packs/">Packs</a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_Credits" class="MenuItem" href="/Credits/">Credits</a></span>
+            <span><a id="ctl00_Credits" class="MenuItem" href="../Credits/">Credits</a></span>
         </div>
     </div>
     
@@ -39,6 +39,9 @@
         <div id="MainContent">
             <!-- Loading message -->
             <div id="LoadingMessage">Loading packs...</div>
+            
+            <!-- Debug info -->
+            <div id="DebugInfo" style="background: #f0f0f0; padding: 10px; margin: 10px 0; display: none;"></div>
             
             <!-- Pack Grid will be populated by JavaScript -->
             <div class="PackGrid" id="PackGrid" style="display: none;">
@@ -62,29 +65,43 @@
 // LOAD PACKS FROM JSON
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
+    // Show debug info
+    const debugDiv = document.getElementById('DebugInfo');
+    debugDiv.style.display = 'block';
+    debugDiv.innerHTML = 'Attempting to load packs...';
+    
     loadPacks();
 });
 
 function loadPacks() {
-    fetch('/packs.json')  // Use absolute path
+    const debugDiv = document.getElementById('DebugInfo');
+    debugDiv.innerHTML += '<br>Fetching ../packs.json';
+    
+    fetch('../packs.json')  // Use relative path like CSS
         .then(response => {
+            debugDiv.innerHTML += '<br>Response received: ' + response.status;
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error('Network response was not ok: ' + response.status);
             }
             return response.json();
         })
         .then(packs => {
+            debugDiv.innerHTML += '<br>Packs loaded: ' + packs.length + ' items';
             displayPacks(packs);
         })
         .catch(error => {
+            debugDiv.innerHTML += '<br>Error: ' + error.message;
             console.error('Error loading packs:', error);
-            document.getElementById('LoadingMessage').textContent = 'Error loading packs. Please try again later.';
+            document.getElementById('LoadingMessage').textContent = 'Error loading packs: ' + error.message;
         });
 }
 
 function displayPacks(packs) {
     const packGrid = document.getElementById('PackGrid');
     const loadingMessage = document.getElementById('LoadingMessage');
+    const debugDiv = document.getElementById('DebugInfo');
+    
+    debugDiv.innerHTML += '<br>Displaying ' + packs.length + ' packs';
     
     // Clear loading message
     loadingMessage.style.display = 'none';
@@ -96,18 +113,24 @@ function displayPacks(packs) {
     packGrid.innerHTML = '';
     
     // Create pack items
-    packs.forEach(pack => {
+    packs.forEach((pack, index) => {
+        debugDiv.innerHTML += '<br>Creating pack ' + index + ': ' + pack.title;
         const packItem = createPackItem(pack);
         packGrid.appendChild(packItem);
     });
+    
+    // Hide debug after 5 seconds
+    setTimeout(() => {
+        debugDiv.style.display = 'none';
+    }, 5000);
 }
 
 function createPackItem(pack) {
     const div = document.createElement('div');
     div.className = 'PackItem';
     
-    // Use absolute paths for icons if they're relative
-    const iconPath = pack.icon.startsWith('http') ? pack.icon : '/' + pack.icon;
+    // Fix icon path if it's a relative path
+    const iconPath = pack.icon.startsWith('http') ? pack.icon : '../' + pack.icon;
     
     div.innerHTML = `
         <img class="PackIcon" src="${iconPath || 'https://picsum.photos/seed/' + pack.id + '/100/100.jpg'}" alt="${pack.title} Icon">
