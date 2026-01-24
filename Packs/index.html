@@ -31,6 +31,8 @@
             <span><a id="ctl00_Packs" class="MenuItem" href="../Packs/">Packs</a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
             <span><a id="ctl00_Credits" class="MenuItem" href="../Credits/">Credits</a></span>
+            <span class="Separator">&nbsp;|&nbsp;</span>
+            <span><a id="ctl00_Credits" class="MenuItem" href="/Submit/">Submit Packs</a></span>
         </div>
     </div>
     
@@ -217,6 +219,8 @@ function createPackItem(pack) {
              loading="lazy">
         <div class="PackTitle">${escapeHtml(pack.title)}</div>
         <div class="PackAuthor">By: ${escapeHtml(pack.author)}</div>
+        <div class="PackCategory" style="font-size: 12px; color: #666; margin-bottom: 10px;">Category: ${pack.category || 'Other'}</div>
+        ${pack.version ? `<div class="PackVersion" style="font-size: 12px; color: #666; margin-bottom: 10px;">Version: ${pack.version}</div>` : ''}
         <a href="${downloadUrl}" class="PackDownload" target="_blank" download>Download</a>
     `;
     
