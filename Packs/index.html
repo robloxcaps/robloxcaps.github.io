@@ -13,7 +13,6 @@
 
 <body>
 
-<form name="aspnetForm" method="post" action="default.aspx" id="aspnetForm">
 <div id="Container">
 
     <!-- HEADER SECTION -->
@@ -43,7 +42,7 @@
             <div id="ErrorMessage" style="display:none; text-align:center; color:red; padding:20px;">
                 Error loading packs.
                 <br><br>
-                <button onclick="loadPacks()">Retry</button>
+                <button onclick="loadPacks()" type="button">Retry</button>
             </div>
 
             <div id="LastUpdated" style="display:none; text-align:center; font-size:12px;">
@@ -51,9 +50,9 @@
             </div>
 
             <div id="PaginationControls" style="display:none; text-align:center; margin-bottom:15px;">
-                <button id="prevPage">Previous</button>
+                <button id="prevPage" type="button"><</button>
                 <span id="pageInfo"></span>
-                <button id="nextPage">Next</button>
+                <button id="nextPage" type="button">></button>
             </div>
 
             <div class="PackGrid" id="PackGrid" style="display:none;"></div>
@@ -68,7 +67,6 @@
     </div>
 
 </div>
-</form>
 
 <script>
 // ============================================
@@ -79,12 +77,18 @@ const GIST_URL = 'https://gist.githubusercontent.com/OGMelodii/5c2f87c5e5020ecd2
 const CACHE_DURATION = 5 * 60 * 1000;
 const PACKS_PER_PAGE = 9;
 
+let currentPage = 1;
+let allPacks = [];
+
 // ============================================
 // LOAD
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function () {
     loadPacks();
+
+    document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
+    document.getElementById('nextPage').addEventListener('click', () => changePage(1));
 });
 
 function loadPacks() {
@@ -96,7 +100,9 @@ function loadPacks() {
     error.style.display = 'none';
 
     if (cached && !isCacheExpired(cached.timestamp)) {
-        displayPacks(cached.packs, cached.timestamp);
+        allPacks = cached.packs;
+        currentPage = 1;
+        displayPacks();
         return;
     }
 
@@ -106,8 +112,10 @@ function loadPacks() {
             return res.json();
         })
         .then(data => {
-            cacheData(data.packs);
-            displayPacks(data.packs, new Date().toISOString());
+            allPacks = data.packs;
+            cacheData(allPacks);
+            currentPage = 1;
+            displayPacks();
         })
         .catch(() => {
             loading.style.display = 'none';
@@ -119,26 +127,45 @@ function loadPacks() {
 // DISPLAY PACKS
 // ============================================
 
-function displayPacks(packs, timestamp) {
+function displayPacks() {
     const grid = document.getElementById('PackGrid');
     const loading = document.getElementById('LoadingMessage');
     const updated = document.getElementById('LastUpdated');
     const time = document.getElementById('UpdateTime');
+    const pagination = document.getElementById('PaginationControls');
+    const pageInfo = document.getElementById('pageInfo');
 
     loading.style.display = 'none';
     grid.style.display = 'grid';
     grid.innerHTML = '';
 
-    time.textContent = new Date(timestamp).toLocaleString();
-    updated.style.display = 'block';
+    const start = (currentPage - 1) * PACKS_PER_PAGE;
+    const end = start + PACKS_PER_PAGE;
+    const pagePacks = allPacks.slice(start, end);
 
-    packs.slice(0, PACKS_PER_PAGE).forEach(pack => {
+    pagePacks.forEach(pack => {
         grid.appendChild(createPackItem(pack));
     });
+
+    time.textContent = new Date().toLocaleString();
+    updated.style.display = 'block';
+
+    // Update pagination
+    pagination.style.display = allPacks.length > PACKS_PER_PAGE ? 'block' : 'none';
+    pageInfo.textContent = `Page ${currentPage} of ${Math.ceil(allPacks.length / PACKS_PER_PAGE)}`;
+
+    document.getElementById('prevPage').disabled = currentPage === 1;
+    document.getElementById('nextPage').disabled = currentPage === Math.ceil(allPacks.length / PACKS_PER_PAGE);
+}
+
+function changePage(delta) {
+    const totalPages = Math.ceil(allPacks.length / PACKS_PER_PAGE);
+    currentPage = Math.min(Math.max(1, currentPage + delta), totalPages);
+    displayPacks();
 }
 
 // ============================================
-// CREATE PACK ITEM (SEE PROFILE INCLUDED)
+// CREATE PACK ITEM
 // ============================================
 
 function createPackItem(pack) {
