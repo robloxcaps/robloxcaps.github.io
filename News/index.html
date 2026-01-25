@@ -6,8 +6,8 @@
 <link rel="icon" href="../img/FaviIcon.ico" type="image/x-icon">
 <link rel="stylesheet" href="../style.css">
 <meta name="author" content="OGMelodii & Jakyro">
-<meta name="description" content="Contains all packs made by OGMelodii & Jakyro.">
-<meta name="keywords" content="Roblox, Retro, Roblox Pack, Sandbox">
+<meta name="description" content="Stay up to date with ROBLOX; CAP.">
+<meta name="keywords" content="Roblox, Retro, Roblox Pack, Sandbox, News">
 <meta name="robots" content="all">
 </head>
 <body>
@@ -19,7 +19,7 @@
             <div id="Options"></div>
             <img id="MainBanner" src="../img/2007NoLogoBanner.png" alt="ROBLOX Banner">
         </div>
-<div id="Navigation">
+        <div id="Navigation">
             <span><a id="ctl00_hlInfo" class="MenuItem" href="/">Info<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/dist/png/information.png"></a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
             <span><a id="ctl00_hlPacks" class="MenuItem" href="/Packs/">Packs<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/package.png"></a></span>
@@ -29,17 +29,55 @@
             <span><a id="ctl00_hlSubmit" class="MenuItem" href="/Submit/">Submit Packs<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/package_add.png"></a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
             <span><a id="ctl00_News" class="MenuItem" href="/News/">News<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/newspaper.png"></a></span>
-</div>
+        </div>
+    </div>
 
     <!-- MAIN CONTENT -->
     <div id="RobloxAtAGlance">
-        <h2>WIP WIP</h2>
-        <h2>WIP WIP</h2>
-        <h2>WIP WIP</h2>
-        <h2>WIP WIP</h2>
-        <h2>WIP WIP</h2>
-        <h2>WIP WIP</h2>
-        <h2>WIP WIP</h2>
+        <div class="NewsContainer">
+            <div class="NewsHeader">
+                <h2>RCAP News & Updates</h2>
+                <p>Stay up to date with the latest news and updates from the Roblox Classic Asset Packs team.</p>
+            </div>
+            
+            <!-- Filter Buttons -->
+            <div class="FilterButtons">
+                <button class="FilterButton active" data-filter="all">All</button>
+                <button class="FilterButton" data-filter="important">Important</button>
+                <button class="FilterButton" data-filter="feature">Features</button>
+                <button class="FilterButton" data-filter="fix">Fixes</button>
+                <button class="FilterButton" data-filter="other">Other</button>
+            </div>
+            
+            <!-- Loading message -->
+            <div id="LoadingMessage">
+                Loading news...
+            </div>
+            
+            <!-- Error message (hidden by default) -->
+            <div id="ErrorMessage" style="display: none;">
+                <p>Error loading news. Please try again later.</p>
+                <button class="RetryButton" onclick="loadNews()">Retry</button>
+            </div>
+            
+            <!-- News Grid -->
+            <div class="NewsGrid" id="NewsGrid" style="display: none;">
+                <!-- News items will be dynamically inserted here -->
+            </div>
+            
+            <!-- View All Updates Button -->
+            <button class="ViewAllButton" id="ViewAllButton" style="display: none;" onclick="toggleUpdateHistory()">
+                View Update History
+            </button>
+            
+            <!-- Update History Section (Hidden by default) -->
+            <div class="UpdateHistory" id="UpdateHistory" style="display: none;">
+                <h3>Complete Update History</h3>
+                <div id="UpdateHistoryList">
+                    <!-- Update history items will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -53,5 +91,304 @@
     </div>
 </div>
 
+<script>
+// ============================================
+// CONFIGURATION 
+// ============================================
+const NEWS_GIST_URL = 'https://gist.githubusercontent.com/OGMelodii/4d2efc3b0f53b427267dafa3da252798/raw'; // Replace with your actual gist URL
+const CACHE_DURATION = 1 * 60 * 1000; // 5 minutes cache
+const RETRY_ATTEMPTS = 3;
+const RETRY_DELAY = 1000; // 1 second
+
+// ============================================
+// MAIN FUNCTIONALITY
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up filter buttons
+    setupFilterButtons();
+    
+    // Load news
+    loadNews();
+});
+
+function setupFilterButtons() {
+    const filterButtons = document.querySelectorAll('.FilterButton');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Filter news items
+            const filter = this.getAttribute('data-filter');
+            filterNewsItems(filter);
+        });
+    });
+}
+
+function filterNewsItems(filter) {
+    const newsItems = document.querySelectorAll('.NewsItem');
+    
+    newsItems.forEach(item => {
+        if (filter === 'all') {
+            item.style.display = 'block';
+        } else {
+            const hasTag = item.querySelector(`.${filter}Badge`);
+            item.style.display = hasTag ? 'block' : 'none';
+        }
+    });
+}
+
+function loadNews(retryCount = 0) {
+    const loadingMessage = document.getElementById('LoadingMessage');
+    const errorMessage = document.getElementById('ErrorMessage');
+    const newsGrid = document.getElementById('NewsGrid');
+    
+    // Show loading, hide error and news grid
+    loadingMessage.style.display = 'block';
+    errorMessage.style.display = 'none';
+    newsGrid.style.display = 'none';
+    
+    // Check cache first
+    const cachedData = getCachedNewsData();
+    if (cachedData && !isCacheExpired(cachedData.timestamp)) {
+        console.log('Loading news from cache');
+        displayNews(cachedData.news);
+        return;
+    }
+    
+    // Add cache-busting parameter
+    const timestamp = new Date().getTime();
+    const url = `${NEWS_GIST_URL}?t=${timestamp}`;
+    
+    console.log('Fetching news from Gist:', url);
+    
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Validate data structure
+            if (!data || !data.news || !Array.isArray(data.news)) {
+                throw new Error('Invalid data structure: expected data.news array');
+            }
+            
+            // Cache the data
+            cacheNewsData(data.news);
+            
+            // Display the news
+            displayNews(data.news);
+            
+            console.log('Successfully loaded', data.news.length, 'news items');
+        })
+        .catch(error => {
+            console.error('Error loading news:', error);
+            
+            // Retry logic
+            if (retryCount < RETRY_ATTEMPTS) {
+                console.log(`Retrying... Attempt ${retryCount + 1}/${RETRY_ATTEMPTS}`);
+                setTimeout(() => loadNews(retryCount + 1), RETRY_DELAY);
+                return;
+            }
+            
+            // Show error message
+            loadingMessage.style.display = 'none';
+            errorMessage.style.display = 'block';
+            
+            // Try to use cached data if available
+            const fallbackData = getCachedNewsData();
+            if (fallbackData) {
+                console.log('Using cached news data as fallback');
+                displayNews(fallbackData.news, true);
+            }
+        });
+}
+
+function displayNews(newsItems, isFallback = false) {
+    const loadingMessage = document.getElementById('LoadingMessage');
+    const errorMessage = document.getElementById('ErrorMessage');
+    const newsGrid = document.getElementById('NewsGrid');
+    const viewAllButton = document.getElementById('ViewAllButton');
+    
+    // Hide loading and error messages
+    loadingMessage.style.display = 'none';
+    errorMessage.style.display = 'none';
+    
+    // Show news grid
+    newsGrid.style.display = 'grid';
+    
+    // Clear existing content
+    newsGrid.innerHTML = '';
+    
+    // Sort news items by date (newest first)
+    newsItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Create news items
+    newsItems.forEach((news, index) => {
+        // Only show the first 6 items by default
+        if (index < 6) {
+            const newsItem = createNewsItem(news);
+            newsGrid.appendChild(newsItem);
+        }
+    });
+    
+    // Show view all button if there are more than 6 items
+    if (newsItems.length > 6) {
+        viewAllButton.style.display = 'block';
+    }
+    
+    // Create update history
+    createUpdateHistory(newsItems);
+    
+    // Show fallback warning if applicable
+    if (isFallback) {
+        const warning = document.createElement('div');
+        warning.className = 'ErrorMessage';
+        warning.textContent = 'Showing cached data - unable to fetch latest news';
+        warning.style.marginBottom = '20px';
+        newsGrid.parentNode.insertBefore(warning, newsGrid);
+    }
+}
+
+function createNewsItem(news) {
+    const div = document.createElement('div');
+    div.className = 'NewsItem';
+    
+    // Format date
+    const date = new Date(news.date);
+    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    
+    // Create tags HTML
+    let tagsHTML = '';
+    if (news.tags && Array.isArray(news.tags)) {
+        news.tags.forEach(tag => {
+            tagsHTML += `<span class="NewsBadge ${tag}Badge">${tag}</span>`;
+        });
+    }
+    
+    // Determine if content should be collapsed
+    const shouldCollapse = news.content && news.content.length > 200;
+    const collapsedClass = shouldCollapse ? 'Collapsed' : '';
+    
+    div.innerHTML = `
+        <div class="NewsItemHeader">
+            <div class="NewsTitle">${escapeHtml(news.title)}</div>
+            <div class="NewsDate">${formattedDate}</div>
+        </div>
+        <div class="NewsAuthor">By: ${escapeHtml(news.author)}</div>
+        <div class="NewsContent ${collapsedClass}">${escapeHtml(news.content)}</div>
+        ${shouldCollapse ? '<button class="CollapseButton" onclick="toggleContent(this)">Read more</button>' : ''}
+        <div class="NewsTags">${tagsHTML}</div>
+    `;
+    
+    return div;
+}
+
+function createUpdateHistory(newsItems) {
+    const updateHistoryList = document.getElementById('UpdateHistoryList');
+    updateHistoryList.innerHTML = '';
+    
+    // Create a map of dates to updates
+    const updatesByDate = {};
+    
+    newsItems.forEach(news => {
+        const date = new Date(news.date).toLocaleDateString();
+        if (!updatesByDate[date]) {
+            updatesByDate[date] = [];
+        }
+        updatesByDate[date].push(news);
+    });
+    
+    // Sort dates in descending order
+    const sortedDates = Object.keys(updatesByDate).sort((a, b) => new Date(b) - new Date(a));
+    
+    // Create update history items
+    sortedDates.forEach(date => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'UpdateHistoryItem';
+        
+        const updatesForDate = updatesByDate[date];
+        const firstUpdate = updatesForDate[0];
+        
+        historyItem.innerHTML = `
+            <div class="UpdateHistoryDate">${date}</div>
+            <div class="UpdateHistoryContent">
+                <strong>${updatesForDate.length} update${updatesForDate.length > 1 ? 's' : ''}:</strong><br>
+                ${updatesForDate.map(update => `• ${escapeHtml(update.title)}`).join('<br>')}
+            </div>
+        `;
+        
+        updateHistoryList.appendChild(historyItem);
+    });
+}
+
+function toggleUpdateHistory() {
+    const updateHistory = document.getElementById('UpdateHistory');
+    const viewAllButton = document.getElementById('ViewAllButton');
+    
+    if (updateHistory.style.display === 'none') {
+        updateHistory.style.display = 'block';
+        viewAllButton.textContent = 'Hide Update History';
+    } else {
+        updateHistory.style.display = 'none';
+        viewAllButton.textContent = 'View Update History';
+    }
+}
+
+function toggleContent(button) {
+    const content = button.previousElementSibling;
+    
+    if (content.classList.contains('Collapsed')) {
+        content.classList.remove('Collapsed');
+        button.textContent = 'Read less';
+    } else {
+        content.classList.add('Collapsed');
+        button.textContent = 'Read more';
+    }
+}
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function cacheNewsData(news) {
+    try {
+        const cacheData = {
+            news: news,
+            timestamp: new Date().toISOString()
+        };
+        localStorage.setItem('newsCache', JSON.stringify(cacheData));
+    } catch (e) {
+        console.warn('Failed to cache news data:', e);
+    }
+}
+
+function getCachedNewsData() {
+    try {
+        const cached = localStorage.getItem('newsCache');
+        return cached ? JSON.parse(cached) : null;
+    } catch (e) {
+        console.warn('Failed to read news cache:', e);
+        return null;
+    }
+}
+
+function isCacheExpired(timestamp) {
+    const cachedTime = new Date(timestamp).getTime();
+    const now = new Date().getTime();
+    return (now - cachedTime) > CACHE_DURATION;
+}
+</script>
 </body>
 </html>

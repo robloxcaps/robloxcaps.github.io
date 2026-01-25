@@ -415,6 +415,225 @@ body {
 }
 
 /* ============================================
+   NEWS SECTION STYLES
+   ============================================ */
+.NewsContainer {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: var(--padding-large);
+}
+
+.NewsHeader {
+    text-align: center;
+    margin-bottom: var(--margin-large);
+    font-family: var(--main-font);
+}
+
+.NewsGrid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--padding-large);
+    margin-bottom: var(--padding-large);
+}
+
+
+.NewsItem {
+    border: 1px solid #ccc;
+    border-radius: 0px;
+    padding: var(--padding-normal);
+    background-color: var(--container-bg);
+    position: relative;
+}
+
+.NewsItemHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--margin-normal);
+    border-bottom: 1px solid #eee;
+    padding-bottom: var(--padding-small);
+}
+
+.NewsTitle {
+    font-size: var(--font-size-large);
+    font-weight: bold;
+    color: var(--primary-color);
+    font-family: var(--main-font);
+}
+
+.NewsDate {
+    font-size: var(--font-size-small);
+    color: #666;
+    font-family: var(--main-font);
+}
+
+.NewsAuthor {
+    font-size: var(--font-size-normal);
+    color: var(--text-color);
+    margin-bottom: var(--margin-normal);
+    font-family: var(--main-font);
+}
+
+.NewsContent {
+    font-size: var(--font-size-normal);
+    color: var(--text-color);
+    line-height: 1.5;
+    font-family: var(--main-font);
+}
+
+.NewsBadge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 0px;
+    font-size: var(--font-size-small);
+    margin-right: 5px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.ImportantBadge {
+    background-color: #ff5252;
+    color: white;
+}
+
+.FeatureBadge {
+    background-color: #448aff;
+    color: white;
+}
+
+.FixBadge {
+    background-color: #69f0ae;
+    color: #333;
+}
+
+.OtherBadge {
+    background-color: #ffab40;
+    color: #333;
+}
+
+.ErrorMessage {
+    color: #ff5252;
+    padding: var(--padding-normal);
+    border: 1px solid #ff5252;
+    border-radius: 0px;
+    margin: var(--margin-normal) 0;
+    text-align: center;
+}
+
+.RetryButton {
+    background-color: var(--primary-color);
+    color: var(--white-text);
+    border: none;
+    padding: var(--padding-small) var(--padding-normal);
+    border-radius: 0px;
+    cursor: pointer;
+    margin-top: var(--margin-normal);
+    font-family: var(--main-font);
+}
+
+.CollapseButton {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    font-family: var(--main-font);
+    margin-top: var(--margin-small);
+}
+
+.CollapseButton:hover {
+    text-decoration: underline;
+}
+
+.Collapsed {
+    max-height: 100px;
+    overflow: hidden;
+    position: relative;
+}
+
+.Collapsed::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: linear-gradient(transparent, var(--container-bg));
+}
+
+.NewsTags {
+    margin-top: var(--margin-normal);
+}
+
+.ViewAllButton {
+    background-color: var(--primary-color);
+    color: var(--white-text);
+    border: none;
+    padding: var(--padding-normal) var(--padding-large);
+    border-radius: 0px;
+    cursor: pointer;
+    margin: var(--margin-large) auto;
+    display: block;
+    font-family: var(--main-font);
+    font-size: var(--font-size-normal);
+}
+
+.FilterButtons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--padding-large);
+    gap: var(--margin-small);
+}
+
+.FilterButton {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    padding: var(--padding-small) var(--padding-normal);
+    border-radius: 0px;
+    cursor: pointer;
+    font-family: var(--main-font);
+    font-size: var(--font-size-normal);
+}
+
+.FilterButton.active {
+    background-color: var(--primary-color);
+    color: var(--white-text);
+    border-color: var(--primary-color);
+}
+
+.UpdateHistory {
+    margin-top: var(--padding-large);
+    padding-top: var(--padding-large);
+    border-top: 1px solid #eee;
+}
+
+.UpdateHistory h3 {
+    color: var(--primary-color);
+    margin-bottom: var(--margin-normal);
+    font-family: var(--main-font);
+}
+
+.UpdateHistoryItem {
+    padding: var(--padding-normal);
+    border-left: 3px solid var(--primary-color);
+    margin-bottom: var(--margin-normal);
+    background-color: #f9f9f9;
+}
+
+.UpdateHistoryDate {
+    font-size: var(--font-size-small);
+    color: #666;
+    font-family: var(--main-font);
+}
+
+.UpdateHistoryContent {
+    margin-top: var(--margin-small);
+    font-family: var(--main-font);
+}
+
+/* ============================================
    SIDEBAR WITH SCROLLABLE LIST (for future use)
    ============================================ */
 #Sidebar {
@@ -535,7 +754,7 @@ hr {
 }
 
 @media (max-width: 768px) {
-    .PackGrid {
+    .PackGrid, .NewsGrid {
         grid-template-columns: repeat(2, 1fr);
         gap: 15px;
     }
@@ -551,7 +770,7 @@ hr {
 }
 
 @media (max-width: 480px) {
-    .PackGrid {
+    .PackGrid, .NewsGrid {
         grid-template-columns: 1fr;
     }
     
@@ -564,7 +783,7 @@ hr {
         padding: 10px;
     }
     
-    .PackItem {
+    .PackItem, .NewsItem {
         padding: 10px;
     }
     
