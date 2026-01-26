@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" id="www-roblox-com">
 <head>
-<title>PACKS - ROBLOX CLASSIC ASSET PACKS</title>
+<title>PLUGINS - ROBLOX CLASSIC ASSET PACKS</title>
 <link rel="icon" href="../img/FaviIcon.ico" type="image/x-icon"> 
 <link rel="stylesheet" href="../style.css">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta name="author" content="OGMelodii & Jakyro"/>
-<meta name="description" content="Contains all packs made by OGMelodii & Jakyro."/>
-<meta name="keywords" content="Roblox, Retro, Roblox Pack, Sandbox"/>
+<meta name="description" content="Contains all plugins made by OGMelodii & Jakyro."/>
+<meta name="keywords" content="Roblox, Retro, Roblox Plugin, Sandbox"/>
 <meta name="robots" content="all"/>
 </head>
 
@@ -23,15 +23,15 @@
         <div id="Navigation">
             <span><a id="ctl00_hlInfo" class="MenuItem" href="/">Info<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/dist/png/information.png"></a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_hlPacks" class="MenuItem" href="/Packs/">Packs<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/bricks.png"></a></span>
+            <span><a id="ctl00_hlPacks" class="MenuItem" href="/Packs/">Packs<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/package.png"></a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
             <span><a id="ctl00_hlCredits" class="MenuItem" href="/Credits/">Credits<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/user.png"></a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
             <span><a id="ctl00_hlSubmit" class="MenuItem" href="/Submit/">Submit Packs<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/package_add.png"></a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_News" class="MenuItem" href="/News/">News<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/newspaper.png"></a></span>
+            <span><a id="ctl00_hlNews" class="MenuItem" href="/News/">News<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/newspaper.png"></a></span>
             <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_Plugins" class="MenuItem" href="/Plugins/">Plugins<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/plugin.png"></a></span>
+            <span><a id="ctl00_hlPlugins" class="MenuItem Active" href="/Plugins/">Plugins<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/plugin.png"></a></span>
         </div>
     </div>
 
@@ -39,12 +39,12 @@
     <div id="Body">
         <div id="MainContent">
 
-            <div id="LoadingMessage">Loading packs...</div>
+            <div id="LoadingMessage">Loading plugins...</div>
 
             <div id="ErrorMessage" style="display:none; text-align:center; color:red; padding:20px;">
-                Error loading packs.
+                Error loading plugins.
                 <br><br>
-                <button onclick="loadPacks()" type="button">Retry</button>
+                <button onclick="loadPlugins()" type="button">Retry</button>
             </div>
 
             <div id="LastUpdated" style="display:none; text-align:center; font-size:12px;">
@@ -57,7 +57,7 @@
                 <button id="nextPage" type="button">></button>
             </div>
 
-            <div class="PackGrid" id="PackGrid" style="display:none;"></div>
+            <div class="PluginGrid" id="PluginGrid" style="display:none;"></div>
 
         </div>
     </div>
@@ -74,7 +74,7 @@
 <div id="DescriptionModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2 id="modalTitle">Pack Description</h2>
+            <h2 id="modalTitle">Plugin Description</h2>
             <span class="close">&times;</span>
         </div>
         <div class="modal-body">
@@ -88,19 +88,20 @@
 // CONFIGURATION
 // ============================================
 
-const GIST_URL = 'https://gist.githubusercontent.com/OGMelodii/5c2f87c5e5020ecd294daba796370a91/raw';
+// Replace this with your actual GitHub gist URL for plugins
+const GIST_URL = 'https://gist.githubusercontent.com/OGMelodii/51a64abbd766d1dd4791368bd3d3adc7/raw';
 const CACHE_DURATION = 5 * 60 * 1000;
-const PACKS_PER_PAGE = 9;
+const PLUGINS_PER_PAGE = 6; // 2 columns × 3 rows
 
 let currentPage = 1;
-let allPacks = [];
+let allPlugins = [];
 
 // ============================================
 // LOAD
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function () {
-    loadPacks();
+    loadPlugins();
 
     document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
     document.getElementById('nextPage').addEventListener('click', () => changePage(1));
@@ -120,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-function loadPacks() {
+function loadPlugins() {
     const loading = document.getElementById('LoadingMessage');
     const error = document.getElementById('ErrorMessage');
     const cached = getCachedData();
@@ -129,9 +130,9 @@ function loadPacks() {
     error.style.display = 'none';
 
     if (cached && !isCacheExpired(cached.timestamp)) {
-        allPacks = cached.packs;
+        allPlugins = cached.plugins;
         currentPage = 1;
-        displayPacks();
+        displayPlugins();
         return;
     }
 
@@ -141,10 +142,10 @@ function loadPacks() {
             return res.json();
         })
         .then(data => {
-            allPacks = data.packs;
-            cacheData(allPacks);
+            allPlugins = data.plugins;
+            cacheData(allPlugins);
             currentPage = 1;
-            displayPacks();
+            displayPlugins();
         })
         .catch(() => {
             loading.style.display = 'none';
@@ -153,11 +154,11 @@ function loadPacks() {
 }
 
 // ============================================
-// DISPLAY PACKS
+// DISPLAY PLUGINS
 // ============================================
 
-function displayPacks() {
-    const grid = document.getElementById('PackGrid');
+function displayPlugins() {
+    const grid = document.getElementById('PluginGrid');
     const loading = document.getElementById('LoadingMessage');
     const updated = document.getElementById('LastUpdated');
     const time = document.getElementById('UpdateTime');
@@ -168,67 +169,67 @@ function displayPacks() {
     grid.style.display = 'grid';
     grid.innerHTML = '';
 
-    const start = (currentPage - 1) * PACKS_PER_PAGE;
-    const end = start + PACKS_PER_PAGE;
-    const pagePacks = allPacks.slice(start, end);
+    const start = (currentPage - 1) * PLUGINS_PER_PAGE;
+    const end = start + PLUGINS_PER_PAGE;
+    const pagePlugins = allPlugins.slice(start, end);
 
-    pagePacks.forEach(pack => {
-        grid.appendChild(createPackItem(pack));
+    pagePlugins.forEach(plugin => {
+        grid.appendChild(createPluginItem(plugin));
     });
 
     time.textContent = new Date().toLocaleString();
     updated.style.display = 'block';
 
     // Update pagination
-    pagination.style.display = allPacks.length > PACKS_PER_PAGE ? 'block' : 'none';
-    pageInfo.textContent = `Page ${currentPage} of ${Math.ceil(allPacks.length / PACKS_PER_PAGE)}`;
+    pagination.style.display = allPlugins.length > PLUGINS_PER_PAGE ? 'block' : 'none';
+    pageInfo.textContent = `Page ${currentPage} of ${Math.ceil(allPlugins.length / PLUGINS_PER_PAGE)}`;
 
     document.getElementById('prevPage').disabled = currentPage === 1;
-    document.getElementById('nextPage').disabled = currentPage === Math.ceil(allPacks.length / PACKS_PER_PAGE);
+    document.getElementById('nextPage').disabled = currentPage === Math.ceil(allPlugins.length / PLUGINS_PER_PAGE);
 }
 
 function changePage(delta) {
-    const totalPages = Math.ceil(allPacks.length / PACKS_PER_PAGE);
+    const totalPages = Math.ceil(allPlugins.length / PLUGINS_PER_PAGE);
     currentPage = Math.min(Math.max(1, currentPage + delta), totalPages);
-    displayPacks();
+    displayPlugins();
 }
 
 // ============================================
-// CREATE PACK ITEM
+// CREATE PLUGIN ITEM
 // ============================================
 
-function createPackItem(pack) {
+function createPluginItem(plugin) {
     const div = document.createElement('div');
-    div.className = 'PackItem';
+    div.className = 'PluginItem';
 
-    let iconPath = pack.icon || '../img/Placeholder.png';
-    let profileUrl = pack.profileUrl && pack.profileUrl.trim() !== ''
-        ? pack.profileUrl
+    let iconPath = plugin.icon || '../img/Placeholder.png';
+    let profileUrl = plugin.profileUrl && plugin.profileUrl.trim() !== ''
+        ? plugin.profileUrl
         : null;
     
-    let description = pack.description || 'No description available.';
+    let description = plugin.description || 'No description available.';
 
     div.innerHTML = `
-        <img class="PackIcon"
+        <img class="PluginIcon"
              src="${iconPath}"
-             alt="${escapeHtml(pack.title)} Icon"
+             alt="${escapeHtml(plugin.title)} Icon"
              loading="lazy">
 
-        <div class="PackTitle">${escapeHtml(pack.title)}</div>
-        <div class="PackAuthor">By: ${escapeHtml(pack.author)}</div>
+        <div class="PluginTitle">${escapeHtml(plugin.title)}</div>
+        <div class="PluginAuthor">By: ${escapeHtml(plugin.author)}</div>
 
-        <div class="PackCategory" style="font-size:12px; color:#666;">
-            Category: ${escapeHtml(pack.category || 'Other')}
+        <div class="PluginCategory" style="font-size:12px; color:#666;">
+            Category: ${escapeHtml(plugin.category || 'Other')}
         </div>
 
-        <div class="PackVersion" style="font-size:12px; color:#666;">
-            Version: ${escapeHtml(pack.version || 'N/A')}
+        <div class="PluginVersion" style="font-size:12px; color:#666;">
+            Version: ${escapeHtml(plugin.version || 'N/A')}
         </div>
 
-        <div class="PackButtons" style="display:flex; gap:3px; margin-top:8px;">
+        <div class="PluginButtons" style="display:flex; gap:3px; margin-top:8px;">
 
-            <a href="${pack.downloadUrl}"
-               class="PackDownload"
+            <a href="${plugin.downloadUrl}"
+               class="PluginDownload"
                target="_blank"
                download
                style="flex:1; text-align:center;">
@@ -236,8 +237,8 @@ function createPackItem(pack) {
                 Download
             </a>
 
-            <button class="PackSeeMore"
-               data-title="${escapeHtml(pack.title)}"
+            <button class="PluginSeeMore"
+               data-title="${escapeHtml(plugin.title)}"
                data-description="${escapeHtml(description)}"
                style="flex:1; text-align:center; background:var(--accent-color); color:white; border:none; padding:4px 2px; cursor:pointer; font-family:'Comic Sans MS','Comic Sans',cursive; font-size:11px;">
                 <img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/magnifier.png">
@@ -246,7 +247,7 @@ function createPackItem(pack) {
 
             ${profileUrl ? `
             <a href="${profileUrl}"
-               class="PackProfile"
+               class="PluginProfile"
                target="_blank"
                rel="noopener noreferrer"
                style="flex:1; text-align:center; background:var(--primary-color); color:white; border:none; padding:4px 2px; cursor:pointer; text-decoration:none; font-family:'Comic Sans MS','Comic Sans',cursive; font-size:11px;">
@@ -259,7 +260,7 @@ function createPackItem(pack) {
     `;
 
     // Add event listener to the See More button
-    const seeMoreBtn = div.querySelector('.PackSeeMore');
+    const seeMoreBtn = div.querySelector('.PluginSeeMore');
     seeMoreBtn.addEventListener('click', function() {
         showDescription(this.dataset.title, this.dataset.description);
     });
@@ -291,15 +292,15 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-function cacheData(packs) {
-    localStorage.setItem('packsCache', JSON.stringify({
-        packs: packs,
+function cacheData(plugins) {
+    localStorage.setItem('pluginsCache', JSON.stringify({
+        plugins: plugins,
         timestamp: new Date().toISOString()
     }));
 }
 
 function getCachedData() {
-    const cached = localStorage.getItem('packsCache');
+    const cached = localStorage.getItem('pluginsCache');
     return cached ? JSON.parse(cached) : null;
 }
 
