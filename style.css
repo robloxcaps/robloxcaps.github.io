@@ -188,16 +188,205 @@ body {
     flex: 1;
     padding: var(--padding-large);
     text-align: center;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
 }
 
-#RobloxAtAGlance h2 {
+/* Welcome Card */
+.welcome-card {
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 1px solid #ccc;
+}
+
+.card-header {
+    background: var(--primary-color);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    filter: brightness(0) invert(1);
+}
+
+.card-header h2 {
+    color: white;
+    margin: 0;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.card-content {
+    padding: 25px;
+}
+
+.card-content p {
+    color: var(--text-color);
+    line-height: 1.6;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.card-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Features Grid */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.feature-card {
+    background: white;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-top: 4px solid var(--primary-color);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #ccc;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--primary-color);
+    transform: scaleX(0);
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 20px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature-icon img {
+    width: 30px;
+    height: 30px;
+}
+
+.feature-card h3 {
     color: var(--primary-color);
-    margin-bottom: var(--margin-small);
+    margin-bottom: 15px;
+    font-size: 20px;
 }
 
-#RobloxAtAGlance h3 {
-    color: var(--accent-color);
-    margin-bottom: var(--padding-large);
+.feature-card p {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.discord-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #5865F2;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.discord-link img {
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) invert(1);
+}
+
+/* Navigation Guide */
+.navigation-guide {
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 1px solid #ccc;
+}
+
+.guide-header {
+    background: var(--accent-color);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.guide-icon {
+    width: 40px;
+    height: 40px;
+    filter: brightness(0) invert(1);
+}
+
+.guide-header h3 {
+    color: white;
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.guide-content {
+    padding: 25px;
+}
+
+.guide-content p {
+    color: var(--text-color);
+    margin-bottom: 25px;
+    font-size: 16px;
+}
+
+.nav-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.nav-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+}
+
+.step-number {
+    min-width: 35px;
+    height: 35px;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.step-content h4 {
+    color: var(--primary-color);
+    margin-bottom: 5px;
+    font-size: 18px;
+}
+
+.step-content p {
+    color: #666;
+    margin: 0;
+    font-size: 14px;
 }
 
 #PlaceholderImage img {
@@ -962,6 +1151,36 @@ hr {
     .PluginButtons > button {
         flex-basis: 100%;
     }
+    
+    #RobloxAtAGlance {
+        padding: 15px;
+        gap: 20px;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .nav-steps {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-header {
+        padding: 15px;
+    }
+    
+    .card-header h2 {
+        font-size: 22px;
+    }
+    
+    .guide-header {
+        padding: 15px;
+    }
+    
+    .guide-header h3 {
+        font-size: 20px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -989,5 +1208,25 @@ hr {
     .PackIcon, .PluginIcon {
         width: 80px;
         height: 80px;
+    }
+    
+    .card-header h2 {
+        font-size: 18px;
+    }
+    
+    .guide-header h3 {
+        font-size: 18px;
+    }
+    
+    .feature-card {
+        padding: 20px 15px;
+    }
+    
+    .card-content {
+        padding: 20px 15px;
+    }
+    
+    .guide-content {
+        padding: 20px 15px;
     }
 }
