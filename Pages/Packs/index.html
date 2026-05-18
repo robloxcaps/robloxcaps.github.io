@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="OGMelodii & Jakyro">
+    <meta name="description" content="Browse classic Roblox asset packs.">
+    <meta name="robots" content="all">
+    <title>Packs - CAP Central</title>
+    <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .PackItem { position: relative; }
+
+        .btn-delete-pack {
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 20px; height: 20px;
+            background: #cc2222; color: #fff;
+            border: none; border-radius: 2px;
+            font-size: 13px; line-height: 1;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; opacity: 0.85;
+        }
+        .btn-delete-pack:hover { opacity: 1; background: #aa1111; }
+
+        .btn-favorite {
+            flex: 1;
+            font-size: 10px; padding: 3px 6px;
+            font-weight: bold;
+            border: 1px solid #c0cce0;
+            cursor: pointer; font-family: inherit;
+            background: #e6ecf5; color: #2a3a5a;
+            border-radius: 2px;
+        }
+        .btn-favorite.favorited { background: #e8a020; color: #fff; border-color: #c07800; }
+        .btn-favorite:hover { background: #d0d8e8; }
+        .btn-favorite.favorited:hover { background: #c07800; }
+
+        .pack-downloads { font-size: 10px; color: #889; margin-top: 2px; }
+    </style>
+</head>
+<body>
+
+<div id="Header"></div>
+<div id="Container">
+    <div id="Body">
+        <div id="MainContent">
+
+            <div id="LoadingMessage">Loading packs...</div>
+
+            <div id="ErrorMessage" style="display:none; text-align:center; padding:20px;">
+                <p style="color:#cc2222;font-weight:700;">Error loading packs.</p>
+                <button onclick="loadPacks()" type="button" class="RetryButton" style="margin-top:10px;">Retry</button>
+            </div>
+
+            <div id="SortFilterBar" style="display:none;">
+                <label for="SearchInput">Search:</label>
+                <input type="text" id="SearchInput" placeholder="Search packs..." oninput="applyFilters()" autocomplete="off">
+                <label for="CategoryFilter" style="margin-left:8px;">Category:</label>
+                <select id="CategoryFilter" onchange="applyFilters()"><option value="">All</option></select>
+                <label for="SortSelect" style="margin-left:8px;">Sort:</label>
+                <select id="SortSelect" onchange="applyFilters()">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="az">A → Z</option>
+                    <option value="za">Z → A</option>
+                    <option value="author_az">Author A → Z</option>
+                    <option value="author_za">Author Z → A</option>
+                    <option value="downloads">Most Downloaded</option>
+                </select>
+                <span id="ResultCount"></span>
+            </div>
+
+            <div id="PaginationControls" style="display:none; text-align:center; margin-bottom:15px;">
+                <button id="prevPage" type="button">&lsaquo;</button>
+                <span id="pageInfo"></span>
+                <button id="nextPage" type="button">&rsaquo;</button>
+            </div>
+
+            <div class="PackGrid" id="PackGrid" style="display:none;"></div>
+
+            <div id="NoResults" style="display:none; text-align:center; padding:30px; color:#778;">
+                No packs match your search.
+            </div>
+
+        </div>
+    </div>
+</div>
+<div id="FooterWrapper">
+    <div id="Footer"></div>
+</div>
+
+<!-- MODAL -->
+<div id="DescriptionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Pack Details</h2>
+            <button class="close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-image-col">
+                <img id="modalIcon" src="" alt="Pack Icon">
+            </div>
+            <div class="modal-info-col">
+                <div class="modal-meta">
+                    <span class="meta-badge" id="modalCategory">Category</span>
+                    <span class="meta-badge" id="modalAuthor">Author</span>
+                </div>
+                <span class="modal-desc-label">Description</span>
+                <div id="modalDescription" class="modal-description">No description provided.</div>
+                <div class="modal-actions">
+                    <a href="#" id="modalDownloadBtn" class="btn-modal btn-modal-primary" target="_blank" rel="noopener noreferrer" onclick="handleModalDownload()">Download</a>
+                    <button class="btn-modal btn-modal-secondary" onclick="closeModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/config.js"></script>
+<script>
+const PACKS_PER_PAGE = 9;
+let currentPage      = 1;
+let allPacks         = [];
+let filteredPacks    = [];
+let currentModalPack = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
+    document.getElementById('nextPage').addEventListener('click', () => changePage(1));
+    const modal = document.getElementById('DescriptionModal');
+    window.onclick = e => { if (e.target === modal) closeModal(); };
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+});
+
+setTimeout(async () => {
+    await loadPacks();
+}, 300);
+
+async function loadPacks() {
+    const loading = document.getElementById('LoadingMessage');
+    const error   = document.getElementById('ErrorMessage');
+    const grid    = document.getElementById('PackGrid');
+    const bar     = document.getElementById('SortFilterBar');
+    const pag     = document.getElementById('PaginationControls');
+
+    loading.style.display = 'block';
+    error.style.display   = 'none';
+    grid.style.display    = 'none';
+    bar.style.display     = 'none';
+    pag.style.display     = 'none';
+
+    const { data, error: err } = await sb.from('packs').select('*').order('created_at', { ascending: false });
+    loading.style.display = 'none';
+
+    if (err) { error.style.display = 'block'; return; }
+
+    allPacks = data || [];
+    initControls();
+    applyFilters();
+}
+
+function initControls() {
+    const cats = [...new Set(allPacks.map(p => p.category || 'Other'))].sort();
+    const sel  = document.getElementById('CategoryFilter');
+    while (sel.options.length > 1) sel.remove(1);
+    cats.forEach(cat => { const o = document.createElement('option'); o.value = cat; o.textContent = cat; sel.appendChild(o); });
+    document.getElementById('SortFilterBar').style.display = 'flex';
+}
+
+function applyFilters() {
+    const query    = document.getElementById('SearchInput').value.toLowerCase().trim();
+    const category = document.getElementById('CategoryFilter').value;
+    const sort     = document.getElementById('SortSelect').value;
+
+    filteredPacks = allPacks.filter(p => {
+        const matchCat    = !category || (p.category || 'Other') === category;
+        const matchSearch = !query || (p.title||'').toLowerCase().includes(query) || (p.author||'').toLowerCase().includes(query);
+        return matchCat && matchSearch;
+    });
+
+    filteredPacks.sort((a, b) => {
+        switch (sort) {
+            case 'newest':    return new Date(b.created_at) - new Date(a.created_at);
+            case 'oldest':    return new Date(a.created_at) - new Date(b.created_at);
+            case 'az':        return (a.title||'').localeCompare(b.title||'', 'en', {sensitivity:'base'});
+            case 'za':        return (b.title||'').localeCompare(a.title||'', 'en', {sensitivity:'base'});
+            case 'author_az': return (a.author||'').localeCompare(b.author||'', 'en', {sensitivity:'base'});
+            case 'author_za': return (b.author||'').localeCompare(a.author||'', 'en', {sensitivity:'base'});
+            case 'downloads': return (b.downloads||0) - (a.downloads||0);
+            default: return 0;
+        }
+    });
+
+    currentPage = 1;
+    displayPacks();
+}
+
+function displayPacks() {
+    const grid       = document.getElementById('PackGrid');
+    const pagination = document.getElementById('PaginationControls');
+    const noResults  = document.getElementById('NoResults');
+    const countEl    = document.getElementById('ResultCount');
+
+    if (filteredPacks.length === 0) {
+        grid.style.display = 'none'; pagination.style.display = 'none';
+        noResults.style.display = 'block'; countEl.textContent = '0 packs';
+        return;
+    }
+
+    noResults.style.display = 'none';
+    grid.style.display      = 'grid';
+    grid.innerHTML          = '';
+
+    const totalPages = Math.ceil(filteredPacks.length / PACKS_PER_PAGE);
+    currentPage = Math.min(currentPage, totalPages);
+    const start = (currentPage - 1) * PACKS_PER_PAGE;
+    filteredPacks.slice(start, start + PACKS_PER_PAGE).forEach(p => grid.appendChild(createPackItem(p)));
+
+    countEl.textContent = filteredPacks.length === allPacks.length
+        ? `${allPacks.length} pack${allPacks.length !== 1 ? 's' : ''}`
+        : `${filteredPacks.length} of ${allPacks.length}`;
+
+    pagination.style.display = filteredPacks.length > PACKS_PER_PAGE ? 'block' : 'none';
+    document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+    document.getElementById('prevPage').disabled = currentPage === 1;
+    document.getElementById('nextPage').disabled = currentPage === totalPages;
+}
+
+function changePage(delta) {
+    currentPage = Math.min(Math.max(1, currentPage + delta), Math.ceil(filteredPacks.length / PACKS_PER_PAGE));
+    displayPacks();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function createPackItem(pack) {
+    const div   = document.createElement('div');
+    div.className = 'PackItem';
+    div.id = `pack-${pack.id}`;
+    const dl    = pack.downloads || 0;
+
+    div.innerHTML = `
+        ${window.isAdmin ? `<button class="btn-delete-pack" title="Delete pack" onclick="deletePack('${pack.id}', this)">&times;</button>` : ''}
+        <div class="PackContentGroup">
+            <img class="PackIcon" src="${esc(pack.icon||'/img/Placeholder.png')}" alt="${esc(pack.title)}" loading="lazy" onerror="this.src='/img/Placeholder.png'">
+            <div class="PackTitle">${esc(pack.title)}</div>
+            <div class="PackAuthor">by ${esc(pack.author)}</div>
+            <div class="PackCategory">${esc(pack.category||'Other')}</div>
+            <!-- <div class="pack-downloads">${dl} download${dl !== 1 ? 's' : ''}</div> -->
+        </div>
+        <div class="PackButtons">
+            <a href="${esc(pack.download_url||'#')}" target="_blank" rel="noopener noreferrer" class="PackDownload" onclick="incrementDownload('${pack.id}')">Download</a>
+            <button class="PackSeeMore">Details</button>
+        </div>
+    `;
+
+    div.querySelector('.PackSeeMore').addEventListener('click', () => showDetails(pack));
+    return div;
+}
+
+async function deletePack(id, btn) {
+    if (!confirm('Delete this pack permanently?')) return;
+    btn.disabled = true; btn.textContent = '...';
+    const { error } = await sb.from('packs').delete().eq('id', id);
+    if (error) { alert('Error: ' + error.message); btn.disabled = false; btn.textContent = '×'; return; }
+    allPacks      = allPacks.filter(p => p.id !== id);
+    filteredPacks = filteredPacks.filter(p => p.id !== id);
+    displayPacks();
+}
+
+function showDetails(pack) {
+    currentModalPack = pack;
+    document.getElementById('modalTitle').textContent       = pack.title;
+    document.getElementById('modalAuthor').textContent      = `By ${pack.author || 'Unknown'}`;
+    document.getElementById('modalCategory').textContent    = pack.category || 'Other';
+    document.getElementById('modalDescription').textContent = (pack.description && pack.description.length > 5)
+        ? pack.description : 'No description available.';
+    document.getElementById('modalDownloadBtn').href = pack.download_url || '#';
+    const iconEl = document.getElementById('modalIcon');
+    iconEl.src = pack.icon || '/img/Placeholder.png';
+    iconEl.onerror = function() { this.src = '/img/Placeholder.png'; };
+    document.getElementById('DescriptionModal').style.display = 'block';
+}
+
+function handleModalDownload() { if (currentModalPack) incrementDownload(currentModalPack.id); }
+function closeModal() { document.getElementById('DescriptionModal').style.display = 'none'; currentModalPack = null; }
+function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+</script>
+</body>
+</html>

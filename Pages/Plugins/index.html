@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Plugins - CAP Central</title>
+<link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
+<link rel="stylesheet" href="/assets/css/style.css">
+<meta name="author" content="OGMelodii & Jakyro">
+<meta name="description" content="Contains all plugins made by OGMelodii & Jakyro.">
+<meta name="keywords" content="Roblox, Retro, Roblox Plugin, Sandbox">
+<meta name="robots" content="all">
+</head>
+<body>
+
+<div id="Container">
+    <div id="Header"></div>
+
+    <div id="Body">
+        <div id="MainContent">
+
+            <div id="LoadingMessage">Loading plugins...</div>
+
+            <div id="ErrorMessage" style="display:none; text-align:center; padding:20px;">
+                <p style="color:var(--danger);font-weight:700;">Error loading plugins.</p>
+                <button onclick="loadPlugins()" type="button" class="RetryButton" style="margin-top:10px;">Retry</button>
+            </div>
+
+            <div id="SortFilterBar" style="display:none;">
+                <label for="SearchInput"><i data-lucide="search" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;"></i>Search:</label>
+                <input type="text" id="SearchInput" placeholder="Search plugins..." oninput="applyFilters()">
+                <label for="CategoryFilter" style="margin-left:8px;">Category:</label>
+                <select id="CategoryFilter" onchange="applyFilters()"><option value="">All</option></select>
+                <label for="SortSelect" style="margin-left:8px;">Sort:</label>
+                <select id="SortSelect" onchange="applyFilters()">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="az">A → Z</option>
+                    <option value="za">Z → A</option>
+                    <option value="author_az">Author A → Z</option>
+                    <option value="author_za">Author Z → A</option>
+                </select>
+                <span id="ResultCount"></span>
+            </div>
+
+            <div id="LastUpdated" style="display:none; text-align:center; font-size:var(--text-xs); color:var(--text-muted); margin-bottom:8px;">
+                Last updated: <span id="UpdateTime"></span>
+            </div>
+
+            <div id="PaginationControls" style="display:none; text-align:center; margin-bottom:15px;">
+                <button id="prevPage" type="button">&lsaquo;</button>
+                <span id="pageInfo"></span>
+                <button id="nextPage" type="button">&rsaquo;</button>
+            </div>
+
+            <div class="PluginGrid" id="PluginGrid" style="display:none;"></div>
+
+            <div id="NoResults" style="display:none; text-align:center; padding:30px; color:var(--text-muted);">
+                <i data-lucide="search-x" style="width:32px;height:32px;margin-bottom:10px;display:block;margin:0 auto 10px;"></i>
+                No plugins match your search.
+            </div>
+
+        </div>
+    </div>
+
+    <div id="Footer"></div>
+</div>
+
+<div id="DescriptionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Plugin Description</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p id="modalDescription"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+const GIST_URL = 'https://gist.githubusercontent.com/OGMelodii/51a64abbd766d1dd4791368bd3d3adc7/raw';
+const CACHE_DURATION = 5 * 60 * 1000;
+const PLUGINS_PER_PAGE = 6;
+
+let currentPage = 1;
+let allPlugins = [];
+let filteredPlugins = [];
+
+document.addEventListener('DOMContentLoaded', function () {
+    loadPlugins();
+    document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
+    document.getElementById('nextPage').addEventListener('click', () => changePage(1));
+    const modal = document.getElementById('DescriptionModal');
+    document.querySelector('.close').onclick = () => modal.style.display = 'none';
+    window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
+});
+
+function loadPlugins() {
+    const loading = document.getElementById('LoadingMessage');
+    const error   = document.getElementById('ErrorMessage');
+    const cached  = getCachedData();
+    loading.style.display = 'block'; error.style.display = 'none';
+    if (cached && !isCacheExpired(cached.timestamp)) {
+        allPlugins = cached.plugins; initControls(); applyFilters(); return;
+    }
+    fetch(GIST_URL + '?t=' + Date.now())
+        .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+        .then(data => { allPlugins = data.plugins; cacheData(allPlugins); initControls(); applyFilters(); })
+        .catch(() => { loading.style.display = 'none'; error.style.display = 'block'; });
+}
+
+function initControls() {
+    const cats = [...new Set(allPlugins.map(p => p.category || 'Other'))].sort();
+    const sel  = document.getElementById('CategoryFilter');
+    cats.forEach(cat => { const o = document.createElement('option'); o.value = cat; o.textContent = cat; sel.appendChild(o); });
+    document.getElementById('SortFilterBar').style.display = 'flex';
+}
+
+function applyFilters() {
+    const query    = document.getElementById('SearchInput').value.toLowerCase().trim();
+    const category = document.getElementById('CategoryFilter').value;
+    const sort     = document.getElementById('SortSelect').value;
+    filteredPlugins = allPlugins.filter(p => {
+        const matchCat    = !category || (p.category||'Other') === category;
+        const matchSearch = !query || (p.title||'').toLowerCase().includes(query) || (p.author||'').toLowerCase().includes(query) || (p.description||'').toLowerCase().includes(query);
+        return matchCat && matchSearch;
+    });
+    filteredPlugins.sort((a, b) => {
+        switch (sort) {
+            case 'newest':    return parseDate(b) - parseDate(a);
+            case 'oldest':    return parseDate(a) - parseDate(b);
+            case 'az':        return (a.title||'').localeCompare(b.title||'');
+            case 'za':        return (b.title||'').localeCompare(a.title||'');
+            case 'author_az': return (a.author||'').localeCompare(b.author||'');
+            case 'author_za': return (b.author||'').localeCompare(a.author||'');
+            default: return 0;
+        }
+    });
+    currentPage = 1; displayPlugins();
+}
+
+function parseDate(p) { if (!p.date) return 0; const d = new Date(p.date); return isNaN(d) ? 0 : d.getTime(); }
+
+function displayPlugins() {
+    const grid       = document.getElementById('PluginGrid');
+    const loading    = document.getElementById('LoadingMessage');
+    const updated    = document.getElementById('LastUpdated');
+    const time       = document.getElementById('UpdateTime');
+    const pagination = document.getElementById('PaginationControls');
+    const pageInfo   = document.getElementById('pageInfo');
+    const noResults  = document.getElementById('NoResults');
+    const countEl    = document.getElementById('ResultCount');
+    loading.style.display = 'none';
+    if (filteredPlugins.length === 0) {
+        grid.style.display = 'none'; noResults.style.display = 'block'; pagination.style.display = 'none';
+        countEl.textContent = '0 plugins'; return;
+    }
+    noResults.style.display = 'none'; grid.style.display = 'grid'; grid.innerHTML = '';
+    const totalPages = Math.ceil(filteredPlugins.length / PLUGINS_PER_PAGE);
+    currentPage = Math.min(currentPage, totalPages);
+    const start = (currentPage - 1) * PLUGINS_PER_PAGE;
+    filteredPlugins.slice(start, start + PLUGINS_PER_PAGE).forEach(p => grid.appendChild(createPluginItem(p)));
+    time.textContent = new Date().toLocaleString(); updated.style.display = 'block';
+    countEl.textContent = filteredPlugins.length === allPlugins.length
+        ? `${allPlugins.length} plugin${allPlugins.length !== 1 ? 's' : ''}`
+        : `${filteredPlugins.length} of ${allPlugins.length} plugin${allPlugins.length !== 1 ? 's' : ''}`;
+    pagination.style.display = filteredPlugins.length > PLUGINS_PER_PAGE ? 'block' : 'none';
+    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    document.getElementById('prevPage').disabled = currentPage === 1;
+    document.getElementById('nextPage').disabled = currentPage === totalPages;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function changePage(delta) {
+    currentPage = Math.min(Math.max(1, currentPage + delta), Math.ceil(filteredPlugins.length / PLUGINS_PER_PAGE));
+    displayPlugins(); window.scrollTo(0, 0);
+}
+
+function createPluginItem(plugin) {
+    const div = document.createElement('div');
+    div.className = 'PluginItem';
+    const iconPath    = plugin.icon || '../img/Placeholder.png';
+    const profileUrl  = plugin.profileUrl?.trim() || null;
+    const description = plugin.description || 'No description available.';
+    const authorHTML  = profileUrl
+        ? `<a href="${profileUrl}" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:none;font-weight:700;">${esc(plugin.author)}</a>`
+        : esc(plugin.author);
+    div.innerHTML = `
+        <img class="PluginIcon" src="${iconPath}" alt="${esc(plugin.title)} Icon" loading="lazy">
+        <div class="PluginTitle">${esc(plugin.title)}</div>
+        <div class="PluginAuthor">by ${authorHTML}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">${esc(plugin.category||'Other')} · v${esc(plugin.version||'N/A')}</div>
+        <div class="PluginButtons">
+            <a href="${plugin.downloadUrl}" class="PluginDownload" target="_blank" download>
+                <i data-lucide="download" style="width:11px;height:11px;"></i> Download
+            </a>
+            <button class="PluginSeeMore" data-title="${esc(plugin.title)}" data-description="${esc(description)}">
+                <i data-lucide="info" style="width:11px;height:11px;"></i> Details
+            </button>
+        </div>
+    `;
+    div.querySelector('.PluginSeeMore').addEventListener('click', function () {
+        showDescription(this.dataset.title, this.dataset.description);
+    });
+    return div;
+}
+
+function showDescription(title, description) {
+    document.getElementById('modalTitle').textContent       = title;
+    document.getElementById('modalDescription').textContent = description;
+    document.getElementById('DescriptionModal').style.display = 'block';
+}
+
+function esc(text) { const d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
+function cacheData(plugins) { try { localStorage.setItem('pluginsCache', JSON.stringify({plugins, timestamp: new Date().toISOString()})); } catch(e){} }
+function getCachedData() { try { const c = localStorage.getItem('pluginsCache'); return c ? JSON.parse(c) : null; } catch(e){ return null; } }
+function isCacheExpired(ts) { return Date.now() - new Date(ts).getTime() > CACHE_DURATION; }
+</script>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="/assets/js/config.js"></script>
+</body>
+</html>

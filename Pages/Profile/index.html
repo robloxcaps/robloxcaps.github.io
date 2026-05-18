@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>Profile - CAP Central</title>
+    <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .sub-status-badge {
+            display: inline-block;
+            font-size: 10px; font-weight: bold;
+            padding: 1px 7px; border-radius: 2px;
+            border: 1px solid #ccc;
+        }
+        .sub-status-badge.pending  { background: #fef8e0; border-color: #d4aa30; color: #664400; }
+        .sub-status-badge.approved { background: #4a7fc1; color: #fff; border-color: #3060a0; }
+        .sub-status-badge.rejected { background: #fff4f4; color: #cc2222; border-color: #cc2222; }
+
+        .sub-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 10px; border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+        .sub-row:nth-child(odd)  { background: #f4f6fa; }
+        .sub-row:last-child { border-bottom: none; }
+        .sub-row-icon { width: 36px; height: 36px; object-fit: cover; border: 1px solid #ccc; border-radius: 2px; flex-shrink: 0; }
+        .sub-row-title { font-weight: bold; color: #2a3a5a; flex: 1; }
+        .sub-row-meta  { font-size: 11px; color: #778; }
+    </style>
+</head>
+<body>
+
+<div id="Header"></div>
+<div id="Container">
+    <div id="Body">
+
+        <div id="LoadingState" style="text-align:center;padding:50px;color:#778;">Loading profile...</div>
+
+        <div id="NotFound" style="display:none;">
+            <h2>User Not Found</h2>
+            <p>This profile doesn't exist or may have been removed.</p>
+            <a href="/" class="ProfileHomeBtn">Go Home</a>
+        </div>
+
+        <div id="ErrorState" style="display:none;">
+            <h2>Something went wrong</h2>
+            <p>Couldn't load this profile. Try again later.</p>
+        </div>
+
+        <div id="ProfileWrapper" style="display:none;">
+
+            <!-- PROFILE CARD -->
+            <div id="ProfileCard">
+                <div id="ProfileHeader">
+                    <div id="ProfileAvatar">?</div>
+                    <div>
+                        <div id="ProfileUsername" style="font-size:16px;font-weight:bold;color:#2a3a5a;"></div>
+                        <div id="ProfileBadge"    style="font-size:11px;color:#778;margin-top:2px;"></div>
+                    </div>
+                </div>
+                <div id="ProfileBody">
+                    <div class="profile-row">
+                        <span class="profile-row-label">Username</span>
+                        <span id="InfoUsername">—</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-row-label">Role</span>
+                        <span id="InfoRole">—</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-row-label">Joined</span>
+                        <span id="InfoJoined">—</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-row-label">Packs</span>
+                        <span id="InfoPackCount">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUBMITTED PACKS -->
+            <div style="margin-top:16px;">
+                <div class="CatHeader">
+                    <h3 id="PacksSectionTitle">Submitted Packs</h3>
+                </div>
+                <div style="border:1px solid #ccc;border-top:none;background:#fff;padding:12px;">
+                    <div id="UserPacksLoading" style="text-align:center;color:#778;font-size:12px;padding:8px;">Loading packs...</div>
+                    <div id="UserPacksEmpty"   style="display:none;text-align:center;color:#778;font-size:12px;padding:8px;">No approved packs submitted yet.</div>
+                    <div class="PackGrid" id="UserPackGrid" style="display:none;"></div>
+                </div>
+            </div>
+
+            <!-- SUBMISSION HISTORY — only shown on own profile -->
+            <div id="SubmissionHistorySection" style="display:none;margin-top:16px;">
+                <div class="CatHeader">
+                    <h3>Submission History</h3>
+                </div>
+                <div style="border:1px solid #ccc;border-top:none;background:#fff;">
+                    <div id="SubHistoryLoading" style="text-align:center;color:#778;font-size:12px;padding:12px;">Loading...</div>
+                    <div id="SubHistoryEmpty"   style="display:none;text-align:center;color:#778;font-size:12px;padding:12px;">No submissions yet.</div>
+                    <div id="SubHistoryList"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div id="FooterWrapper">
+    <div id="Footer"></div>
+</div>
+
+<!-- MODAL -->
+<div id="DescriptionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Pack Details</h2>
+            <button class="close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-image-col"><img id="modalIcon" src="" alt="Pack Icon"></div>
+            <div class="modal-info-col">
+                <div class="modal-meta">
+                    <span class="meta-badge" id="modalCategory">Category</span>
+                    <span class="meta-badge" id="modalAuthor">Author</span>
+                </div>
+                <span class="modal-desc-label">Description</span>
+                <div id="modalDescription" class="modal-description">No description provided.</div>
+                <div class="modal-actions">
+                    <a href="#" id="modalDownloadBtn" class="btn-modal btn-modal-primary" target="_blank" rel="noopener noreferrer">Download</a>
+                    <button class="btn-modal btn-modal-secondary" onclick="closeModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/config.js"></script>
+<script>
+function getUsernameFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('u')) return params.get('u');
+    const parts = window.location.pathname.replace(/\/+$/, '').split('/');
+    return parts[parts.length - 1] || null;
+}
+
+const modal = document.getElementById('DescriptionModal');
+window.onclick = e => { if (e.target === modal) closeModal(); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+setTimeout(async () => {
+    const username = getUsernameFromURL();
+
+    if (!username || username === 'users') {
+        document.getElementById('LoadingState').style.display = 'none';
+        document.getElementById('NotFound').style.display = 'block';
+        return;
+    }
+
+    document.title = `${username} - CAP Central`;
+
+    const { data: profile, error } = await sb
+        .from('profiles')
+        .select('username, is_admin, is_banned, created_at')
+        .eq('username', username)
+        .maybeSingle();
+
+    document.getElementById('LoadingState').style.display = 'none';
+
+    if (error) { document.getElementById('ErrorState').style.display = 'block'; return; }
+    if (!profile) { document.getElementById('NotFound').style.display = 'block'; return; }
+
+    // Fill card
+    document.getElementById('ProfileAvatar').textContent   = profile.username.charAt(0).toUpperCase();
+    document.getElementById('ProfileUsername').textContent = profile.username;
+    document.getElementById('InfoUsername').textContent    = profile.username;
+    document.getElementById('InfoJoined').textContent      = new Date(profile.created_at).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    let role = 'User';
+    if (profile.is_banned) role = 'Banned';
+    else if (profile.is_admin) role = 'Admin';
+    document.getElementById('InfoRole').textContent = role;
+
+    if (profile.is_admin && !profile.is_banned) {
+        const badge = document.getElementById('ProfileBadge');
+        badge.textContent = '★ Administrator';
+        badge.style.color = '#e8a020';
+        badge.style.fontWeight = 'bold';
+    }
+
+    document.getElementById('ProfileWrapper').style.display = 'block';
+
+    // Check if viewing own profile
+    const { data: { session } } = await sb.auth.getSession();
+    const isOwnProfile = session && session.user.id !== null && await isOwnUser(session.user.id, username);
+
+    await loadUserPacks(username);
+
+    if (isOwnProfile) {
+        await loadSubmissionHistory(username);
+    }
+
+}, 150);
+
+async function isOwnUser(userId, username) {
+    const { data } = await sb.from('profiles').select('username').eq('id', userId).maybeSingle();
+    return data?.username === username;
+}
+
+async function loadUserPacks(username) {
+    document.getElementById('PacksSectionTitle').textContent = `Packs by ${username}`;
+
+    const { data: packs, error } = await sb
+        .from('packs')
+        .select('*')
+        .eq('submitted_by', username)
+        .order('created_at', { ascending: false });
+
+    document.getElementById('UserPacksLoading').style.display = 'none';
+
+    if (error || !packs || packs.length === 0) {
+        document.getElementById('UserPacksEmpty').style.display = 'block';
+        document.getElementById('InfoPackCount').textContent = '0';
+        return;
+    }
+
+    document.getElementById('InfoPackCount').textContent = packs.length;
+    const grid = document.getElementById('UserPackGrid');
+    grid.style.display = 'grid';
+    packs.forEach(p => grid.appendChild(createPackCard(p)));
+}
+
+async function loadSubmissionHistory(username) {
+    document.getElementById('SubmissionHistorySection').style.display = 'block';
+
+    const { data: subs, error } = await sb
+        .from('submissions')
+        .select('*')
+        .eq('submitted_by', username)
+        .order('created_at', { ascending: false });
+
+    document.getElementById('SubHistoryLoading').style.display = 'none';
+
+    if (error || !subs || subs.length === 0) {
+        document.getElementById('SubHistoryEmpty').style.display = 'block';
+        return;
+    }
+
+    const list = document.getElementById('SubHistoryList');
+    subs.forEach(sub => {
+        const status = sub.status || 'pending';
+        const date   = new Date(sub.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        const row    = document.createElement('div');
+        row.className = 'sub-row';
+        row.innerHTML = `
+            <img class="sub-row-icon" src="${esc(sub.icon||'/img/Placeholder.png')}" alt="" onerror="this.src='/img/Placeholder.png'">
+            <div style="flex:1;">
+                <div class="sub-row-title">${esc(sub.title)}</div>
+                <div class="sub-row-meta">by ${esc(sub.author)} · ${date}</div>
+            </div>
+            <span class="sub-status-badge ${status}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function createPackCard(pack) {
+    const div = document.createElement('div');
+    div.className = 'PackItem';
+    div.innerHTML = `
+        <div class="PackContentGroup">
+            <img class="PackIcon" src="${esc(pack.icon||'/img/Placeholder.png')}" alt="${esc(pack.title)}" loading="lazy" onerror="this.src='/img/Placeholder.png'">
+            <div class="PackTitle">${esc(pack.title)}</div>
+            <div class="PackAuthor">by ${esc(pack.author)}</div>
+            <div class="PackCategory">${esc(pack.category||'Other')}</div>
+        </div>
+        <div class="PackButtons">
+            <a href="${esc(pack.download_url||'#')}" target="_blank" rel="noopener noreferrer" class="PackDownload">Download</a>
+            <button class="PackSeeMore">Details</button>
+        </div>
+    `;
+    div.querySelector('.PackSeeMore').addEventListener('click', () => showDetails(pack));
+    return div;
+}
+
+function showDetails(pack) {
+    document.getElementById('modalTitle').textContent       = pack.title;
+    document.getElementById('modalAuthor').textContent      = `By ${pack.author || 'Unknown'}`;
+    document.getElementById('modalCategory').textContent    = pack.category || 'Other';
+    document.getElementById('modalDescription').textContent = (pack.description && pack.description.length > 5)
+        ? pack.description : 'No description available.';
+    document.getElementById('modalDownloadBtn').href = pack.download_url || '#';
+    const iconEl = document.getElementById('modalIcon');
+    iconEl.src = pack.icon || '/img/Placeholder.png';
+    iconEl.onerror = function() { this.src = '/img/Placeholder.png'; };
+    document.getElementById('DescriptionModal').style.display = 'block';
+}
+
+function closeModal() { document.getElementById('DescriptionModal').style.display = 'none'; }
+function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+</script>
+</body>
+</html>

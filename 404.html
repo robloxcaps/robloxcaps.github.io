@@ -1,59 +1,35 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" id="www-roblox-com">
+<html lang="en">
 <head>
-<title>Oops!</title>
-<link rel="icon" href="../img/FaviIcon.ico" type="image/x-icon"> 
-<link rel="stylesheet" href="../style.css">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<meta name="author" content="OGMelodii & Jakyro"/>
-<meta name="description" content="Contains all packs made by OGMelodii & Jakyro."/>
-<meta name="keywords" content="Roblox, Retro, Roblox Pack, Sandbox"/>
-<meta name="robots" content="all"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="all">
+    <title>Oops! - CAP Central</title>
+    <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
 
-<form name="aspnetForm" method="post" action="default.aspx" id="aspnetForm">
-<div id="Container">
-    <!-- HEADER SECTION -->
-    <div id="Header">
-        <div id="Banner">
-            <img id="MainBanner" src="../img/2007NoLogoBanner.png" alt="ROBLOX Banner" />
-        </div>
-        <div id="Navigation">
-            <span><a id="ctl00_hlInfo" class="MenuItem" href="/">Info<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/dist/png/information.png"></a></span>
-            <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_hlPacks" class="MenuItem" href="/Packs/">Packs<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/bricks.png"></a></span>
-            <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_hlCredits" class="MenuItem" href="/Credits/">Credits<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/user.png"></a></span>
-            <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_hlSubmit" class="MenuItem" href="/Submit/">Submit Packs<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/package_add.png"></a></span>
-            <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_News" class="MenuItem" href="/News/">News<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/newspaper.png"></a></span>
-            <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_Plugins" class="MenuItem" href="/Plugins/">Plugins<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/plugin.png"></a></span>
-        </div>
-    </div>
-
-    </div>
-    
-    <!-- MAIN CONTENT AREA -->
+<div id="Header"></div>
+<div id="Container" class="main-page">
     <div id="Body">
         <div id="MainContent">
-            <div class="error-message">
-                <center><img src="/img/404.png"></center>
-                <big><big>Sorry! This page is not found or currently doesnt exist, Goodbye!</big></big>
-            </div>
+            <div class="error-message" id="NotFound"></div>
         </div>
     </div>
-    
-    <!-- FOOTER SECTION -->
-    <div id="Footer">
-        <hr/>
-        <p class="Legalese">
-            ©2026 OGMelodii & Jakyro. All rights reserved.
-        </p>
-    </div>
 </div>
-</form>
+<div id="FooterWrapper">
+    <div id="Footer"></div>
+</div>
+
+<script>
+    const path = window.location.pathname;
+    if (path.startsWith('/users/')) {
+        const username = path.split('/users/')[1].replace(/\/$/, '');
+        if (username) window.location.replace('/users/?u=' + username);
+    }
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/assets/js/config.js"></script>
 </body>
 </html>

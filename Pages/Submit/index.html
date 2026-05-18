@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="all">
+    <title>Submit a Pack - CAP Central</title>
+    <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+
+<div id="Header"></div>
+<div id="Container">
+    <div id="Body">
+        <div id="MainContent">
+
+            <div class="PageHeader">
+                <h2>Submit a Pack</h2>
+                <p>All submissions are reviewed before being added to the site. You must be logged in to submit.</p>
+            </div>
+
+            <div id="NotLoggedIn" style="display:none;" class="Notice">
+                <h4>Not Logged In</h4>
+                <p>You need to be logged in to submit a pack.</p>
+                <div style="margin-top:8px;display:flex;gap:8px;">
+                    <a href="/Login/"  class="NoticeBtn">Log In</a>
+                    <a href="/Signup/" class="NoticeBtn">Sign Up</a>
+                </div>
+            </div>
+
+            <div class="Notice">
+                <h4>Submission Guidelines</h4>
+                <ul>
+                    <li>Packs must be a <strong>.rbxm</strong> file or toolbox model.</li>
+                    <li>Include a working download link.</li>
+                    <li>Use a direct link to a 100×100px icon image.</li>
+                    <li>Only submit content you have rights to distribute.</li>
+                    <li>If your pack isn't accepted, you can post it in our Discord forum.</li>
+                </ul>
+            </div>
+
+            <div id="SubmitForm" style="display:none;" class="FormCard">
+                <div class="box-header"><h2>Pack Details</h2></div>
+                <div class="box-body">
+
+                    <div class="form-group">
+                        <label for="packName">Pack Name</label>
+                        <input type="text" id="packName" placeholder="e.g. 2009 Roblox Pack" maxlength="80" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="packAuthor">Author Name</label>
+                        <input type="text" id="packAuthor" placeholder="e.g. Builderman" maxlength="60" />
+                        <p class="field-hint">The original creator of the pack — can be different from your username.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="packDownload">Download URL</label>
+                        <input type="url" id="packDownload" placeholder="https://files.catbox.moe/..." />
+                        <p class="field-hint">Direct link to the .rbxm file.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="packIcon">Icon URL</label>
+                        <input type="url" id="packIcon" placeholder="https://..." />
+                        <p class="field-hint">Direct link to a 100×100px image.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="packCategory">Category</label>
+                        <input type="text" id="packCategory" placeholder="e.g. Terrain, Props, Buildings..." maxlength="40" />
+                    </div>
+
+                    <button id="SubmitBtn" onclick="handleSubmit()">Submit Pack</button>
+                    <div id="SubmitStatus"></div>
+
+                </div>
+            </div>
+
+            <div class="Notice">
+                <h4>What Happens Next?</h4>
+                <ol>
+                    <li><strong>Review</strong> — We'll check your pack within 24–48 hours.</li>
+                    <li><strong>Approval</strong> — If approved, it gets added to the Packs page instantly.</li>
+                    <li><strong>Rejection</strong> — If rejected, it won't appear but you can resubmit.</li>
+                </ol>
+                <p style="margin-top:8px;font-size:11px;">
+                    Questions? Join us on <a href="https://discord.gg/wqvWd2zeMV">Discord</a>.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div id="FooterWrapper">
+    <div id="Footer"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/config.js"></script>
+<script>
+function setStatus(msg, type) {
+    const el = document.getElementById('SubmitStatus');
+    el.textContent = msg;
+    el.className = type;
+}
+
+let loggedInUsername = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(async () => {
+        const { data: { session } } = await sb.auth.getSession();
+
+        if (!session) {
+            document.getElementById('NotLoggedIn').style.display = 'block';
+            return;
+        }
+
+        // Fetch username from profiles so submitted_by stores the username, not UUID
+        const { data: profile } = await sb
+            .from('profiles')
+            .select('username')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+        loggedInUsername = profile?.username || null;
+
+        document.getElementById('SubmitForm').style.display = 'block';
+    }, 100);
+});
+
+async function handleSubmit() {
+    const title        = document.getElementById('packName').value.trim();
+    const author       = document.getElementById('packAuthor').value.trim();
+    const download_url = document.getElementById('packDownload').value.trim();
+    const icon         = document.getElementById('packIcon').value.trim();
+    const category     = document.getElementById('packCategory').value.trim();
+    const btn          = document.getElementById('SubmitBtn');
+
+    if (!title || !author || !download_url || !icon || !category) {
+        return setStatus('Please fill in all fields.', 'error');
+    }
+
+    btn.disabled = true;
+    setStatus('Submitting...', '');
+
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return setStatus('You must be logged in to submit.', 'error');
+
+    const { error } = await sb.from('submissions').insert({
+        title,
+        author,
+        download_url,
+        icon,
+        category,
+        submitted_by: loggedInUsername,  // username, not UUID
+    });
+
+    if (error) {
+        btn.disabled = false;
+        return setStatus('Error submitting: ' + error.message, 'error');
+    }
+
+    setStatus('Pack submitted! We\'ll review it within 24–48 hours.', 'success');
+    btn.disabled = true;
+
+    ['packName', 'packAuthor', 'packDownload', 'packIcon', 'packCategory'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+}
+</script>
+</body>
+</html>

@@ -1,127 +1,220 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>ROBLOX CLASSIC ASSET PACKS</title>
-<link rel="icon" href="img/FaviIcon.ico" type="image/x-icon">
-<link rel="stylesheet" href="style.css">
-<meta name="author" content="OGMelodii & Jakyro">
-<meta name="description" content="Contains all packs made by OGMelodii & Jakyro.">
-<meta name="keywords" content="Roblox, Retro, Roblox Pack, Sandbox">
-<meta name="robots" content="all">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Home - CAP Central</title>
+    <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
-
-<div id="Container" class="main-page">
-    <!-- HEADER -->
-    <div id="Header">
-        <div id="Banner">
-            <img id="MainBanner" src="../img/2007NoLogoBanner.png" alt="ROBLOX Banner" />
-        </div>
-        <div id="Navigation">
-            <span><a id="ctl00_hlInfo" class="MenuItem" href="/">Info<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/dist/png/information.png"></a></span>
-            <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_hlPacks" class="MenuItem" href="/Packs/">Packs<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/bricks.png"></a></span>
-            <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_hlCredits" class="MenuItem" href="/Credits/">Credits<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/user.png"></a></span>
-            <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_hlSubmit" class="MenuItem" href="/Submit/">Submit Packs<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/package_add.png"></a></span>
-            <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_News" class="MenuItem" href="/News/">News<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/newspaper.png"></a></span>
-            <span class="Separator">&nbsp;|&nbsp;</span>
-            <span><a id="ctl00_Plugins" class="MenuItem" href="/Plugins/">Plugins<img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/src/plugin.png"></a></span>
+    <div id="Header"></div>
+    <div id="Container" class="main-page">
+        <div id="Body">
+            <div id="MainContent">
+                <div id="SplashSection"></div>
+                <div id="StatsSection"></div>
+                <div id="RecentSection"></div>
+            </div>
         </div>
     </div>
-
-    <div id="Logo">
-        <center><img src="img/Logo.png" width="1000" height="300"></center>
+    <div id="FooterWrapper">
+        <div id="Footer"></div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/assets/js/config.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(async () => {
+            const { data: { session } } = await sb.auth.getSession();
 
-    <!-- MAIN CONTENT -->
-    <div id="RobloxAtAGlance">
-        <div class="welcome-card">
-            <div class="card-header">
-                <h2>Welcome to ROBLOX CAPS</h2>
-            </div>
-            <div class="card-content">
-                <p>You're currently on ROBLOX: CAPS (Classic Asset Packs), your place which has 2007-2017 Roblox Packs completely for free!</p>
-                <p>(Please note that this website is still in construction and there arent many packs available yet, if you can please submit your own!)</p>
-            </div>
-        </div>
+            let username = null;
+            if (session) {
+                const { data: profile } = await sb
+                    .from('profiles')
+                    .select('username')
+                    .eq('id', session.user.id)
+                    .maybeSingle();
+                username = profile?.username || null;
+            }
 
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/dist/png/bricks.png" alt="Packs">
-                </div>
-                <h3>Asset Packs</h3>
-                <p>Browse our extensive collection of classic Roblox assets from 2007-2017</p>
-            </div>
+            buildSplash(username);
+            buildStats();
+            buildRecent();
+        }, 150);
+    });
 
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/dist/png/comments.png" alt="Community">
-                </div>
-                <h3>Join Community</h3>
-                <p>Connect with other enthusiasts in our Discord server</p>
-                <a href="https://discord.gg/3HAHErZeeN" class="discord-link">
-                    <img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/dist/png/application_add.png" alt="Join">
-                    Join Discord Server
-                </a>
-            </div>
+    function buildSplash(username) {
+        const splash = document.getElementById('SplashSection');
 
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <img src="https://raw.githubusercontent.com/legacy-icons/famfamfam-silk/refs/heads/master/dist/png/package_add.png" alt="Submit">
-                </div>
-                <h3>Submit Packs</h3>
-                <p>Share your own classic asset packs with the community</p>
-            </div>
-        </div>
-
-        <div class="navigation-guide">
-            <div class="guide-header">
-                <h3>Navigation Guide</h3>
-            </div>
-            <div class="guide-content">
-                <p>Use the navigation menu above to explore different sections:</p>
-                <div class="nav-steps">
-                    <div class="nav-step">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h4>Packs</h4>
-                            <p>View all available asset packs</p>
-                        </div>
+        if (username) {
+            splash.innerHTML = `
+                <div id="SplashLeft">
+                    <img id="SplashLogo" src="${SITE_CONFIG.splashLogoImg}" alt="${SITE_CONFIG.siteName}">
+                    <div id="SplashBlurb">
+                        <h2>Welcome back, ${esc(username)}!</h2>
+                        <p>${SITE_CONFIG.home.blurbText}</p>
                     </div>
-                    <div class="nav-step">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h4>Credits</h4>
-                            <p>See contributors and credits</p>
+                </div>
+                <div id="SignInArea">
+                    <div id="SignupBox">
+                        <div class="box-header"><h3>Search Packs</h3></div>
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label for="HomeSearch">Pack name or author</label>
+                                <input type="text" id="HomeSearch" placeholder="e.g. 2009 terrain..." autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label for="HomeCategory">Category</label>
+                                <select id="HomeCategory">
+                                    <option value="">All categories</option>
+                                </select>
+                            </div>
+                            <button onclick="handleHomeSearch()">Search</button>
+                            <div style="margin-top:8px;text-align:center;font-size:11px;">
+                                <a href="/Pages/Packs/">Browse all packs &rarr;</a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="nav-step">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h4>Submit</h4>
-                            <p>Upload your own packs</p>
+                        <div class="box-footer">
+                            <a href="/Submit/">Submit your own pack</a>
                         </div>
                     </div>
                 </div>
+            `;
+        } else {
+            splash.innerHTML = `
+                <div id="SplashLeft">
+                    <img id="SplashLogo" src="${SITE_CONFIG.splashLogoImg}" alt="${SITE_CONFIG.siteName}">
+                    <div id="SplashBlurb">
+                        <h2>${SITE_CONFIG.home.slogan}</h2>
+                        <p>${SITE_CONFIG.home.blurbText}</p>
+                    </div>
+                </div>
+                <div id="SignInArea">
+                    <div id="SignupBox">
+                        <div class="box-header"><h3>${SITE_CONFIG.home.signupTitle}</h3></div>
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input id="hw_username" type="text" placeholder="${SITE_CONFIG.home.usernamePh}" maxlength="24" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input id="hw_email" type="email" placeholder="${SITE_CONFIG.home.emailPh}" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input id="hw_password" type="password" placeholder="${SITE_CONFIG.home.passwordPh}">
+                            </div>
+                            <button onclick="handleHomeSignup()">${SITE_CONFIG.home.signupBtn}</button>
+                            <div id="hw_status"></div>
+                        </div>
+                        <div class="box-footer">
+                            <a href="/Login/">${SITE_CONFIG.home.loginLink}</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        loadCategories();
+    }
+
+    async function loadCategories() {
+        const sel = document.getElementById('HomeCategory');
+        if (!sel) return;
+        const { data } = await sb.from('packs').select('category');
+        if (!data) return;
+        const cats = [...new Set(data.map(p => p.category || 'Other').filter(Boolean))].sort();
+        cats.forEach(cat => {
+            const o = document.createElement('option');
+            o.value = cat; o.textContent = cat;
+            sel.appendChild(o);
+        });
+    }
+
+    function handleHomeSearch() {
+        const query    = document.getElementById('HomeSearch')?.value.trim() || '';
+        const category = document.getElementById('HomeCategory')?.value || '';
+        const params   = new URLSearchParams();
+        if (query)    params.set('search', query);
+        if (category) params.set('category', category);
+        window.location.href = '/Pages/Packs/?' + params.toString();
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && document.activeElement?.id === 'HomeSearch') handleHomeSearch();
+    });
+
+    async function buildStats() {
+        const section = document.getElementById('StatsSection');
+        const { count: packCount } = await sb.from('packs').select('*', { count: 'exact', head: true });
+        const { data: dlData }     = await sb.from('packs').select('downloads');
+        const totalDl  = dlData ? dlData.reduce((s, p) => s + (p.downloads || 0), 0) : 0;
+        const { count: userCount } = await sb.from('profiles').select('*', { count: 'exact', head: true });
+
+        section.innerHTML = `
+            <div id="StatsBar" style="margin:0;">
+                <div class="stat-card">
+                    <div class="stat-number">${packCount ?? '—'}</div>
+                    <div class="stat-label">Packs Available</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${totalDl.toLocaleString()}</div>
+                    <div class="stat-label">Total Downloads</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${userCount ?? '—'}</div>
+                    <div class="stat-label">Members</div>
+                </div>
             </div>
-        </div>
-    </div>
-</div>
+        `;
+    }
 
-<!-- FOOTER -->
-<div id="FooterWrapper">
-    <div id="Footer">
-        <hr>
-        <p class="Legalese">
-            ©2026 OGMelodii & Jakyro. All rights reserved.
-        </p>
-    </div>
-</div>
+    async function buildRecent() {
+        const section = document.getElementById('RecentSection');
+        const { data: packs } = await sb
+            .from('packs')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(3);
 
+        if (!packs || packs.length === 0) return;
+
+        section.innerHTML = `
+            <div style="padding:12px 0px 20px;">
+                <div class="CatHeader">
+                    <h3>Recently Added</h3>
+                    <a href="/Pages/Packs/">View all &rarr;</a>
+                </div>
+                <div class="PackGrid" id="RecentGrid" style="margin-top:0;border:1px solid #c0cce0;border-top:none;padding:12px;background:#fff;"></div>
+            </div>
+        `;
+
+        const grid = document.getElementById('RecentGrid');
+        packs.forEach(pack => {
+            const div = document.createElement('div');
+            div.className = 'PackItem';
+            div.innerHTML = `
+                <div class="PackContentGroup">
+                    <img class="PackIcon" src="${esc(pack.icon||'/img/Placeholder.png')}" alt="${esc(pack.title)}" loading="lazy" onerror="this.src='/img/Placeholder.png'">
+                    <div class="PackTitle">${esc(pack.title)}</div>
+                    <div class="PackAuthor">by ${esc(pack.author)}</div>
+                    <div class="PackCategory">${esc(pack.category||'Other')}</div>
+                </div>
+                <div class="PackButtons">
+                    <a href="${esc(pack.download_url||'#')}" target="_blank" rel="noopener noreferrer" class="PackDownload">Download</a>
+                </div>
+            `;
+            grid.appendChild(div);
+        });
+    }
+
+    function esc(t) {
+        if (!t) return '';
+        const d = document.createElement('div');
+        d.textContent = t; return d.innerHTML;
+    }
+    </script>
 </body>
 </html>

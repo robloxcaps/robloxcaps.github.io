@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin - CAP Central</title>
+    <link rel="icon" href="/assets/img/LogoShorten.png">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .admin-section { margin-top: 16px; }
+
+        .tab-bar {
+            display: flex;
+            border-bottom: 2px solid #c0cce0;
+        }
+
+        .tab-btn {
+            padding: 6px 16px;
+            font-size: 11px; font-weight: bold; font-family: inherit;
+            background: #e6ecf5; color: #2a3a5a;
+            border: 1px solid #c0cce0; border-bottom: none;
+            cursor: pointer; margin-right: 2px;
+        }
+
+        .tab-btn.active { background: #fff; border-bottom: 2px solid #fff; margin-bottom: -2px; }
+        .tab-btn:hover:not(.active) { background: #d8e2f0; }
+
+        .tab-panel { display: none; border: 1px solid #c0cce0; border-top: none; background: #fff; padding: 12px; }
+        .tab-panel.active { display: block; }
+
+        .user-input {
+            padding: 3px 6px; border: 1px solid #bbb;
+            font-size: 11px; font-family: inherit;
+            width: 160px; border-radius: 2px;
+        }
+
+        .user-section { margin-bottom: 14px; }
+        .user-section-title { font-size: 11px; font-weight: bold; color: #445; margin-bottom: 6px; }
+        .user-section-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+        .user-section-status { font-size: 11px; margin-top: 4px; min-height: 14px; }
+
+        .edit-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); z-index: 2000;
+            align-items: center; justify-content: center;
+        }
+        .edit-overlay.open { display: flex; }
+
+        .edit-box {
+            background: #fff; border: 1px solid #aaa;
+            width: 90%; max-width: 480px; border-radius: 2px;
+        }
+
+        .edit-box-header {
+            background: #e6ecf5; border-bottom: 1px solid #c0cce0;
+            padding: 6px 12px; display: flex;
+            justify-content: space-between; align-items: center;
+        }
+
+        .edit-box-header h3 { font-size: 12px; font-weight: bold; color: #2a3a5a; }
+        .edit-box-body { padding: 14px; }
+        .edit-box-body .form-group { margin-bottom: 10px; }
+        .edit-box-body label { display: block; font-size: 11px; font-weight: bold; color: #445; margin-bottom: 3px; }
+        .edit-box-body input { width: 100%; padding: 4px 6px; border: 1px solid #bbb; font-size: 12px; font-family: inherit; border-radius: 2px; }
+        .edit-box-footer { padding: 8px 14px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 8px; }
+
+        .list-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 10px; border-bottom: 1px solid #eee; font-size: 12px;
+        }
+        .list-row:nth-child(odd) { background: #f4f6fa; }
+        .list-row:last-child { border-bottom: none; }
+        .list-row-icon { width: 36px; height: 36px; object-fit: cover; border: 1px solid #ccc; border-radius: 2px; flex-shrink: 0; }
+        .list-row-title { font-weight: bold; color: #2a3a5a; }
+        .list-row-meta { font-size: 11px; color: #778; }
+
+        .sub-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-bottom: 1px solid #eee; font-size: 12px;
+        }
+        .sub-row:nth-child(odd) { background: #f4f6fa; }
+        .sub-row:last-child { border-bottom: none; }
+    </style>
+</head>
+<body>
+
+<div id="Header"></div>
+<div id="Container">
+    <div id="Body">
+
+        <div id="AccessDenied" style="display:none;">
+            <h2>Access Denied</h2>
+            <p>You don't have permission to view this page.</p>
+            <a href="/" class="ProfileHomeBtn">Go Home</a>
+        </div>
+
+        <div id="AdminPanel" style="display:none;">
+
+            <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+                <span>Admin Panel</span>
+                <button onclick="refreshAll()" class="btn-modal btn-modal-secondary">Refresh</button>
+            </div>
+
+            <div id="StatsBar">
+                <div class="stat-card"><div class="stat-number" id="StatPending">—</div><div class="stat-label">Pending</div></div>
+                <div class="stat-card"><div class="stat-number" id="StatApproved">—</div><div class="stat-label">Approved Packs</div></div>
+                <div class="stat-card"><div class="stat-number" id="StatTotal">—</div><div class="stat-label">Total Submissions</div></div>
+                <div class="stat-card"><div class="stat-number" id="StatDownloads">—</div><div class="stat-label">Total Downloads</div></div>
+            </div>
+
+            <div class="admin-section">
+                <div class="tab-bar">
+                    <button class="tab-btn active" onclick="switchTab('pending')">Pending</button>
+                    <button class="tab-btn" onclick="switchTab('allsubs')">All Submissions</button>
+                    <button class="tab-btn" onclick="switchTab('packs')">Manage Packs</button>
+                    <button class="tab-btn" onclick="switchTab('users')">Users</button>
+                </div>
+
+                <!-- PENDING -->
+                <div id="tab-pending" class="tab-panel active">
+                    <div id="SubmissionsList"><div id="LoadingMessage">Loading...</div></div>
+                </div>
+
+                <!-- ALL SUBMISSIONS -->
+                <div id="tab-allsubs" class="tab-panel">
+                    <div id="AllSubsList"><div style="color:#778;font-size:12px;">Loading...</div></div>
+                </div>
+
+                <!-- MANAGE PACKS -->
+                <div id="tab-packs" class="tab-panel">
+                    <div id="PacksList"><div style="color:#778;font-size:12px;">Loading...</div></div>
+                </div>
+
+                <!-- USERS -->
+                <div id="tab-users" class="tab-panel">
+
+                    <!-- DELETE USER -->
+                    <div class="user-section">
+                        <div class="user-section-title">Delete User</div>
+                        <div class="user-section-row">
+                            <input class="user-input" type="text" id="DeleteUsernameInput" placeholder="Username">
+                            <button class="btn-reject" onclick="deleteUser()">Delete User</button>
+                        </div>
+                        <div class="user-section-status" id="DeleteUserStatus"></div>
+                    </div>
+
+                    <hr style="margin:12px 0;">
+
+                    <!-- BAN / UNBAN -->
+                    <div class="user-section">
+                        <div class="user-section-title">Ban / Unban User</div>
+                        <div class="user-section-row">
+                            <input class="user-input" type="text" id="BanUsernameInput" placeholder="Username">
+                            <input class="user-input" type="text" id="BanReasonInput" placeholder="Reason (optional)" style="width:180px;">
+                            <button class="btn-approve" onclick="banUser()">Ban</button>
+                            <button class="btn-reject"  onclick="unbanUser()">Unban</button>
+                        </div>
+                        <div class="user-section-status" id="BanStatus"></div>
+                    </div>
+
+                    <hr style="margin:12px 0;">
+
+                    <!-- CHANGE USERNAME -->
+                    <div class="user-section">
+                        <div class="user-section-title">Change Username</div>
+                        <div class="user-section-row">
+                            <input class="user-input" type="text" id="UsernameCurrent" placeholder="Current username">
+                            <input class="user-input" type="text" id="UsernameNew"     placeholder="New username">
+                            <button class="btn-approve" onclick="changeUsername()">Change</button>
+                        </div>
+                        <div class="user-section-status" id="UsernameStatus"></div>
+                    </div>
+
+                    <hr style="margin:12px 0;">
+
+                    <!-- ADMIN ACCESS -->
+                    <div class="user-section">
+                        <div class="user-section-title">Admin Access</div>
+                        <div class="user-section-row">
+                            <input class="user-input" type="text" id="AdminUsernameInput" placeholder="Username">
+                            <button class="btn-approve" onclick="makeAdmin()">Make Admin</button>
+                            <button class="btn-reject"  onclick="removeAdmin()">Remove Admin</button>
+                        </div>
+                        <div class="user-section-status" id="AdminActionStatus"></div>
+                        <div style="margin-top:10px;">
+                            <div style="font-size:11px;font-weight:bold;color:#445;margin-bottom:4px;">Current Admins</div>
+                            <div id="AdminList" style="font-size:12px;">Loading...</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="FooterWrapper">
+    <div id="Footer"></div>
+</div>
+
+<!-- EDIT PACK MODAL -->
+<div id="EditPackOverlay" class="edit-overlay">
+    <div class="edit-box">
+        <div class="edit-box-header">
+            <h3>Edit Pack</h3>
+            <button class="close" onclick="closeEditModal()">&times;</button>
+        </div>
+        <div class="edit-box-body">
+            <input type="hidden" id="editPackId">
+            <div class="form-group"><label>Title</label><input type="text" id="editTitle" maxlength="80"></div>
+            <div class="form-group"><label>Author</label><input type="text" id="editAuthor" maxlength="60"></div>
+            <div class="form-group"><label>Category</label><input type="text" id="editCategory" maxlength="40"></div>
+            <div class="form-group"><label>Icon URL</label><input type="url" id="editIcon"></div>
+            <div class="form-group"><label>Download URL</label><input type="url" id="editDownload"></div>
+            <div id="EditStatus" style="font-size:11px;min-height:14px;"></div>
+        </div>
+        <div class="edit-box-footer">
+            <button class="btn-modal btn-modal-secondary" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-modal btn-modal-primary"   onclick="savePackEdit()">Save</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/config.js"></script>
+<script>
+const ADMIN_UID = '18d4e73a-c6f6-4808-ae7b-84666ceac0e6';
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(async () => {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session || session.user.id !== ADMIN_UID) {
+            document.getElementById('AccessDenied').style.display = 'block';
+            return;
+        }
+        document.getElementById('AdminPanel').style.display = 'block';
+        refreshAll();
+    }, 100);
+
+    document.getElementById('EditPackOverlay').addEventListener('click', e => {
+        if (e.target === document.getElementById('EditPackOverlay')) closeEditModal();
+    });
+});
+
+function refreshAll() {
+    loadStats();
+    loadSubmissions();
+    loadAllSubmissions();
+    loadAllPacks();
+    loadAdminList();
+}
+
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', ['pending','allsubs','packs','users'][i] === tab);
+    });
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(`tab-${tab}`).classList.add('active');
+}
+
+function setStatus(elId, msg, ok) {
+    const el = document.getElementById(elId);
+    el.textContent  = msg;
+    el.style.color  = ok ? '#337722' : '#cc2222';
+}
+
+// ---- STATS ----
+async function loadStats() {
+    const { count: pending }  = await sb.from('submissions').select('*', { count: 'exact', head: true }).or('status.eq.pending,status.is.null');
+    const { count: approved } = await sb.from('packs').select('*', { count: 'exact', head: true });
+    const { count: total }    = await sb.from('submissions').select('*', { count: 'exact', head: true });
+    const { data: dlData }    = await sb.from('packs').select('downloads');
+    const totalDl = dlData ? dlData.reduce((s, p) => s + (p.downloads || 0), 0) : 0;
+
+    document.getElementById('StatPending').textContent   = pending  ?? '—';
+    document.getElementById('StatApproved').textContent  = approved ?? '—';
+    document.getElementById('StatTotal').textContent     = total    ?? '—';
+    document.getElementById('StatDownloads').textContent = totalDl;
+}
+
+// ---- PENDING ----
+async function loadSubmissions() {
+    const list = document.getElementById('SubmissionsList');
+    list.innerHTML = '<div id="LoadingMessage">Loading...</div>';
+
+    const { data, error } = await sb.from('submissions').select('*')
+        .or('status.eq.pending,status.is.null')
+        .order('created_at', { ascending: false });
+
+    if (error) { list.innerHTML = `<div class="ErrorMessage">Error: ${error.message}</div>`; return; }
+    if (!data || data.length === 0) { list.innerHTML = '<div id="LoadingMessage">No pending submissions!</div>'; return; }
+
+    list.innerHTML = '';
+    data.forEach(sub => list.appendChild(createSubCard(sub)));
+}
+
+function createSubCard(sub) {
+    const div = document.createElement('div');
+    div.className = 'submission-card';
+    div.id = `sub-${sub.id}`;
+    const date = new Date(sub.created_at).toLocaleDateString();
+    div.innerHTML = `
+        <img class="submission-icon" src="${esc(sub.icon||'')}" alt="" onerror="this.src='/img/Placeholder.png'">
+        <div class="submission-info">
+            <div class="submission-title">${esc(sub.title)}</div>
+            <div class="submission-meta">
+                <strong>Author:</strong> ${esc(sub.author)} &nbsp;
+                <strong>Category:</strong> ${esc(sub.category||'N/A')} &nbsp;
+                <strong>Submitted by:</strong> ${esc(sub.submitted_by||'unknown')} &nbsp;
+                <strong>Date:</strong> ${date}<br>
+                <strong>Download:</strong> <a href="${esc(sub.download_url)}" target="_blank">View File</a> &nbsp;
+                <strong>Icon:</strong> <a href="${esc(sub.icon)}" target="_blank">View Image</a>
+            </div>
+            <div class="submission-actions">
+                <button class="btn-approve" onclick="approveSubmission('${sub.id}')">Approve</button>
+                <button class="btn-reject"  onclick="rejectSubmission('${sub.id}')">Reject</button>
+            </div>
+        </div>
+    `;
+    return div;
+}
+
+async function approveSubmission(id) {
+    const card = document.getElementById(`sub-${id}`);
+    card.querySelectorAll('button').forEach(b => b.disabled = true);
+
+    const { data: sub, error: fetchErr } = await sb.from('submissions').select('*').eq('id', id).single();
+    if (fetchErr) { alert('Error: ' + fetchErr.message); card.querySelectorAll('button').forEach(b => b.disabled = false); return; }
+
+    const { error: insertErr } = await sb.from('packs').insert({
+        title: sub.title, author: sub.author,
+        download_url: sub.download_url, icon: sub.icon,
+        category: sub.category, submitted_by: sub.submitted_by,
+    });
+
+    if (insertErr) { alert('Error approving: ' + insertErr.message); card.querySelectorAll('button').forEach(b => b.disabled = false); return; }
+
+    await sb.from('submissions').update({ status: 'approved' }).eq('id', id);
+    card.remove();
+    loadStats();
+    loadAllSubmissions();
+}
+
+async function rejectSubmission(id) {
+    if (!confirm('Reject this submission?')) return;
+    const card = document.getElementById(`sub-${id}`);
+    card.querySelectorAll('button').forEach(b => b.disabled = true);
+    const { error } = await sb.from('submissions').update({ status: 'rejected' }).eq('id', id);
+    if (error) { alert('Error: ' + error.message); card.querySelectorAll('button').forEach(b => b.disabled = false); return; }
+    card.remove();
+    loadStats();
+    loadAllSubmissions();
+}
+
+// ---- ALL SUBMISSIONS ----
+async function loadAllSubmissions() {
+    const list = document.getElementById('AllSubsList');
+    list.innerHTML = '<div style="color:#778;font-size:12px;">Loading...</div>';
+
+    const { data, error } = await sb.from('submissions').select('*').order('created_at', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+        list.innerHTML = '<div style="color:#778;font-size:12px;padding:8px;">No submissions found.</div>';
+        return;
+    }
+
+    list.innerHTML = '';
+    data.forEach(sub => {
+        const status = sub.status || 'pending';
+        const date   = new Date(sub.created_at).toLocaleDateString();
+        const row    = document.createElement('div');
+        row.className = 'list-row';
+        row.innerHTML = `
+            <img class="list-row-icon" src="${esc(sub.icon||'')}" alt="" onerror="this.src='/img/Placeholder.png'">
+            <div style="flex:1;">
+                <div class="list-row-title">${esc(sub.title)}</div>
+                <div class="list-row-meta">by ${esc(sub.author)} · submitted by ${esc(sub.submitted_by||'unknown')} · ${date}</div>
+            </div>
+            <span class="status-badge badge-${status}">${status.charAt(0).toUpperCase()+status.slice(1)}</span>
+        `;
+        list.appendChild(row);
+    });
+}
+
+// ---- MANAGE PACKS ----
+async function loadAllPacks() {
+    const list = document.getElementById('PacksList');
+    list.innerHTML = '<div style="color:#778;font-size:12px;">Loading...</div>';
+
+    const { data, error } = await sb.from('packs').select('*').order('created_at', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+        list.innerHTML = '<div style="color:#778;font-size:12px;padding:8px;">No packs found.</div>';
+        return;
+    }
+
+    list.innerHTML = '';
+    data.forEach(pack => {
+        const row = document.createElement('div');
+        row.className = 'list-row';
+        row.id = `packrow-${pack.id}`;
+        row.innerHTML = `
+            <img class="list-row-icon" src="${esc(pack.icon||'')}" alt="" onerror="this.src='/img/Placeholder.png'">
+            <div style="flex:1;">
+                <div class="list-row-title">${esc(pack.title)}</div>
+                <div class="list-row-meta">by ${esc(pack.author)} · ${esc(pack.category||'Other')} · ${pack.downloads||0} downloads</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+                <button class="btn-modal btn-modal-secondary" style="font-size:10px;padding:2px 8px;" onclick='openEditModal(${JSON.stringify(pack)})'>Edit</button>
+                <button class="btn-reject" style="font-size:10px;padding:2px 8px;" onclick="deletePack('${pack.id}')">Delete</button>
+            </div>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function openEditModal(pack) {
+    document.getElementById('editPackId').value   = pack.id;
+    document.getElementById('editTitle').value    = pack.title || '';
+    document.getElementById('editAuthor').value   = pack.author || '';
+    document.getElementById('editCategory').value = pack.category || '';
+    document.getElementById('editIcon').value     = pack.icon || '';
+    document.getElementById('editDownload').value = pack.download_url || '';
+    document.getElementById('EditStatus').textContent = '';
+    document.getElementById('EditPackOverlay').classList.add('open');
+}
+
+function closeEditModal() {
+    document.getElementById('EditPackOverlay').classList.remove('open');
+}
+
+async function savePackEdit() {
+    const id       = document.getElementById('editPackId').value;
+    const title    = document.getElementById('editTitle').value.trim();
+    const author   = document.getElementById('editAuthor').value.trim();
+    const category = document.getElementById('editCategory').value.trim();
+    const icon     = document.getElementById('editIcon').value.trim();
+    const download = document.getElementById('editDownload').value.trim();
+    const statusEl = document.getElementById('EditStatus');
+
+    if (!title || !author) { statusEl.textContent = 'Title and author required.'; statusEl.style.color = '#cc2222'; return; }
+    statusEl.textContent = 'Saving...'; statusEl.style.color = '#778';
+
+    const { error } = await sb.from('packs').update({ title, author, category, icon, download_url: download }).eq('id', id);
+    if (error) { statusEl.textContent = 'Error: ' + error.message; statusEl.style.color = '#cc2222'; return; }
+
+    statusEl.textContent = 'Saved!'; statusEl.style.color = '#337722';
+    setTimeout(closeEditModal, 800);
+    loadAllPacks();
+}
+
+async function deletePack(id) {
+    if (!confirm('Delete this pack permanently?')) return;
+    const { error } = await sb.from('packs').delete().eq('id', id);
+    if (error) { alert('Error: ' + error.message); return; }
+    loadAllPacks();
+    loadStats();
+}
+
+// ---- DELETE USER ----
+async function deleteUser() {
+    const username = document.getElementById('DeleteUsernameInput').value.trim();
+    if (!username) { setStatus('DeleteUserStatus', 'Enter a username.', false); return; }
+    if (!confirm(`Permanently delete user "${username}"? This cannot be undone.`)) return;
+
+    setStatus('DeleteUserStatus', 'Deleting...', true);
+
+    const { data: { session } } = await sb.auth.getSession();
+
+    const res = await fetch(`${SITE_CONFIG.supabaseUrl}/functions/v1/delete-user`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ username, requesting_uid: session.user.id }),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok || result.error) {
+        setStatus('DeleteUserStatus', 'Error: ' + (result.error || 'Unknown error'), false);
+        return;
+    }
+
+    setStatus('DeleteUserStatus', `User "${username}" has been deleted.`, true);
+    document.getElementById('DeleteUsernameInput').value = '';
+}
+
+// ---- BAN / UNBAN ----
+async function banUser() {
+    const username = document.getElementById('BanUsernameInput').value.trim();
+    const reason   = document.getElementById('BanReasonInput').value.trim();
+    if (!username) { setStatus('BanStatus', 'Enter a username.', false); return; }
+
+    setStatus('BanStatus', 'Banning...', true);
+    const { data, error } = await sb.from('profiles').update({ is_banned: true, ban_reason: reason || null }).eq('username', username).select('username').maybeSingle();
+    if (error || !data) { setStatus('BanStatus', error ? error.message : `User "${username}" not found.`, false); return; }
+
+    setStatus('BanStatus', `${username} has been banned.`, true);
+    document.getElementById('BanUsernameInput').value = '';
+    document.getElementById('BanReasonInput').value   = '';
+}
+
+async function unbanUser() {
+    const username = document.getElementById('BanUsernameInput').value.trim();
+    if (!username) { setStatus('BanStatus', 'Enter a username.', false); return; }
+
+    setStatus('BanStatus', 'Unbanning...', true);
+    const { data, error } = await sb.from('profiles').update({ is_banned: false, ban_reason: null }).eq('username', username).select('username').maybeSingle();
+    if (error || !data) { setStatus('BanStatus', error ? error.message : `User "${username}" not found.`, false); return; }
+
+    setStatus('BanStatus', `${username} has been unbanned.`, true);
+    document.getElementById('BanUsernameInput').value = '';
+}
+
+// ---- CHANGE USERNAME ----
+async function changeUsername() {
+    const current = document.getElementById('UsernameCurrent').value.trim();
+    const newName = document.getElementById('UsernameNew').value.trim();
+    if (!current || !newName) { setStatus('UsernameStatus', 'Fill in both fields.', false); return; }
+    if (!/^[a-zA-Z0-9_]{3,24}$/.test(newName)) { setStatus('UsernameStatus', 'Invalid username format.', false); return; }
+
+    setStatus('UsernameStatus', 'Checking...', true);
+    const { data: existing } = await sb.from('profiles').select('username').eq('username', newName).maybeSingle();
+    if (existing) { setStatus('UsernameStatus', 'That username is already taken.', false); return; }
+
+    const { data, error } = await sb.from('profiles').update({ username: newName }).eq('username', current).select('username').maybeSingle();
+    if (error || !data) { setStatus('UsernameStatus', error ? error.message : `User "${current}" not found.`, false); return; }
+
+    setStatus('UsernameStatus', `Changed "${current}" to "${newName}".`, true);
+    document.getElementById('UsernameCurrent').value = '';
+    document.getElementById('UsernameNew').value     = '';
+}
+
+// ---- ADMIN ACCESS ----
+async function makeAdmin()   { await setAdminStatus(true); }
+async function removeAdmin() { await setAdminStatus(false); }
+
+async function setAdminStatus(status) {
+    const username = document.getElementById('AdminUsernameInput').value.trim();
+    if (!username) { setStatus('AdminActionStatus', 'Enter a username.', false); return; }
+
+    setStatus('AdminActionStatus', 'Updating...', true);
+    const { data, error } = await sb.from('profiles').update({ is_admin: status }).eq('username', username).select('username').maybeSingle();
+    if (error || !data) { setStatus('AdminActionStatus', error ? error.message : `User "${username}" not found.`, false); return; }
+
+    setStatus('AdminActionStatus', status ? `${username} is now an admin.` : `${username} is no longer an admin.`, true);
+    document.getElementById('AdminUsernameInput').value = '';
+    loadAdminList();
+}
+
+async function loadAdminList() {
+    const list = document.getElementById('AdminList');
+    const { data, error } = await sb.from('profiles').select('username').eq('is_admin', true).order('created_at', { ascending: true });
+    if (error || !data || data.length === 0) { list.textContent = 'No admins found.'; return; }
+    list.innerHTML = data.map(p => `<div style="padding:2px 0;border-bottom:1px solid #eee;font-size:12px;">★ ${p.username}</div>`).join('');
+}
+
+function esc(text) {
+    if (!text) return '';
+    const d = document.createElement('div');
+    d.textContent = text;
+    return d.innerHTML;
+}
+</script>
+</body>
+</html>

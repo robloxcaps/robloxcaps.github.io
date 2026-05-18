@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sign Up - CAP Central</title>
+<link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
+<link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+
+<div id="Container">
+    <div id="Header"></div>
+
+    <div id="Body">
+        <div class="FormPage">
+            <div class="FormCard">
+                <div class="box-header"><h2>Create an Account</h2></div>
+                <div class="box-body">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" placeholder="e.g. cooluser123" maxlength="24" autocomplete="off" />
+                        <p class="field-hint">Letters, numbers, underscores only. 3–24 chars.</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="you@example.com" autocomplete="off" />
+                        <p class="field-hint">Used to log in. Never shown publicly.</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Min. 6 characters" />
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm">Confirm Password</label>
+                        <input type="password" id="confirm" placeholder="Repeat your password" />
+                    </div>
+                    <button id="SignupBtn" onclick="handleSignup()">Sign Up</button>
+                    <div id="StatusMsg"></div>
+                    <div class="form-footer">
+                        Already have an account? <a href="/Login/">Log in here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="FooterWrapper">
+    <div id="Footer"></div>
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="/assets/js/config.js"></script>
+<script>
+function setStatus(msg, type) {
+    const el = document.getElementById('StatusMsg');
+    el.textContent = msg; el.className = type;
+}
+
+function isValidUsername(u) { return /^[a-zA-Z0-9_]{3,24}$/.test(u); }
+
+async function handleSignup() {
+    const username = document.getElementById('username').value.trim();
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirm  = document.getElementById('confirm').value;
+    const btn      = document.getElementById('SignupBtn');
+
+    setStatus('', '');
+    if (!username||!email||!password||!confirm) return setStatus('Please fill in all fields.', 'error');
+    if (!isValidUsername(username)) return setStatus('Username: letters, numbers, underscores only (3–24 chars).', 'error');
+    if (password.length < 6) return setStatus('Password must be at least 6 characters.', 'error');
+    if (password !== confirm) return setStatus('Passwords do not match.', 'error');
+
+    btn.disabled = true;
+    setStatus('Checking username...', '');
+
+    const { data: existing, error: checkErr } = await sb.from('profiles').select('username').eq('username', username).maybeSingle();
+    if (checkErr) { btn.disabled = false; return setStatus('Error checking username. Try again.', 'error'); }
+    if (existing) { btn.disabled = false; return setStatus('That username is already taken.', 'error'); }
+
+    setStatus('Creating account...', '');
+    const { data: authData, error: authErr } = await sb.auth.signUp({ email, password });
+    if (authErr) { btn.disabled = false; return setStatus(authErr.message, 'error'); }
+
+    const userId = authData.user?.id;
+    if (!userId) { btn.disabled = false; return setStatus('Signup failed. Please try again.', 'error'); }
+
+    const { error: profileErr } = await sb.from('profiles').insert({ id: userId, username });
+    if (profileErr) { btn.disabled = false; return setStatus('Profile setup failed: ' + profileErr.message, 'error'); }
+
+    setStatus('Account created! You can now log in.', 'success');
+    btn.disabled = false;
+}
+</script>
+</body>
+</html>
