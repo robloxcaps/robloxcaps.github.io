@@ -150,7 +150,7 @@ function buildHomeSplash() {
                     <div id="hw_status"></div>
                 </div>
                 <div class="box-footer">
-                    <a href="/Login/">${SITE_CONFIG.home.loginLink}</a>
+                    <a href="/Pages/Login/">${SITE_CONFIG.home.loginLink}</a>
                 </div>
             </div>
         </div>
@@ -166,9 +166,9 @@ async function loadNavAccount() {
 
     if (!session) {
         area.innerHTML = `
-            <a class="nav-signup" href="/Signup/">Sign Up</a>
+            <a class="nav-signup" href="/Pages/SignUp/">Sign Up</a>
             <span class="nav-or">or</span>
-            <a class="nav-login-btn" href="/Login/">Login</a>
+            <a class="nav-login-btn" href="/Pages/Login/">Login</a>
         `;
         return;
     }
