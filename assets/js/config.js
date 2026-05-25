@@ -183,9 +183,12 @@ async function loadNavAccount() {
     const isAdmin  = profile?.is_admin === true;
     window.isAdmin = isAdmin; // expose for other pages
 
+    const path = window.location.pathname;
+    const onProfile = path.startsWith('/Pages/Profile/');
+
     area.innerHTML = `
-        <a class="MenuItem" href="/Pages/Profile/?u=${encodeURIComponent(username)}">${username}</a>
-        ${isAdmin ? `<a class="MenuItem admin-link" href="/Pages/Admin/">Admin Panel</a>` : ''}
+        <a class="MenuItem${onProfile ? ' Active' : ''}" href="/Pages/Profile/?u=${encodeURIComponent(username)}">${esc(username)}</a>
+        ${isAdmin ? `<a class="MenuItem admin-link${path.startsWith('/Pages/Admin/') ? ' Active' : ''}" href="/Pages/Admin/">Admin Panel</a>` : ''}
         <a class="MenuItem" href="#" onclick="handleLogout(event)">Log Out</a>
     `;
 }
@@ -236,6 +239,9 @@ async function handleHomeSignup() {
     document.getElementById('hw_email').value = '';
     document.getElementById('hw_password').value = '';
 }
+
+// ---- HELPERS ----
+function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 
 // ---- BOOT ----
 document.addEventListener('DOMContentLoaded', () => {

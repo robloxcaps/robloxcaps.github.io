@@ -120,7 +120,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../..//assets/js/config.js"></script>
+<script src="/assets/js/config.js"></script>
 <script>
 const PACKS_PER_PAGE = 9;
 let currentPage      = 1;
@@ -249,7 +249,7 @@ function createPackItem(pack) {
             <div class="PackTitle">${esc(pack.title)}</div>
             <div class="PackAuthor">by ${esc(pack.author)}</div>
             <div class="PackCategory">${esc(pack.category||'Other')}</div>
-            <!-- <div class="pack-downloads">${dl} download${dl !== 1 ? 's' : ''}</div> -->
+            <div class="pack-downloads" style="font-size:10px;color:#889;margin-top:2px;">${dl} download${dl !== 1 ? 's' : ''}</div>
         </div>
         <div class="PackButtons">
             <a href="${esc(pack.download_url||'#')}" target="_blank" rel="noopener noreferrer" class="PackDownload" onclick="incrementDownload('${pack.id}')">Download</a>
@@ -263,6 +263,10 @@ function createPackItem(pack) {
 
 async function deletePack(id, btn) {
     if (!confirm('Delete this pack permanently?')) return;
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { alert('Not authenticated.'); return; }
+    const { data: profile } = await sb.from('profiles').select('is_admin').eq('id', session.user.id).maybeSingle();
+    if (!profile?.is_admin) { alert('Admin privileges required.'); return; }
     btn.disabled = true; btn.textContent = '...';
     const { error } = await sb.from('packs').delete().eq('id', id);
     if (error) { alert('Error: ' + error.message); btn.disabled = false; btn.textContent = '×'; return; }
@@ -285,6 +289,10 @@ function showDetails(pack) {
     document.getElementById('DescriptionModal').style.display = 'block';
 }
 
+async function incrementDownload(id) {
+    try { const { data } = await sb.from('packs').select('downloads').eq('id', id).single(); await sb.from('packs').update({ downloads: (data?.downloads||0)+1 }).eq('id', id); }
+    catch { /* silently fail */ }
+}
 function handleModalDownload() { if (currentModalPack) incrementDownload(currentModalPack.id); }
 function closeModal() { document.getElementById('DescriptionModal').style.display = 'none'; currentModalPack = null; }
 function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }

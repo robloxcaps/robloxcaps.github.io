@@ -56,6 +56,10 @@ function setStatus(msg, type) {
     el.textContent = msg; el.className = type;
 }
 
+document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.activeElement?.closest('.FormCard')) handleSignup();
+});
+
 function isValidUsername(u) { return /^[a-zA-Z0-9_]{3,24}$/.test(u); }
 function isGmail(email) { return email.toLowerCase().endsWith('@gmail.com'); }
 

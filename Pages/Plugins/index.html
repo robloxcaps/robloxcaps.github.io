@@ -179,11 +179,12 @@ function changePage(delta) {
 function createPluginItem(plugin) {
     const div = document.createElement('div');
     div.className = 'PluginItem';
-    const iconPath    = plugin.icon || '../img/Placeholder.png';
-    const profileUrl  = plugin.profileUrl?.trim() || null;
+    const iconPath    = esc(plugin.icon) || '../img/Placeholder.png';
+    const profileUrl  = sanitizeUrl(plugin.profileUrl);
+    const safeDownloadUrl = sanitizeUrl(plugin.downloadUrl) || '#';
     const description = plugin.description || 'No description available.';
     const authorHTML  = profileUrl
-        ? `<a href="${profileUrl}" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:none;font-weight:700;">${esc(plugin.author)}</a>`
+        ? `<a href="${esc(profileUrl)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:none;font-weight:700;">${esc(plugin.author)}</a>`
         : esc(plugin.author);
     div.innerHTML = `
         <img class="PluginIcon" src="${iconPath}" alt="${esc(plugin.title)} Icon" loading="lazy">
@@ -191,7 +192,7 @@ function createPluginItem(plugin) {
         <div class="PluginAuthor">by ${authorHTML}</div>
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">${esc(plugin.category||'Other')} · v${esc(plugin.version||'N/A')}</div>
         <div class="PluginButtons">
-            <a href="${plugin.downloadUrl}" class="PluginDownload" target="_blank" download>
+            <a href="${esc(safeDownloadUrl)}" class="PluginDownload" target="_blank" download>
                 <i data-lucide="download" style="width:11px;height:11px;"></i> Download
             </a>
             <button class="PluginSeeMore" data-title="${esc(plugin.title)}" data-description="${esc(description)}">
@@ -211,7 +212,13 @@ function showDescription(title, description) {
     document.getElementById('DescriptionModal').style.display = 'block';
 }
 
-function esc(text) { const d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
+function esc(text) { if (!text) return ''; const d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
+function sanitizeUrl(url) {
+    if (!url) return '';
+    url = url.trim();
+    try { const u = new URL(url); return (u.protocol === 'http:' || u.protocol === 'https:') ? url : ''; }
+    catch { return ''; }
+}
 function cacheData(plugins) { try { localStorage.setItem('pluginsCache', JSON.stringify({plugins, timestamp: new Date().toISOString()})); } catch(e){} }
 function getCachedData() { try { const c = localStorage.getItem('pluginsCache'); return c ? JSON.parse(c) : null; } catch(e){ return null; } }
 function isCacheExpired(ts) { return Date.now() - new Date(ts).getTime() > CACHE_DURATION; }

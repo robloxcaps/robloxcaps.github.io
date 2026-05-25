@@ -23,12 +23,12 @@
                     <div class="form-group">
                         <label for="password">Password</label>
                         <input type="password" id="password" placeholder="Your password" />
-                        <p class="field-hint"><a href="/ForgotPassword/">Forgot your password?</a></p>
+                        <p class="field-hint">Forgot your password? Contact us on <a href="https://discord.gg/wqvWd2zeMV" target="_blank">Discord</a>.</p>
                     </div>
                     <button id="LoginBtn" onclick="handleLogin()">Sign In</button>
                     <div id="StatusMsg"></div>
                     <div class="form-footer">
-                        Not a member? <a href="/Signup/">Sign Up</a>
+                        Not a member? <a href="/Pages/SignUp/">Sign Up</a>
                     </div>
                 </div>
             </div>
@@ -46,6 +46,10 @@ function setStatus(msg, type) {
     const el = document.getElementById('StatusMsg');
     el.textContent = msg; el.className = type;
 }
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.activeElement?.closest('.FormCard')) handleLogin();
+});
 
 async function handleLogin() {
     const email    = document.getElementById('email').value.trim();
@@ -66,10 +70,13 @@ async function handleLogin() {
 
     // Check if banned
     const { data: { session } } = await sb.auth.getSession();
+
+    // Re-fetch session user from auth to double-check
+    const { data: { user } } = await sb.auth.getUser();
     const { data: profile } = await sb
         .from('profiles')
         .select('is_banned, ban_reason')
-        .eq('id', session.user.id)
+        .eq('id', user?.id || session?.user?.id)
         .maybeSingle();
 
     if (profile?.is_banned) {

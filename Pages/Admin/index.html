@@ -308,11 +308,19 @@
              return div;
          }
          
-         async function approveSubmission(id) {
-             const card = document.getElementById(`sub-${id}`);
-             card.querySelectorAll('button').forEach(b => b.disabled = true);
-         
-             const { data: sub, error: fetchErr } = await sb.from('submissions').select('*').eq('id', id).single();
+          async function requireAdmin() {
+              const { data: { session } } = await sb.auth.getSession();
+              if (!session) throw new Error('Not authenticated');
+              const { data: profile } = await sb.from('profiles').select('is_admin').eq('id', session.user.id).maybeSingle();
+              if (!profile?.is_admin) throw new Error('Admin privileges required');
+          }
+
+          async function approveSubmission(id) {
+              try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+              const card = document.getElementById(`sub-${id}`);
+              card.querySelectorAll('button').forEach(b => b.disabled = true);
+          
+              const { data: sub, error: fetchErr } = await sb.from('submissions').select('*').eq('id', id).single();
              if (fetchErr) { alert('Error: ' + fetchErr.message); card.querySelectorAll('button').forEach(b => b.disabled = false); return; }
          
              const { error: insertErr } = await sb.from('packs').insert({
@@ -330,10 +338,11 @@
              loadAllSubmissions();
          }
          
-         async function rejectSubmission(id) {
-             if (!confirm('Reject this submission?')) return;
-             const card = document.getElementById(`sub-${id}`);
-             card.querySelectorAll('button').forEach(b => b.disabled = true);
+          async function rejectSubmission(id) {
+              try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+              if (!confirm('Reject this submission?')) return;
+              const card = document.getElementById(`sub-${id}`);
+              card.querySelectorAll('button').forEach(b => b.disabled = true);
              const { error } = await sb.from('submissions').update({ status: 'rejected' }).eq('id', id);
              if (error) { alert('Error: ' + error.message); card.querySelectorAll('button').forEach(b => b.disabled = false); return; }
              card.remove();
@@ -418,9 +427,10 @@
              document.getElementById('EditPackOverlay').classList.remove('open');
          }
          
-         async function savePackEdit() {
-             const id       = document.getElementById('editPackId').value;
-             const title    = document.getElementById('editTitle').value.trim();
+          async function savePackEdit() {
+              try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+              const id       = document.getElementById('editPackId').value;
+              const title    = document.getElementById('editTitle').value.trim();
              const author   = document.getElementById('editAuthor').value.trim();
              const category = document.getElementById('editCategory').value.trim();
              const icon     = document.getElementById('editIcon').value.trim();
@@ -438,18 +448,20 @@
              loadAllPacks();
          }
          
-         async function deletePack(id) {
-             if (!confirm('Delete this pack permanently?')) return;
-             const { error } = await sb.from('packs').delete().eq('id', id);
+          async function deletePack(id) {
+              try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+              if (!confirm('Delete this pack permanently?')) return;
+              const { error } = await sb.from('packs').delete().eq('id', id);
              if (error) { alert('Error: ' + error.message); return; }
              loadAllPacks();
              loadStats();
          }
          
          // ---- DELETE USER ----
-         async function deleteUser() {
-             const username = document.getElementById('DeleteUsernameInput').value.trim();
-             if (!username) { setStatus('DeleteUserStatus', 'Enter a username.', false); return; }
+          async function deleteUser() {
+              try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+              const username = document.getElementById('DeleteUsernameInput').value.trim();
+              if (!username) { setStatus('DeleteUserStatus', 'Enter a username.', false); return; }
              if (!confirm(`Permanently delete user "${username}"? This cannot be undone.`)) return;
          
              setStatus('DeleteUserStatus', 'Deleting...', true);
@@ -477,12 +489,14 @@
          }
          
          // ---- BAN / UNBAN ----
-         async function banUser() {
-             const username = document.getElementById('BanUsernameInput').value.trim();
-             const reason   = document.getElementById('BanReasonInput').value.trim();
-             if (!username) { setStatus('BanStatus', 'Enter a username.', false); return; }
-         
-             setStatus('BanStatus', 'Banning...', true);
+          async function banUser() {
+              try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+              const username = document.getElementById('BanUsernameInput').value.trim();
+              const reason   = document.getElementById('BanReasonInput').value.trim();
+              if (!username) { setStatus('BanStatus', 'Enter a username.', false); return; }
+              if (!confirm(`Ban user "${username}"${reason ? ' ('+reason+')' : ''}?`)) return;
+
+              setStatus('BanStatus', 'Banning...', true);
              const { data, error } = await sb.from('profiles').update({ is_banned: true, ban_reason: reason || null }).eq('username', username).select('username').maybeSingle();
              if (error || !data) { setStatus('BanStatus', error ? error.message : `User "${username}" not found.`, false); return; }
          
@@ -491,11 +505,13 @@
              document.getElementById('BanReasonInput').value   = '';
          }
          
-         async function unbanUser() {
-             const username = document.getElementById('BanUsernameInput').value.trim();
-             if (!username) { setStatus('BanStatus', 'Enter a username.', false); return; }
-         
-             setStatus('BanStatus', 'Unbanning...', true);
+          async function unbanUser() {
+              try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+              const username = document.getElementById('BanUsernameInput').value.trim();
+              if (!username) { setStatus('BanStatus', 'Enter a username.', false); return; }
+              if (!confirm(`Unban user "${username}"?`)) return;
+
+              setStatus('BanStatus', 'Unbanning...', true);
              const { data, error } = await sb.from('profiles').update({ is_banned: false, ban_reason: null }).eq('username', username).select('username').maybeSingle();
              if (error || !data) { setStatus('BanStatus', error ? error.message : `User "${username}" not found.`, false); return; }
          
@@ -504,13 +520,15 @@
          }
          
          // ---- CHANGE USERNAME ----
-         async function changeUsername() {
-             const current = document.getElementById('UsernameCurrent').value.trim();
-             const newName = document.getElementById('UsernameNew').value.trim();
-             if (!current || !newName) { setStatus('UsernameStatus', 'Fill in both fields.', false); return; }
-             if (!/^[a-zA-Z0-9_]{3,24}$/.test(newName)) { setStatus('UsernameStatus', 'Invalid username format.', false); return; }
-         
-             setStatus('UsernameStatus', 'Checking...', true);
+          async function changeUsername() {
+              try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+              const current = document.getElementById('UsernameCurrent').value.trim();
+              const newName = document.getElementById('UsernameNew').value.trim();
+              if (!current || !newName) { setStatus('UsernameStatus', 'Fill in both fields.', false); return; }
+              if (!/^[a-zA-Z0-9_]{3,24}$/.test(newName)) { setStatus('UsernameStatus', 'Invalid username format.', false); return; }
+              if (!confirm(`Change "${current}" to "${newName}"?`)) return;
+
+              setStatus('UsernameStatus', 'Checking...', true);
              const { data: existing } = await sb.from('profiles').select('username').eq('username', newName).maybeSingle();
              if (existing) { setStatus('UsernameStatus', 'That username is already taken.', false); return; }
          
@@ -526,11 +544,13 @@
          async function makeAdmin()   { await setAdminStatus(true); }
          async function removeAdmin() { await setAdminStatus(false); }
          
-         async function setAdminStatus(status) {
-             const username = document.getElementById('AdminUsernameInput').value.trim();
-             if (!username) { setStatus('AdminActionStatus', 'Enter a username.', false); return; }
-         
-             setStatus('AdminActionStatus', 'Updating...', true);
+           async function setAdminStatus(status) {
+               try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+               const username = document.getElementById('AdminUsernameInput').value.trim();
+              if (!username) { setStatus('AdminActionStatus', 'Enter a username.', false); return; }
+              if (!confirm(`${status ? 'Grant admin to' : 'Remove admin from'} "${username}"?`)) return;
+          
+              setStatus('AdminActionStatus', 'Updating...', true);
              const { data, error } = await sb.from('profiles').update({ is_admin: status }).eq('username', username).select('username').maybeSingle();
              if (error || !data) { setStatus('AdminActionStatus', error ? error.message : `User "${username}" not found.`, false); return; }
          
@@ -543,7 +563,7 @@
              const list = document.getElementById('AdminList');
              const { data, error } = await sb.from('profiles').select('username').eq('is_admin', true).order('created_at', { ascending: true });
              if (error || !data || data.length === 0) { list.textContent = 'No admins found.'; return; }
-             list.innerHTML = data.map(p => `<div style="padding:2px 0;border-bottom:1px solid #eee;font-size:12px;">★ ${p.username}</div>`).join('');
+             list.innerHTML = data.map(p => `<div style="padding:2px 0;border-bottom:1px solid #eee;font-size:12px;">★ ${esc(p.username)}</div>`).join('');
          }
          
          function esc(text) {

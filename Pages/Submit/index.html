@@ -50,6 +50,8 @@
                 <p>All submissions are reviewed before being added to the site. You must be logged in to submit.</p>
             </div>
 
+            <div id="LoadingAuth" style="text-align:center;padding:12px;color:#999;font-size:12px;">Checking session...</div>
+
             <div id="NotLoggedIn" style="display:none;" class="Notice">
                 <h4>Not Logged In</h4>
                 <p>You need to be logged in to submit a pack.</p>
@@ -167,17 +169,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/config.js"></script>
 <script>
-function setStatus(msg, type) {
+function setStatus(msg, type, html) {
     const el = document.getElementById('SubmitStatus');
-    el.textContent = msg;
-    el.className = type;
+    if (html) { el.innerHTML = msg; } else { el.textContent = msg; }
+    el.className = type || '';
 }
-
-let loggedInUsername = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(async () => {
         const { data: { session } } = await sb.auth.getSession();
+
+        document.getElementById('LoadingAuth').style.display = 'none';
 
         if (!session) {
             document.getElementById('NotLoggedIn').style.display = 'block';
@@ -200,7 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        loggedInUsername = profile?.username || null;
         document.getElementById('SubmitForm').style.display = 'block';
     }, 100);
 
@@ -237,6 +238,14 @@ async function handleSubmit() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) return setStatus('You must be logged in to submit.', 'error');
 
+    const { data: profile } = await sb
+        .from('profiles')
+        .select('username, is_banned')
+        .eq('id', session.user.id)
+        .maybeSingle();
+    if (!profile) return setStatus('Profile not found.', 'error');
+    if (profile.is_banned) return setStatus('Your account is banned.', 'error');
+
     const { error } = await sb.from('submissions').insert({
         title,
         author,
@@ -244,7 +253,7 @@ async function handleSubmit() {
         icon,
         category,
         description: description || null,
-        submitted_by: loggedInUsername,
+        submitted_by: profile.username,
     });
 
     if (error) {
@@ -252,7 +261,8 @@ async function handleSubmit() {
         return setStatus('Error submitting: ' + error.message, 'error');
     }
 
-    setStatus("Pack submitted! We'll review it within 24–48 hours.", 'success');
+    const profileUrl = `/Pages/Profile/?u=${encodeURIComponent(profile.username)}`;
+    setStatus(`Pack submitted! We'll review it within 24–48 hours. <a href="${esc(profileUrl)}" style="color:var(--c-success);">View your submissions</a> or <a href="#" onclick="resetSubmitForm()" style="color:var(--c-success);">submit another</a>.`, 'success', true);
     btn.disabled = true;
 
     ['packName','packAuthor','packDownload','packIcon','packCategory','packDescription'].forEach(id => {
@@ -261,6 +271,13 @@ async function handleSubmit() {
 
     document.getElementById('IconPreviewPanel').style.display = 'none';
 }
+
+function resetSubmitForm() {
+    document.getElementById('SubmitBtn').disabled = false;
+    setStatus('', '');
+    document.getElementById('packName').focus();
+}
+function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 </script>
 </body>
 </html>
