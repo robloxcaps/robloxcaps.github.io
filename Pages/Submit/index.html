@@ -7,6 +7,36 @@
     <title>Submit a Pack - CAP Central</title>
     <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .submit-layout {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .submit-main { flex: 1; min-width: 0; }
+        .submit-main .FormCard { max-width: 100%; width: 100%; }
+
+        .submit-sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 16px;
+        }
+
+        @media (max-width: 768px) {
+            .submit-layout { flex-direction: column; }
+            .submit-sidebar { width: 100%; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
 
@@ -29,65 +59,102 @@
                 </div>
             </div>
 
-            <div class="Notice">
-                <h4>Submission Guidelines</h4>
-                <ul>
-                    <li>Packs must be a <strong>.rbxm</strong> file or toolbox model.</li>
-                    <li>Include a working download link.</li>
-                    <li>Use a direct link to a 100×100px icon image.</li>
-                    <li>Only submit content you have rights to distribute.</li>
-                    <li>If your pack isn't accepted, you can post it in our Discord forum.</li>
-                </ul>
+            <div id="BannedNotice" style="display:none;" class="Notice">
+                <h4>Account Banned</h4>
+                <p id="BannedReason">Your account has been banned and cannot submit packs.</p>
             </div>
 
-            <div id="SubmitForm" style="display:none;" class="FormCard">
-                <div class="box-header"><h2>Pack Details</h2></div>
-                <div class="box-body">
+            <div class="submit-layout">
 
-                    <div class="form-group">
-                        <label for="packName">Pack Name</label>
-                        <input type="text" id="packName" placeholder="e.g. 2009 Roblox Pack" maxlength="80" />
+                <div class="submit-main">
+                    <div id="SubmitForm" style="display:none;" class="FormCard">
+                        <div class="box-header"><h2>Pack Details</h2></div>
+                        <div class="box-body">
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="packName">Pack Name</label>
+                                    <input type="text" id="packName" placeholder="e.g. 2009 Roblox Pack" maxlength="80" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="packAuthor">Author Name</label>
+                                    <input type="text" id="packAuthor" placeholder="e.g. Builderman" maxlength="60" />
+                                    <p class="field-hint">The original creator — can differ from your username.</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="packDownload">Download URL</label>
+                                    <input type="url" id="packDownload" placeholder="https://files.catbox.moe/..." />
+                                    <p class="field-hint">Direct link to the .rbxm file.</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="packIcon">Icon URL</label>
+                                    <input type="url" id="packIcon" placeholder="https://..." />
+                                    <p class="field-hint">Direct link to a 100×100px image.</p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="packCategory">Category</label>
+                                <input type="text" id="packCategory" placeholder="e.g. Terrain, Props, Buildings..." maxlength="40" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="packDescription">Description <span style="font-weight:400;color:#aaa;text-transform:none;letter-spacing:0;">(optional)</span></label>
+                                <textarea id="packDescription" rows="4" placeholder="Describe your pack — what it includes, what era it's from, any notes for users..." maxlength="600" style="resize:vertical;"></textarea>
+                                <p class="field-hint">Max 600 characters. Shown in the pack details modal.</p>
+                            </div>
+
+                            <button id="SubmitBtn" onclick="handleSubmit()">Submit Pack</button>
+                            <div id="SubmitStatus"></div>
+
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="packAuthor">Author Name</label>
-                        <input type="text" id="packAuthor" placeholder="e.g. Builderman" maxlength="60" />
-                        <p class="field-hint">The original creator of the pack — can be different from your username.</p>
+                    <div id="LoginPromptCard" style="display:none;" class="FormCard">
+                        <div class="box-header"><h2>Pack Details</h2></div>
+                        <div class="box-body" style="text-align:center;padding:32px;color:#aaa;">
+                            <p>Please log in to access the submission form.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-sidebar">
+
+                    <div class="Notice">
+                        <h4>Submission Guidelines</h4>
+                        <ul>
+                            <li>Packs must be a <strong>.rbxm</strong> file or toolbox model.</li>
+                            <li>Include a working download link.</li>
+                            <li>Use a direct link to a 100×100px icon image.</li>
+                            <li>Only submit content you have rights to distribute.</li>
+                            <li>If not accepted, post it in our Discord.</li>
+                        </ul>
                     </div>
 
-                    <div class="form-group">
-                        <label for="packDownload">Download URL</label>
-                        <input type="url" id="packDownload" placeholder="https://files.catbox.moe/..." />
-                        <p class="field-hint">Direct link to the .rbxm file.</p>
+                    <div class="Notice">
+                        <h4>What Happens Next?</h4>
+                        <ol>
+                            <li><strong>Review</strong> — We'll check your pack within 24–48 hours.</li>
+                            <li><strong>Approval</strong> — Added to the Packs page instantly.</li>
+                            <li><strong>Rejection</strong> — Won't appear, but you can resubmit.</li>
+                        </ol>
+                        <p style="margin-top:10px;font-size:11px;">
+                            Questions? Join us on <a href="https://discord.gg/wqvWd2zeMV" target="_blank">Discord</a>.
+                        </p>
                     </div>
 
-                    <div class="form-group">
-                        <label for="packIcon">Icon URL</label>
-                        <input type="url" id="packIcon" placeholder="https://..." />
-                        <p class="field-hint">Direct link to a 100×100px image.</p>
+                    <div class="Panel" id="IconPreviewPanel" style="display:none;">
+                        <div class="Panel-header">Icon Preview</div>
+                        <div class="Panel-body" style="text-align:center;">
+                            <img id="IconPreviewImg" src="" alt="Icon preview" style="width:100px;height:100px;object-fit:cover;border:1px solid #ddd;border-radius:4px;margin:0 auto;">
+                            <p style="font-size:11px;color:#aaa;margin-top:8px;">This is how your icon will appear on the site.</p>
+                        </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="packCategory">Category</label>
-                        <input type="text" id="packCategory" placeholder="e.g. Terrain, Props, Buildings..." maxlength="40" />
-                    </div>
-
-                    <button id="SubmitBtn" onclick="handleSubmit()">Submit Pack</button>
-                    <div id="SubmitStatus"></div>
 
                 </div>
-            </div>
-
-            <div class="Notice">
-                <h4>What Happens Next?</h4>
-                <ol>
-                    <li><strong>Review</strong> — We'll check your pack within 24–48 hours.</li>
-                    <li><strong>Approval</strong> — If approved, it gets added to the Packs page instantly.</li>
-                    <li><strong>Rejection</strong> — If rejected, it won't appear but you can resubmit.</li>
-                </ol>
-                <p style="margin-top:8px;font-size:11px;">
-                    Questions? Join us on <a href="https://discord.gg/wqvWd2zeMV">Discord</a>.
-                </p>
             </div>
 
         </div>
@@ -114,20 +181,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!session) {
             document.getElementById('NotLoggedIn').style.display = 'block';
+            document.getElementById('LoginPromptCard').style.display = 'block';
             return;
         }
 
-        // Fetch username from profiles so submitted_by stores the username, not UUID
+        // Check banned status
         const { data: profile } = await sb
             .from('profiles')
-            .select('username')
+            .select('username, is_banned, ban_reason')
             .eq('id', session.user.id)
             .maybeSingle();
 
-        loggedInUsername = profile?.username || null;
+        if (profile?.is_banned) {
+            const reason = profile.ban_reason ? ` Reason: ${profile.ban_reason}` : '';
+            document.getElementById('BannedReason').textContent = `Your account has been banned and cannot submit packs.${reason}`;
+            document.getElementById('BannedNotice').style.display = 'block';
+            document.getElementById('LoginPromptCard').style.display = 'block';
+            return;
+        }
 
+        loggedInUsername = profile?.username || null;
         document.getElementById('SubmitForm').style.display = 'block';
     }, 100);
+
+    document.getElementById('packIcon')?.addEventListener('input', function() {
+        const url   = this.value.trim();
+        const panel = document.getElementById('IconPreviewPanel');
+        const img   = document.getElementById('IconPreviewImg');
+        if (url) {
+            img.src = url;
+            img.onerror = () => { panel.style.display = 'none'; };
+            img.onload  = () => { panel.style.display = 'block'; };
+        } else {
+            panel.style.display = 'none';
+        }
+    });
 });
 
 async function handleSubmit() {
@@ -136,10 +224,11 @@ async function handleSubmit() {
     const download_url = document.getElementById('packDownload').value.trim();
     const icon         = document.getElementById('packIcon').value.trim();
     const category     = document.getElementById('packCategory').value.trim();
+    const description  = document.getElementById('packDescription').value.trim();
     const btn          = document.getElementById('SubmitBtn');
 
     if (!title || !author || !download_url || !icon || !category) {
-        return setStatus('Please fill in all fields.', 'error');
+        return setStatus('Please fill in all required fields.', 'error');
     }
 
     btn.disabled = true;
@@ -154,7 +243,8 @@ async function handleSubmit() {
         download_url,
         icon,
         category,
-        submitted_by: loggedInUsername,  // username, not UUID
+        description: description || null,
+        submitted_by: loggedInUsername,
     });
 
     if (error) {
@@ -162,12 +252,14 @@ async function handleSubmit() {
         return setStatus('Error submitting: ' + error.message, 'error');
     }
 
-    setStatus('Pack submitted! We\'ll review it within 24–48 hours.', 'success');
+    setStatus("Pack submitted! We'll review it within 24–48 hours.", 'success');
     btn.disabled = true;
 
-    ['packName', 'packAuthor', 'packDownload', 'packIcon', 'packCategory'].forEach(id => {
+    ['packName','packAuthor','packDownload','packIcon','packCategory','packDescription'].forEach(id => {
         document.getElementById(id).value = '';
     });
+
+    document.getElementById('IconPreviewPanel').style.display = 'none';
 }
 </script>
 </body>

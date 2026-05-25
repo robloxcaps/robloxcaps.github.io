@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Sign Up - CAP Central</title>
-<link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
-<link rel="stylesheet" href="/assets/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign Up - CAP Central</title>
+    <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
 
+<div id="Header"></div>
 <div id="Container">
-    <div id="Header"></div>
-
     <div id="Body">
         <div class="FormPage">
             <div class="FormCard">
@@ -22,9 +22,9 @@
                         <p class="field-hint">Letters, numbers, underscores only. 3–24 chars.</p>
                     </div>
                     <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" placeholder="you@example.com" autocomplete="off" />
-                        <p class="field-hint">Used to log in. Never shown publicly.</p>
+                        <label for="email">Gmail Address</label>
+                        <input type="email" id="email" placeholder="you@gmail.com" autocomplete="off" />
+                        <p class="field-hint">Must be a Gmail address (@gmail.com). Never shown publicly.</p>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
@@ -44,12 +44,11 @@
         </div>
     </div>
 </div>
-
 <div id="FooterWrapper">
     <div id="Footer"></div>
 </div>
 
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/config.js"></script>
 <script>
 function setStatus(msg, type) {
@@ -58,6 +57,7 @@ function setStatus(msg, type) {
 }
 
 function isValidUsername(u) { return /^[a-zA-Z0-9_]{3,24}$/.test(u); }
+function isGmail(email) { return email.toLowerCase().endsWith('@gmail.com'); }
 
 async function handleSignup() {
     const username = document.getElementById('username').value.trim();
@@ -67,8 +67,9 @@ async function handleSignup() {
     const btn      = document.getElementById('SignupBtn');
 
     setStatus('', '');
-    if (!username||!email||!password||!confirm) return setStatus('Please fill in all fields.', 'error');
+    if (!username || !email || !password || !confirm) return setStatus('Please fill in all fields.', 'error');
     if (!isValidUsername(username)) return setStatus('Username: letters, numbers, underscores only (3–24 chars).', 'error');
+    if (!isGmail(email)) return setStatus('Only Gmail addresses (@gmail.com) are accepted.', 'error');
     if (password.length < 6) return setStatus('Password must be at least 6 characters.', 'error');
     if (password !== confirm) return setStatus('Passwords do not match.', 'error');
 

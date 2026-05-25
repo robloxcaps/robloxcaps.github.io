@@ -4,14 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Home - CAP Central</title>
-    <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="icon" href="assets/img/FaviIcon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* Logged-out browse CTA strip */
+        #BrowseStrip {
+            background: var(--c-accent);
+            color: #fff;
+            text-align: center;
+            padding: 10px 20px;
+            font-size: 12px;
+            border-bottom: 1px solid var(--c-accent-hover);
+            display: none;
+        }
+
+        #BrowseStrip a {
+            color: #fff;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-left: 8px;
+        }
+
+        #BrowseStrip a:hover { color: #ddeeff; }
+
+        /* Make the active nav item obvious */
+        #Navigation a.MenuItem.Active {
+            border-bottom: 2px solid var(--c-accent);
+        }
+
+        /* Quicklinks below splash for logged out users */
+        .quicklinks {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .quicklink-btn {
+            display: inline-block;
+            padding: 5px 14px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 2px;
+            text-decoration: none;
+            border: 1px solid;
+        }
+
+        .quicklink-btn.primary {
+            background: var(--c-accent);
+            color: #fff;
+            border-color: var(--c-accent-hover);
+        }
+
+        .quicklink-btn.primary:hover {
+            background: var(--c-accent-hover);
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .quicklink-btn.secondary {
+            background: var(--c-cat-bg);
+            color: var(--c-cat-text);
+            border-color: var(--c-cat-border);
+        }
+
+        .quicklink-btn.secondary:hover {
+            background: #d8e0f0;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
     <div id="Header"></div>
     <div id="Container" class="main-page">
         <div id="Body">
             <div id="MainContent">
+                <div id="BrowseStrip">
+                    You don't need an account to browse packs.
+                    <a href="/Pages/Packs/">Browse Packs &rarr;</a>
+                </div>
                 <div id="SplashSection"></div>
                 <div id="StatsSection"></div>
                 <div id="RecentSection"></div>
@@ -22,7 +93,7 @@
         <div id="Footer"></div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/assets/js/config.js"></script>
+    <script src="assets/js/config.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         setTimeout(async () => {
@@ -48,12 +119,18 @@
         const splash = document.getElementById('SplashSection');
 
         if (username) {
+            // Logged in — show welcome + search
             splash.innerHTML = `
                 <div id="SplashLeft">
                     <img id="SplashLogo" src="${SITE_CONFIG.splashLogoImg}" alt="${SITE_CONFIG.siteName}">
                     <div id="SplashBlurb">
                         <h2>Welcome back, ${esc(username)}!</h2>
                         <p>${SITE_CONFIG.home.blurbText}</p>
+                    </div>
+                    <div class="quicklinks">
+                        <a href="/Pages/Packs/" class="quicklink-btn primary">Browse Packs</a>
+                        <a href="/Pages/Submit/" class="quicklink-btn secondary">Submit a Pack</a>
+                        <a href="/Pages/Profile/?u=${encodeURIComponent(username)}" class="quicklink-btn secondary">My Profile</a>
                     </div>
                 </div>
                 <div id="SignInArea">
@@ -76,18 +153,25 @@
                             </div>
                         </div>
                         <div class="box-footer">
-                            <a href="/Submit/">Submit your own pack</a>
+                            <a href="/Pages/Submit/">Submit your own pack</a>
                         </div>
                     </div>
                 </div>
             `;
         } else {
+            // Logged out — show browse strip, signup form, and browse CTA
+            document.getElementById('BrowseStrip').style.display = 'block';
+
             splash.innerHTML = `
                 <div id="SplashLeft">
                     <img id="SplashLogo" src="${SITE_CONFIG.splashLogoImg}" alt="${SITE_CONFIG.siteName}">
                     <div id="SplashBlurb">
                         <h2>${SITE_CONFIG.home.slogan}</h2>
                         <p>${SITE_CONFIG.home.blurbText}</p>
+                    </div>
+                    <div class="quicklinks">
+                        <a href="/Pages/Packs/" class="quicklink-btn primary">Browse Packs</a>
+                        <a href="/Pages/Plugins/" class="quicklink-btn secondary">Browse Plugins</a>
                     </div>
                 </div>
                 <div id="SignInArea">
@@ -110,7 +194,7 @@
                             <div id="hw_status"></div>
                         </div>
                         <div class="box-footer">
-                            <a href="/Login/">${SITE_CONFIG.home.loginLink}</a>
+                            <a href="/Pages/Login/">${SITE_CONFIG.home.loginLink}</a>
                         </div>
                     </div>
                 </div>
@@ -148,10 +232,10 @@
 
     async function buildStats() {
         const section = document.getElementById('StatsSection');
-        const { count: packCount } = await sb.from('packs').select('*', { count: 'exact', head: true });
-        const { data: dlData }     = await sb.from('packs').select('downloads');
-        const totalDl  = dlData ? dlData.reduce((s, p) => s + (p.downloads || 0), 0) : 0;
-        const { count: userCount } = await sb.from('profiles').select('*', { count: 'exact', head: true });
+        const { count: packCount }  = await sb.from('packs').select('*', { count: 'exact', head: true });
+        const { data: dlData }      = await sb.from('packs').select('downloads');
+        const { count: userCount }  = await sb.from('profiles').select('*', { count: 'exact', head: true });
+        const totalDl = dlData ? dlData.reduce((s, p) => s + (p.downloads || 0), 0) : 0;
 
         section.innerHTML = `
             <div id="StatsBar" style="margin:0;">
@@ -182,12 +266,12 @@
         if (!packs || packs.length === 0) return;
 
         section.innerHTML = `
-            <div style="padding:12px 0px 20px;">
+            <div style="padding:20 0px 20px;">
                 <div class="CatHeader">
                     <h3>Recently Added</h3>
                     <a href="/Pages/Packs/">View all &rarr;</a>
                 </div>
-                <div class="PackGrid" id="RecentGrid" style="margin-top:0;border:1px solid #c0cce0;border-top:none;padding:12px;background:#fff;"></div>
+                <div class="PackGrid" id="RecentGrid" style="margin-top:0;border:1px solid var(--c-cat-border);border-top:none;padding:12px;background:#fff;border-radius:0 0 2px 2px;"></div>
             </div>
         `;
 
@@ -195,15 +279,18 @@
         packs.forEach(pack => {
             const div = document.createElement('div');
             div.className = 'PackItem';
+            const dl = pack.downloads || 0;
             div.innerHTML = `
                 <div class="PackContentGroup">
-                    <img class="PackIcon" src="${esc(pack.icon||'/img/Placeholder.png')}" alt="${esc(pack.title)}" loading="lazy" onerror="this.src='/img/Placeholder.png'">
+                    <img class="PackIcon" src="${esc(pack.icon||'/assets/img/Placeholder.png')}" alt="${esc(pack.title)}" loading="lazy" onerror="this.src='/assets/img/Placeholder.png'">
                     <div class="PackTitle">${esc(pack.title)}</div>
                     <div class="PackAuthor">by ${esc(pack.author)}</div>
                     <div class="PackCategory">${esc(pack.category||'Other')}</div>
+                    <div style="font-size:10px;color:#889;margin-top:2px;">${dl} download${dl !== 1 ? 's' : ''}</div>
                 </div>
                 <div class="PackButtons">
                     <a href="${esc(pack.download_url||'#')}" target="_blank" rel="noopener noreferrer" class="PackDownload">Download</a>
+                    <a href="/Pages/Packs/" class="PackButtons > button" style="flex:1;font-size:10px;padding:3px 6px;font-weight:bold;background:var(--c-cat-bg);border:1px solid var(--c-border-dark);cursor:pointer;font-family:inherit;color:var(--c-cat-text);border-radius:2px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;">Browse More</a>
                 </div>
             `;
             grid.appendChild(div);
