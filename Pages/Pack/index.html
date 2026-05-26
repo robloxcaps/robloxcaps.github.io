@@ -310,7 +310,7 @@ async function loadComments() {
     let canDelete = false;
     if (currentUser) {
         const { data: prof } = await sb.from('profiles').select('role').eq('id', currentUser.id).maybeSingle();
-        canDelete = prof?.role === 'admin' || prof?.role === 'moderator';
+        canDelete = prof?.role === 'admin' || prof?.role === 'moderator' || prof?.role === 'content_moderator';
     }
 
     list.innerHTML = comments.map(c => `

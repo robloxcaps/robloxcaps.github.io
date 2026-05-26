@@ -126,6 +126,8 @@
 
         let roleLabel = 'User';
         if (profile.role === 'moderator') roleLabel = 'Moderator';
+        else if (profile.role === 'content_moderator') roleLabel = 'Content Mod.';
+        else if (profile.role === 'contributor') roleLabel = 'Contributor';
         document.getElementById('SettingsRole').textContent = roleLabel;
 
         // Avatar preview

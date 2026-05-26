@@ -207,6 +207,8 @@ setTimeout(async () => {
     if (profile.is_banned) roleLabel = 'Banned';
     else if (profile.is_admin) roleLabel = 'Admin';
     else if (profile.role === 'moderator') roleLabel = 'Moderator';
+    else if (profile.role === 'content_moderator') roleLabel = 'Content Mod.';
+    else if (profile.role === 'contributor') roleLabel = 'Contributor';
     document.getElementById('InfoRole').textContent = roleLabel;
 
     const badge = document.getElementById('ProfileBadge');
@@ -217,6 +219,14 @@ setTimeout(async () => {
     } else if (profile.role === 'moderator' && !profile.is_banned) {
         badge.textContent = '★ Moderator';
         badge.style.color = '#1a8a6e';
+        badge.style.fontWeight = 'bold';
+    } else if (profile.role === 'content_moderator' && !profile.is_banned) {
+        badge.textContent = 'Content Moderator';
+        badge.style.color = '#2a7a9a';
+        badge.style.fontWeight = 'bold';
+    } else if (profile.role === 'contributor' && !profile.is_banned) {
+        badge.textContent = 'Contributor';
+        badge.style.color = '#8a6a3a';
         badge.style.fontWeight = 'bold';
     }
 
@@ -302,13 +312,15 @@ function createPackCard(pack) {
     div.className = 'PackItem';
     div.innerHTML = `
         <div class="PackContentGroup">
-            <img class="PackIcon" src="${esc(pack.icon||'/img/Placeholder.png')}" alt="${esc(pack.title)}" loading="lazy" onerror="this.src='/img/Placeholder.png'">
+            <img class="PackIcon" src="${attrEsc(pack.icon||'/img/Placeholder.png')}" alt="${esc(pack.title)}" loading="lazy" onerror="this.src='/img/Placeholder.png'">
+
             <div class="PackTitle">${esc(pack.title)}</div>
+
             <div class="PackAuthor">by ${esc(pack.author)}</div>
+
             <div class="PackCategory">${esc(pack.category||'Other')}</div>
-        </div>
-        <div class="PackButtons">
-            <a href="${esc(pack.download_url||'#')}" target="_blank" rel="noopener noreferrer" class="PackDownload">Download</a>
+
+            <a href="${sanitizeUrl(pack.download_url) || '#'}" target="_blank" rel="noopener noreferrer" class="PackDownload">Download</a>
             <button class="PackSeeMore"><img src="/assets/img/icons/package_go.png" width="14" height="14" alt="" style="vertical-align:middle;"> Details</button>
         </div>
     `;

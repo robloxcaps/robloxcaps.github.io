@@ -226,7 +226,7 @@ function createPackItem(pack) {
     div.innerHTML = `
         ${window.isAdmin ? `<button class="btn-delete-pack" title="Delete pack" data-id="${pack.id}">&times;</button>` : ''}
         <div class="PackContentGroup">
-            <img class="PackIcon" src="${esc(pack.icon||'/img/Placeholder.png')}" alt="${esc(pack.title)}" loading="lazy" onerror="this.src='/img/Placeholder.png'">
+            <img class="PackIcon" src="${attrEsc(pack.icon||'/img/Placeholder.png')}" alt="${esc(pack.title)}" loading="lazy" onerror="this.src='/img/Placeholder.png'">
             <div class="PackTitle">${esc(pack.title)}</div>
             <div class="PackAuthor">by ${esc(pack.author)}</div>
             <div class="PackCategory">${esc(pack.category||'Other')}</div>

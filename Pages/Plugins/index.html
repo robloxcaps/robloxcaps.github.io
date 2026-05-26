@@ -208,7 +208,7 @@ function createPluginItem(plugin) {
             <a href="${esc(safeDownloadUrl)}" class="PluginDownload" target="_blank" download>
                 <img src="/assets/img/icons/disk.png" width="11" height="11" alt="" style="vertical-align:middle;"> Download
             </a>
-            <button class="PluginSeeMore" data-title="${esc(plugin.title)}" data-description="${esc(description)}">
+            <button class="PluginSeeMore" data-title="${attrEsc(plugin.title)}" data-description="${attrEsc(description)}">
                 <img src="/assets/img/icons/bullet_go.png" width="11" height="11" alt="" style="vertical-align:middle;"> Details
             </button>
             <a href="#" class="ReportBtn" title="Report this plugin" data-title="${encodeURIComponent(plugin.title)}"><img src="/assets/img/icons/flag_red.png" width="14" height="14" alt="Report"></a>

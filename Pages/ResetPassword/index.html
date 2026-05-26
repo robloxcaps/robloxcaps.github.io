@@ -7,6 +7,11 @@
     <title>Reset Password - CAP Central</title><script>document.title = SITE_CONFIG.ui.pageTitles.reset + ' - ' + SITE_CONFIG.siteName;</script>
     <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .reset-success { text-align:center;padding:30px; }
+        .reset-success h2 { margin:0 0 8px; }
+        .reset-success p  { font-size:12px;color:#778;margin:0; }
+    </style>
 </head>
 <body>
 <div id="MainContainer">
@@ -37,17 +42,14 @@
                 <div class="box-body">
                     <div class="form-group">
                         <label for="newPassword">New Password</label>
-                        <input type="password" id="newPassword" placeholder="Min. 6 characters" />
+                        <input type="password" id="newPassword" placeholder="Min. 6 characters" autocomplete="new-password" />
                     </div>
                     <div class="form-group">
                         <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" placeholder="Repeat your password" />
+                        <input type="password" id="confirmPassword" placeholder="Repeat your password" autocomplete="new-password" />
                     </div>
                     <button id="ResetBtn" onclick="handleResetPassword()"><img src="/assets/img/icons/key.png" width="14" height="14" alt="" style="vertical-align:middle;"> Update Password</button>
                     <div id="ResetStatus"></div>
-                </div>
-                <div class="form-footer">
-                    <a href="/Pages/Login/">Back to Login</a>
                 </div>
             </div>
         </div>
@@ -58,9 +60,14 @@
     <div id="Footer"></div>
 </div>
 
+<!-- Capture hash before Supabase clears it -->
+<script>window._rcapHash = window.location.hash;</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/config.js"></script>
 <script>
+// Check URL hash BEFORE Supabase clears it (captured via _rcapHash above)
+const _hasRecoveryHash = window._rcapHash && window._rcapHash.includes('type=recovery');
+
 function setStatus(el, msg, type) {
     el.textContent = msg;
     el.className = type || '';
@@ -73,6 +80,25 @@ document.addEventListener('keydown', e => {
     if (card.id === 'RequestCard') handleRequestReset();
     else if (card.id === 'ResetCard') handleResetPassword();
 });
+
+// ---- DETECT RECOVERY ON LOAD ----
+document.addEventListener('DOMContentLoaded', () => {
+    if (_hasRecoveryHash) showResetCard();
+});
+
+// Listen for auth state changes (fires when Supabase processes URL hash)
+sb.auth.onAuthStateChange((event) => {
+    if (event === 'PASSWORD_RECOVERY') {
+        showResetCard();
+    }
+});
+
+function showResetCard() {
+    const requestCard = document.getElementById('RequestCard');
+    const resetCard = document.getElementById('ResetCard');
+    if (requestCard) requestCard.style.display = 'none';
+    if (resetCard) resetCard.style.display = 'block';
+}
 
 // ---- REQUEST RESET ----
 async function handleRequestReset() {
@@ -87,21 +113,13 @@ async function handleRequestReset() {
     setStatus(st, 'Sending...', '');
 
     const { error } = await sb.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + '/Pages/ResetPassword/',
+        redirectTo: SITE_CONFIG.siteUrl + '/Pages/ResetPassword/',
     });
 
     if (error) { btn.disabled = false; return setStatus(st, error.message, 'error'); }
 
     setStatus(st, 'Check your email for the reset link. You can close this page.', 'success');
 }
-
-// ---- DETECT RECOVERY TOKEN ----
-sb.auth.onAuthStateChange((event) => {
-    if (event === 'PASSWORD_RECOVERY') {
-        document.getElementById('RequestCard').style.display = 'none';
-        document.getElementById('ResetCard').style.display = 'block';
-    }
-});
 
 // ---- CONFIRM RESET ----
 async function handleResetPassword() {
@@ -122,6 +140,8 @@ async function handleResetPassword() {
 
     if (error) { btn.disabled = false; return setStatus(st, error.message, 'error'); }
 
+    // Sign out and redirect to login
+    await sb.auth.signOut();
     setStatus(st, 'Password updated! Redirecting to login...', 'success');
     setTimeout(() => window.location.href = '/Pages/Login/', 1500);
 }

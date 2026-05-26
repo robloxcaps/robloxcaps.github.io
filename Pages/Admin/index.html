@@ -92,14 +92,14 @@
             </div>
             <div class="admin-section">
                <div class="tab-bar">
-                   <button class="tab-btn active" onclick="switchTab('dashboard')"><img src="/assets/img/icons/house.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabDashboard">Dashboard</span></button>
-                   <button class="tab-btn" onclick="switchTab('submissions')"><img src="/assets/img/icons/page_white_add.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabSubmissions">Submissions</span></button>
-                   <button class="tab-btn" onclick="switchTab('packs')"><img src="/assets/img/icons/package.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabPacks">Packs</span></button>
-                   <button class="tab-btn" onclick="switchTab('users')"><img src="/assets/img/icons/user.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabUsers">Users</span></button>
-                   <button class="tab-btn" onclick="switchTab('comments')"><img src="/assets/img/icons/comments.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabComments">Comments</span></button>
-                   <button class="tab-btn" onclick="switchTab('categories')"><img src="/assets/img/icons/package.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabCategories">Categories</span></button>
-                   <button class="tab-btn" onclick="switchTab('reports')"><img src="/assets/img/icons/flag_red.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabReports">Reports</span></button>
-                   <button class="tab-btn" onclick="switchTab('activity')"><img src="/assets/img/icons/shield.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabActivity">Activity Log</span></button>
+                    <button class="tab-btn active" onclick="switchTab('dashboard')" data-perm="all"><img src="/assets/img/icons/house.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabDashboard">Dashboard</span></button>
+                    <button class="tab-btn" onclick="switchTab('submissions')" data-perm="all"><img src="/assets/img/icons/page_white_add.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabSubmissions">Submissions</span></button>
+                    <button class="tab-btn" onclick="switchTab('packs')" data-perm="admin,moderator"><img src="/assets/img/icons/package.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabPacks">Packs</span></button>
+                    <button class="tab-btn" onclick="switchTab('users')" data-perm="admin"><img src="/assets/img/icons/user.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabUsers">Users</span></button>
+                    <button class="tab-btn" onclick="switchTab('comments')" data-perm="all"><img src="/assets/img/icons/comments.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabComments">Comments</span></button>
+                    <button class="tab-btn" onclick="switchTab('categories')" data-perm="admin"><img src="/assets/img/icons/package.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabCategories">Categories</span></button>
+                    <button class="tab-btn" onclick="switchTab('reports')" data-perm="admin"><img src="/assets/img/icons/flag_red.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabReports">Reports</span></button>
+                    <button class="tab-btn" onclick="switchTab('activity')" data-perm="all"><img src="/assets/img/icons/shield.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabActivity">Activity Log</span></button>
                </div>
 
                <!-- DASHBOARD -->
@@ -187,13 +187,28 @@
                         <button class="btn-reject"  onclick="removeAdmin()"><img src="/assets/img/icons/shield.png" width="12" height="12" alt="" style="vertical-align:middle;"> Remove Admin</button>
                      </div>
                      <div class="user-section-status" id="AdminActionStatus"></div>
-                     <div style="margin-top:10px;">
-                        <div style="font-size:11px;font-weight:bold;color:#445;margin-bottom:4px;">Current Admins</div>
-                        <div id="AdminList" style="font-size:12px;">Loading...</div>
-                     </div>
-                  </div>
-                  <hr style="margin:12px 0;">
-                  <div class="user-section">
+                      <div style="margin-top:10px;">
+                         <div style="font-size:11px;font-weight:bold;color:#445;margin-bottom:4px;">Current Admins</div>
+                         <div id="AdminList" style="font-size:12px;">Loading...</div>
+                      </div>
+                   </div>
+                   <hr style="margin:12px 0;">
+                   <div class="user-section" id="RoleSection">
+                      <div class="user-section-title">Set Role</div>
+                      <div class="user-section-row">
+                         <input class="user-input" type="text" id="RoleUsernameInput" placeholder="Username">
+                         <select id="RoleSelect" style="padding:3px 6px;border:1px solid #bbb;font-size:11px;font-family:inherit;">
+                            <option value="user">User</option>
+                            <option value="contributor">Contributor</option>
+                            <option value="content_moderator">Content Moderator</option>
+                            <option value="moderator">Moderator</option>
+                         </select>
+                         <button class="btn-approve" onclick="setUserRole()"><img src="/assets/img/icons/shield.png" width="12" height="12" alt="" style="vertical-align:middle;"> Set Role</button>
+                      </div>
+                      <div class="user-section-status" id="RoleStatus"></div>
+                   </div>
+                   <hr style="margin:12px 0;">
+                   <div class="user-section">
                      <div class="user-section-title">All Users</div>
                      <div style="margin-bottom:6px;font-size:11px;color:#778;">
                         <span id="UserListCount"></span>
@@ -289,8 +304,8 @@
                const { data: { session } } = await sb.auth.getSession();
                if (!session) { document.getElementById('AccessDenied').style.display = 'block'; return; }
                const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
-               const role = profile?.role || null;
-               if (role !== 'admin' && role !== 'moderator') { document.getElementById('AccessDenied').style.display = 'block'; return; }
+                const role = profile?.role || null;
+                if (role !== 'admin' && role !== 'moderator' && role !== 'content_moderator') { document.getElementById('AccessDenied').style.display = 'block'; return; }
                window.userRole = role;
                 document.getElementById('AdminPanel').style.display = 'block';
                 loadAdminUI();
@@ -367,18 +382,40 @@
            document.getElementById('subTab-all').style.display = tab === 'all' ? 'block' : 'none';
        }
 
-       function applyRoleRestrictions(role) {
-           if (role === 'admin') return;
-            const hideTitles = ['Delete User', 'Change Username', 'Admin Access', 'Ban User', 'Delete Category'];
-           document.querySelectorAll('.user-section').forEach(section => {
-               const title = section.querySelector('.user-section-title');
-               if (title && hideTitles.includes(title.textContent.trim())) {
-                   section.style.display = 'none';
-                   let next = section.nextElementSibling;
-                   if (next && next.tagName === 'HR') next.style.display = 'none';
-               }
-           });
-       }
+        function applyRoleRestrictions(role) {
+            // Hide tabs the user doesn't have permission for
+            const tabs = ['dashboard','submissions','packs','users','comments','categories','reports','activity'];
+            document.querySelectorAll('.tab-bar > .tab-btn').forEach((btn, i) => {
+                const perm = btn.getAttribute('data-perm') || 'all';
+                const allowed = perm === 'all' || perm.split(',').includes(role);
+                btn.style.display = allowed ? '' : 'none';
+                if (!allowed && btn.classList.contains('active')) {
+                    btn.classList.remove('active');
+                    // Switch to first visible tab
+                    const firstVisible = document.querySelector('.tab-bar > .tab-btn:not([style*="display: none"])');
+                    if (firstVisible) {
+                        const idx = Array.from(document.querySelectorAll('.tab-bar > .tab-btn')).indexOf(firstVisible);
+                        switchTab(tabs[idx]);
+                    }
+                }
+            });
+            // For admins, no further restrictions
+            if (role === 'admin') return;
+            // Hide destructive admin sections
+             const hideTitles = ['Delete User', 'Change Username', 'Admin Access', 'Ban User', 'Delete Category', 'Set Role'];
+            document.querySelectorAll('.user-section').forEach(section => {
+                const title = section.querySelector('.user-section-title');
+                if (title && hideTitles.includes(title.textContent.trim())) {
+                    section.style.display = 'none';
+                    let next = section.nextElementSibling;
+                    if (next && next.tagName === 'HR') next.style.display = 'none';
+                }
+            });
+            // Content moderator cannot edit packs
+            if (role === 'content_moderator') {
+                document.querySelectorAll('.pack-edit-btn').forEach(el => el.style.display = 'none');
+            }
+        }
 
        function setStatus(elId, msg, ok) {
            const el = document.getElementById(elId);
@@ -435,7 +472,7 @@
            const list = document.getElementById('SubmissionsList');
            list.innerHTML = '<div id="LoadingMessage">Loading...</div>';
            const { data, error } = await sb.from('submissions').select('*').or('status.eq.pending,status.is.null').order('created_at', { ascending: false });
-           if (error) { list.innerHTML = `<div class="ErrorMessage">Error: ${error.message}</div>`; return; }
+            if (error) { list.innerHTML = `<div class="ErrorMessage">Error: ${esc(error.message)}</div>`; return; }
            if (!data || data.length === 0) { list.innerHTML = '<div id="LoadingMessage">No pending submissions!</div>'; return; }
            list.innerHTML = '';
            data.forEach(sub => list.appendChild(createSubCard(sub)));
@@ -455,8 +492,8 @@
                        <strong>Category:</strong> ${esc(sub.category||'N/A')} &nbsp;
                        <strong>Submitted by:</strong> ${esc(sub.submitted_by||'unknown')} &nbsp;
                        <strong>Date:</strong> ${date}<br>
-                       <strong>Download:</strong> <a href="${esc(sub.download_url)}" target="_blank">View File</a> &nbsp;
-                       <strong>Icon:</strong> <a href="${esc(sub.icon)}" target="_blank">View Image</a>
+                        <strong>Download:</strong> <a href="${sanitizeUrl(sub.download_url)}" target="_blank">View File</a> &nbsp;
+                        <strong>Icon:</strong> <a href="${sanitizeUrl(sub.icon)}" target="_blank">View Image</a>
                    </div>
                     <div class="submission-actions">
                         <button class="btn-approve" onclick="approveSubmission('${sub.id}')"><img src="/assets/img/icons/accept.png" width="12" height="12" alt="" style="vertical-align:middle;"> Approve</button>
@@ -472,7 +509,7 @@
             if (!session) throw new Error('Not authenticated');
             const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
             const role = profile?.role || null;
-            if (role !== 'admin' && role !== 'moderator') throw new Error('Moderator or admin privileges required');
+            if (role !== 'admin' && role !== 'moderator' && role !== 'content_moderator') throw new Error('Moderator or admin privileges required');
         }
 
         async function requireAdminOnly() {
@@ -567,7 +604,7 @@
                    <div style="flex:1;"><div class="list-row-title">${esc(pack.title)}</div>
                    <div class="list-row-meta">by ${esc(pack.author)} · ${esc(pack.category||'Other')}</div></div>
                     <div style="display:flex;gap:6px;flex-shrink:0;">
-                        ${window.userRole === 'admin' ? `<button class="btn-modal btn-modal-secondary" style="font-size:10px;padding:2px 8px;" onclick='openEditModal(${JSON.stringify(pack)})'><img src="/assets/img/icons/wrench.png" width="10" height="10" alt="" style="vertical-align:middle;"> Edit</button>` : ''}
+                         ${window.userRole === 'admin' ? `<button class="btn-modal btn-modal-secondary" style="font-size:10px;padding:2px 8px;" onclick="openEditModal('${encodeURIComponent(JSON.stringify(pack))}')"><img src="/assets/img/icons/wrench.png" width="10" height="10" alt="" style="vertical-align:middle;"> Edit</button>` : ''}
                         <button class="btn-reject" style="font-size:10px;padding:2px 8px;" onclick="deletePack('${pack.id}')"><img src="/assets/img/icons/flag_red.png" width="10" height="10" alt="" style="vertical-align:middle;"> Delete</button>
                     </div>
                `;
@@ -575,7 +612,8 @@
            });
        }
 
-        function openEditModal(pack) {
+        function openEditModal(encoded) {
+            const pack = JSON.parse(decodeURIComponent(encoded));
             document.getElementById('editPackId').value   = pack.id;
             document.getElementById('editTitle').value    = pack.title || '';
             document.getElementById('editAuthor').value   = pack.author || '';
@@ -712,11 +750,27 @@
             logAdminAction(status ? 'grant_admin' : 'remove_admin', `${status ? 'Granted' : 'Removed'} admin ${status ? 'to' : 'from'} "${username}"`, 'user', username);
             setStatus('AdminActionStatus', status ? `${username} is now an admin.` : `${username} is no longer an admin.`, true);
            document.getElementById('AdminUsernameInput').value = '';
-           loadAdminList();
-           loadUserList();
-       }
+            loadAdminList();
+            loadUserList();
+        }
 
-       async function loadAdminList() {
+        // ---- SET ROLE ----
+        async function setUserRole() {
+            try { await requireAdminOnly(); } catch(e) { alert(e.message); return; }
+            const username = document.getElementById('RoleUsernameInput').value.trim();
+            const role = document.getElementById('RoleSelect').value;
+            if (!username) { setStatus('RoleStatus', 'Enter a username.', false); return; }
+            setStatus('RoleStatus', 'Updating...', true);
+            const { data, error } = await sb.from('profiles').update({ role: role === 'user' ? null : role }).eq('username', username).select('username').maybeSingle();
+            if (error || !data) { setStatus('RoleStatus', error ? error.message : `User "${username}" not found.`, false); return; }
+            logAdminAction('set_role', `Set "${username}" role → ${role}`, 'user', username);
+            setStatus('RoleStatus', `${username} is now ${role === 'user' ? 'a regular user' : role.replace(/_/g, ' ')}.`, true);
+            document.getElementById('RoleUsernameInput').value = '';
+            document.getElementById('RoleSelect').value = 'user';
+            loadUserList();
+        }
+
+        async function loadAdminList() {
            const list = document.getElementById('AdminList');
            const { data, error } = await sb.from('profiles').select('username').eq('is_admin', true).order('created_at', { ascending: true });
            if (error || !data || data.length === 0) { list.textContent = 'No admins found.'; list.innerHTML = '<span style="color:#778;">No admins found.</span>'; return; }
@@ -811,7 +865,7 @@
                 <div class="cat-row">
                     <span style="font-weight:600;flex:1;">${esc(cat)}</span>
                     <span class="admin-tag">${count} pack${count !== 1 ? 's' : ''}</span>
-                    <button class="btn-reject" style="font-size:10px;padding:1px 6px;" onclick="deleteCategory('${esc(cat)}')"><img src="/assets/img/icons/flag_red.png" width="10" height="10" alt="" style="vertical-align:middle;"> Delete</button>
+                    <button class="btn-reject" style="font-size:10px;padding:1px 6px;" onclick="deleteCategory('${attrEsc(cat)}')"><img src="/assets/img/icons/flag_red.png" width="10" height="10" alt="" style="vertical-align:middle;"> Delete</button>
                 </div>
             `).join('');
         }

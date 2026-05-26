@@ -13,6 +13,8 @@ const SITE_CONFIG = {
     supabaseUrl: 'https://itirtrahnteyxaxxhitw.supabase.co',
     supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0aXJ0cmFobnRleXhheHhoaXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2Nzc5NzcsImV4cCI6MjA5MTI1Mzk3N30.KKOsjH6qzv9UsXG5MSFI6DI8oT755I44trWzFZr9SlM',
 
+    siteUrl: 'https://robloxcaps.github.io',
+
     logoImg:       '/assets/img/Logos/RBLXCapsMiniLogo.png',
     splashLogoImg: '/assets/img/Logos/Logo.png',
 
@@ -521,7 +523,7 @@ async function loadNavAccount() {
     const path = window.location.pathname;
     const onProfile = path.startsWith('/Pages/Profile/');
     const onSettings = path.startsWith('/Pages/Settings/');
-    const showAdminLink = isAdmin || userRole === 'moderator';
+    const showAdminLink = isAdmin || userRole === 'moderator' || userRole === 'content_moderator';
 
     const avatarHtml = avatar
         ? `<img class="nav-avatar" src="${esc(avatar)}" alt="">`
@@ -584,6 +586,7 @@ async function handleHomeSignup() {
 
 // ---- HELPERS ----
 function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+function attrEsc(t) { if (!t) return ''; return esc(t).replace(/'/g, '&#39;').replace(/"/g, '&#34;'); }
 function sanitizeUrl(url) {
     if (!url) return '';
     try { const u = new URL(url); return (u.protocol === 'http:' || u.protocol === 'https:') ? url : ''; }

@@ -5,8 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all">
     <title>Oops! - CAP Central</title><script>document.title = SITE_CONFIG.ui.pageTitles.notFound + ' - ' + SITE_CONFIG.siteName;</script>
-    <link rel="icon" href="assets/img/FaviIcon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .error-404 {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .error-404 h1 {
+            font-size: var(--font-h1);
+            color: var(--c-text-heading);
+            margin: 0 0 8px;
+        }
+        .error-404 .error-code {
+            font-size: var(--font-title);
+            color: var(--c-text-muted);
+            margin-bottom: 4px;
+        }
+        .error-404 p {
+            font-size: var(--font-sm);
+            color: var(--c-text-light);
+            max-width: 400px;
+            margin: 0 auto 24px;
+            line-height: 1.6;
+        }
+        .error-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .error-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            background: var(--c-card-bg);
+            border: 1px solid var(--c-border);
+            color: var(--c-text);
+            font-size: var(--font-sm);
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+        .error-links a:hover {
+            background: var(--c-bg-subtle);
+            border-color: var(--c-text-light);
+        }
+        .error-links a img {
+            vertical-align: middle;
+        }
+        .legacy-note {
+            font-size: var(--font-xs);
+            color: var(--c-text-muted);
+            margin-top: 32px;
+        }
+    </style>
 </head>
 <body>
 <div id="MainContainer">
@@ -15,7 +68,19 @@
     <div id="Container" class="main-page">
     <div id="Body">
         <div id="MainContent">
-            <div class="error-message" id="NotFound"></div>
+            <div class="error-404">
+                <div class="error-code">404</div>
+                <h1>Page Not Found</h1>
+                <p>The page you're looking for doesn't exist or may have been moved. The <strong>CAP Central</strong> site has been restructured — try one of the links below.</p>
+                <div class="error-links">
+                    <a href="/"><img src="/assets/img/icons/house.png" width="14" height="14" alt=""> Home</a>
+                    <a href="/Pages/Packs/"><img src="/assets/img/icons/package.png" width="14" height="14" alt=""> Packs</a>
+                    <a href="/Pages/Plugins/"><img src="/assets/img/icons/plugin.png" width="14" height="14" alt=""> Plugins</a>
+                    <a href="/Pages/Submit/"><img src="/assets/img/icons/page_white_add.png" width="14" height="14" alt=""> Submit</a>
+                    <a href="/Pages/Credits/"><img src="/assets/img/icons/group.png" width="14" height="14" alt=""> Credits</a>
+                </div>
+                <div class="legacy-note">Old URLs like <code>/Packs</code>, <code>/Pack</code>, and <code>/Profile</code> should redirect automatically.</div>
+            </div>
         </div>
     </div>
 </div>
@@ -24,7 +89,7 @@
 </div>
 
 <script>
-    const path = window.location.pathname.replace(/\/+$/, ''); // strip trailing slash
+    const path = window.location.pathname.replace(/\/+$/, '');
     const search = window.location.search;
 
     const legacyRedirects = {
@@ -52,7 +117,7 @@
     }
 </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="assets/js/config.js"></script>
+    <script src="/assets/js/config.js"></script>
 </div>
 </body>
 </html>
