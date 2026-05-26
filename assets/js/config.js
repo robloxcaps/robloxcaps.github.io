@@ -76,7 +76,7 @@ function buildHeader() {
     header.innerHTML = `
         <div id="Navigation">
             <a href="/" id="NavLogo">
-                <img src="${SITE_CONFIG.logoImg}" alt="${SITE_CONFIG.siteName}" height="28">
+                <img src="${SITE_CONFIG.logoImg}" alt="${SITE_CONFIG.siteName}" height="30">
             </a>
             ${links}
             <span id="NavAccountArea"></span>
@@ -175,20 +175,30 @@ async function loadNavAccount() {
 
     const { data: profile } = await sb
         .from('profiles')
-        .select('username, is_admin')
+        .select('username, is_admin, role, avatar_url')
         .eq('id', session.user.id)
         .maybeSingle();
 
     const username = profile?.username || session.user.email || 'User';
     const isAdmin  = profile?.is_admin === true;
-    window.isAdmin = isAdmin; // expose for other pages
+    const userRole = profile?.role || null;
+    const avatar   = profile?.avatar_url || null;
+    window.isAdmin    = isAdmin;
+    window.userRole   = userRole;
 
     const path = window.location.pathname;
     const onProfile = path.startsWith('/Pages/Profile/');
+    const onSettings = path.startsWith('/Pages/Settings/');
+    const showAdminLink = isAdmin || userRole === 'moderator';
+
+    const avatarHtml = avatar
+        ? `<img class="nav-avatar" src="${esc(avatar)}" alt="">`
+        : `<span class="nav-avatar-letter">${esc(username.charAt(0).toUpperCase())}</span>`;
 
     area.innerHTML = `
-        <a class="MenuItem${onProfile ? ' Active' : ''}" href="/Pages/Profile/?u=${encodeURIComponent(username)}">${esc(username)}</a>
-        ${isAdmin ? `<a class="MenuItem admin-link${path.startsWith('/Pages/Admin/') ? ' Active' : ''}" href="/Pages/Admin/">Admin Panel</a>` : ''}
+        <a class="MenuItem${onProfile ? ' Active' : ''}" href="/Pages/Profile/?u=${encodeURIComponent(username)}">${avatarHtml} ${esc(username)}</a>
+        <a class="MenuItem${onSettings ? ' Active' : ''}" href="/Pages/Settings/">Settings</a>
+        ${showAdminLink ? `<a class="MenuItem admin-link${path.startsWith('/Pages/Admin/') ? ' Active' : ''}" href="/Pages/Admin/">Admin Panel</a>` : ''}
         <a class="MenuItem" href="#" onclick="handleLogout(event)">Log Out</a>
     `;
 }

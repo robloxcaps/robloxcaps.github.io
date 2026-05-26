@@ -39,9 +39,10 @@
     </style>
 </head>
 <body>
+<div id="MainContainer">
 
-<div id="Header"></div>
-<div id="Container">
+    <div id="HeaderWrapper"><div id="Header"></div></div>
+    <div id="Container">
     <div id="Body">
         <div id="MainContent">
 
@@ -162,7 +163,7 @@
         </div>
     </div>
 </div>
-<div id="FooterWrapper">
+    <div id="FooterWrapper">
     <div id="Footer"></div>
 </div>
 
@@ -279,5 +280,6 @@ function resetSubmitForm() {
 }
 function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 </script>
+</div>
 </body>
 </html>

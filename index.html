@@ -75,11 +75,13 @@
     </style>
 </head>
 <body>
-    <div id="Header"></div>
+<div id="MainContainer">
+
+    <div id="HeaderWrapper"><div id="Header"></div></div>
     <div id="Container" class="main-page">
-        <div id="Body">
-            <div id="MainContent">
-                <div id="BrowseStrip">
+    <div id="Body">
+        <div id="MainContent">
+            <div id="BrowseStrip">
                     You don't need an account to browse packs.
                     <a href="/Pages/Packs/">Browse Packs &rarr;</a>
                 </div>
@@ -119,7 +121,7 @@
         const splash = document.getElementById('SplashSection');
 
         if (username) {
-            // Logged in — show welcome + search
+            // Logged in — show welcome + dashboard
             splash.innerHTML = `
                 <div id="SplashLeft">
                     <img id="SplashLogo" src="${SITE_CONFIG.splashLogoImg}" alt="${SITE_CONFIG.siteName}">
@@ -135,29 +137,18 @@
                 </div>
                 <div id="SignInArea">
                     <div id="SignupBox">
-                        <div class="box-header"><h3>Search Packs</h3></div>
+                        <div class="box-header"><h3>Your Dashboard</h3></div>
                         <div class="box-body">
-                            <div class="form-group">
-                                <label for="HomeSearch">Pack name or author</label>
-                                <input type="text" id="HomeSearch" placeholder="e.g. 2009 terrain..." autocomplete="off">
+                            <div style="font-size:12px;color:#555;margin-bottom:10px;line-height:1.5;" id="DashInfo">Loading...</div>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                <a href="/Pages/Settings/" class="quicklink-btn secondary" style="flex:1;text-align:center;font-size:10px;">Settings</a>
+                                <a href="/Pages/Submit/" class="quicklink-btn primary" style="flex:1;text-align:center;font-size:10px;">New Submission</a>
                             </div>
-                            <div class="form-group">
-                                <label for="HomeCategory">Category</label>
-                                <select id="HomeCategory">
-                                    <option value="">All categories</option>
-                                </select>
-                            </div>
-                            <button onclick="handleHomeSearch()">Search</button>
-                            <div style="margin-top:8px;text-align:center;font-size:11px;">
-                                <a href="/Pages/Packs/">Browse all packs &rarr;</a>
-                            </div>
-                        </div>
-                        <div class="box-footer">
-                            <a href="/Pages/Submit/">Submit your own pack</a>
                         </div>
                     </div>
                 </div>
             `;
+            loadDashStats(username);
         } else {
             // Logged out — show browse strip, signup form, and browse CTA
             document.getElementById('BrowseStrip').style.display = 'block';
@@ -217,36 +208,32 @@
         });
     }
 
-    function handleHomeSearch() {
-        const query    = document.getElementById('HomeSearch')?.value.trim() || '';
-        const category = document.getElementById('HomeCategory')?.value || '';
-        const params   = new URLSearchParams();
-        if (query)    params.set('search', query);
-        if (category) params.set('category', category);
-        window.location.href = '/Pages/Packs/?' + params.toString();
+    async function loadDashStats(username) {
+        const el = document.getElementById('DashInfo');
+        if (!el) return;
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { el.textContent = 'Could not load stats.'; return; }
+        const { data: profile } = await sb.from('profiles').select('id').eq('username', username).maybeSingle();
+        if (!profile) { el.textContent = 'Could not load stats.'; return; }
+        const { count: packCount } = await sb.from('packs').select('*', { count: 'exact', head: true }).eq('submitted_by', username);
+        const { count: subCount }  = await sb.from('submissions').select('*', { count: 'exact', head: true }).eq('submitted_by', username);
+        el.innerHTML = `You've submitted <strong>${packCount ?? 0}</strong> pack${packCount !== 1 ? 's' : ''}${subCount > 0 ? ` and have <strong>${subCount}</strong> submission${subCount !== 1 ? 's' : ''} pending review.` : '.'}`;
     }
 
     document.addEventListener('keydown', e => {
-        if (e.key === 'Enter' && document.activeElement?.id === 'HomeSearch') handleHomeSearch();
         if (e.key === 'Enter' && document.activeElement?.closest('#SignupBox')) handleHomeSignup();
     });
 
     async function buildStats() {
         const section = document.getElementById('StatsSection');
         const { count: packCount }  = await sb.from('packs').select('*', { count: 'exact', head: true });
-        const { data: dlData }      = await sb.from('packs').select('downloads');
         const { count: userCount }  = await sb.from('profiles').select('*', { count: 'exact', head: true });
-        const totalDl = dlData ? dlData.reduce((s, p) => s + (p.downloads || 0), 0) : 0;
 
         section.innerHTML = `
             <div id="StatsBar" style="margin:0;">
                 <div class="stat-card">
                     <div class="stat-number">${packCount ?? '—'}</div>
                     <div class="stat-label">Packs Available</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${totalDl.toLocaleString()}</div>
-                    <div class="stat-label">Total Downloads</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">${userCount ?? '—'}</div>
@@ -280,14 +267,12 @@
         packs.forEach(pack => {
             const div = document.createElement('div');
             div.className = 'PackItem';
-            const dl = pack.downloads || 0;
             div.innerHTML = `
                 <div class="PackContentGroup">
                     <img class="PackIcon" src="${esc(pack.icon||'/assets/img/Placeholder.png')}" alt="${esc(pack.title)}" loading="lazy" onerror="this.src='/assets/img/Placeholder.png'">
                     <div class="PackTitle">${esc(pack.title)}</div>
                     <div class="PackAuthor">by ${esc(pack.author)}</div>
                     <div class="PackCategory">${esc(pack.category||'Other')}</div>
-                    <div style="font-size:10px;color:#889;margin-top:2px;">${dl} download${dl !== 1 ? 's' : ''}</div>
                 </div>
                 <div class="PackButtons">
                     <a href="${esc(pack.download_url||'#')}" target="_blank" rel="noopener noreferrer" class="PackDownload">Download</a>
@@ -304,5 +289,6 @@
         d.textContent = t; return d.innerHTML;
     }
     </script>
+</div>
 </body>
 </html>

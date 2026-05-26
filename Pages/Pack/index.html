@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>Pack - CAP Central</title>
+    <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        #PackDetailWrap {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+        #PackDetailHeader {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--c-border);
+            margin-bottom: 20px;
+        }
+        #PackDetailIcon {
+            width: 120px; height: 120px;
+            object-fit: cover;
+            border: 1px solid var(--c-border);
+            background: var(--c-row-alt);
+            flex-shrink: 0;
+        }
+        #PackDetailInfo { flex: 1; min-width: 0; }
+        #PackDetailTitle {
+            font-size: 22px; font-weight: 600;
+            color: #222; margin-bottom: 4px;
+        }
+        #PackDetailAuthor {
+            font-size: 14px; color: #8a8070; margin-bottom: 8px;
+        }
+        #PackDetailMeta {
+            display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
+        }
+        #PackDetailCategory {
+            font-size: 11px; padding: 3px 10px;
+            font-weight: 600;
+            background: var(--c-cat-bg);
+            border: 1px solid var(--c-cat-border);
+            color: var(--c-cat-text);
+        }
+        #PackDetailActions { display: flex; gap: 8px; }
+        #PackDetailActions a, #PackDetailActions button { height: 34px; padding: 6px 20px; font-size: 13px; }
+
+        #PackDetailDescription {
+            font-size: 14px; line-height: 1.7;
+            color: #4a4040; margin-bottom: 24px;
+            padding: 16px;
+            border: 1px solid var(--c-border);
+            background: var(--c-row-alt);
+        }
+
+        #NoPack { text-align: center; padding: 60px 20px; color: #9a9080; }
+        #NoPack h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #4a4040; }
+
+        .CommentCount {
+            font-size: 15px; font-weight: 600;
+            color: #222; margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--c-border);
+        }
+
+        .CommentItem {
+            padding: 10px 14px;
+            border: 1px solid var(--c-border);
+            margin-bottom: 8px;
+            background: var(--c-white);
+        }
+        .CommentHead {
+            display: flex; align-items: center;
+            gap: 8px; margin-bottom: 6px;
+        }
+        .CommentAvatar {
+            width: 28px; height: 28px;
+            background: var(--c-btn);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .CommentAvatar img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .CommentUsername {
+            font-weight: 600; font-size: 13px;
+            color: var(--c-link); text-decoration: none;
+        }
+        .CommentUsername:hover { text-decoration: underline; }
+        .CommentDate {
+            font-size: 11px; color: #aaa;
+            margin-left: auto;
+        }
+        .CommentBody {
+            font-size: 13px; line-height: 1.5;
+            color: #4a4040;
+        }
+        .CommentDelete {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: #c0392b;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 0 4px;
+            line-height: 1;
+            font-family: inherit;
+        }
+        .CommentDelete:hover { color: #a02020; }
+
+        #CommentForm {
+            margin-top: 16px;
+            padding: 14px;
+            border: 1px solid var(--c-border);
+            background: var(--c-cat-bg);
+        }
+        #CommentForm textarea {
+            width: 100%; height: 60px;
+            padding: 8px 10px;
+            border: 1px solid var(--c-input-border);
+            font-size: 13px;
+            font-family: var(--font);
+            resize: vertical;
+            background: #fff;
+            color: #333;
+        }
+        #CommentForm textarea:focus {
+            border-color: var(--c-input-focus);
+            outline: none;
+        }
+        #CommentForm button {
+            margin-top: 8px;
+            height: 32px;
+            padding: 0 18px;
+            font-size: 13px; font-weight: 400;
+            background: var(--c-btn);
+            color: #fff;
+            border: 1px solid var(--c-btn-border);
+            cursor: pointer;
+        }
+        #CommentForm button:hover { background: var(--c-btn-hover); }
+        #CommentForm button:disabled { background: #9a9080; cursor: not-allowed; }
+        #CommentStatus { font-size: 12px; color: #8a8070; margin-top: 6px; }
+
+        #LoginToComment {
+            text-align: center; padding: 16px;
+            border: 1px solid var(--c-border);
+            color: #8a8070; font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+<div id="MainContainer">
+
+    <div id="HeaderWrapper"><div id="Header"></div></div>
+    <div id="Container">
+    <div id="Body">
+        <div id="MainContent">
+
+        <div id="NoPack" style="display:none;">
+            <h2>Pack Not Found</h2>
+            <p>This pack doesn't exist or was removed.</p>
+            <a href="/Pages/Packs/" style="display:inline-block;margin-top:12px;">&larr; Browse Packs</a>
+        </div>
+
+        <div id="PackDetailWrap" style="display:none;">
+            <div id="PackDetailHeader">
+                <img id="PackDetailIcon" src="" alt="Pack Icon">
+                <div id="PackDetailInfo">
+                    <div id="PackDetailTitle"></div>
+                    <div id="PackDetailAuthor"></div>
+                    <div id="PackDetailMeta">
+                        <span id="PackDetailCategory">Category</span>
+                    </div>
+                    <div id="PackDetailActions">
+                        <a href="#" id="PackDetailDownload" class="PackDownload" style="flex:0;padding:6px 24px;" target="_blank" rel="noopener noreferrer">Download</a>
+                        <a href="/Pages/Packs/" class="btn-modal-secondary" style="display:inline-flex;align-items:center;padding:6px 16px;font-size:13px;text-decoration:none;">&larr; Back</a>
+                    </div>
+                </div>
+            </div>
+            <div id="PackDetailDescription">No description.</div>
+
+            <div id="CommentsSection">
+                <div class="CommentCount" id="CommentCount">Comments</div>
+                <div id="CommentList"></div>
+                <div id="CommentForm" style="display:none;">
+                    <textarea id="CommentInput" placeholder="Leave a comment..." maxlength="500"></textarea>
+                    <button id="CommentSubmitBtn" onclick="postComment()">Post Comment</button>
+                    <div id="CommentStatus"></div>
+                </div>
+                <div id="LoginToComment" style="display:none;">
+                    <a href="/Pages/Login/">Log in</a> or <a href="/Pages/SignUp/">sign up</a> to leave a comment.
+                </div>
+            </div>
+        </div>
+
+        </div>
+    </div>
+</div>
+
+    <div id="FooterWrapper">
+    <div id="Footer"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/config.js"></script>
+<script>
+let currentPack = null;
+let currentUser = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const packId = params.get('id');
+    if (packId) loadPack(packId);
+    else { document.getElementById('NoPack').style.display = 'block'; }
+});
+
+async function loadPack(packId) {
+    const { data: pack, error } = await sb.from('packs').select('*').eq('id', packId).maybeSingle();
+    if (error || !pack) {
+        document.getElementById('NoPack').style.display = 'block';
+        return;
+    }
+
+    currentPack = pack;
+    document.title = `${pack.title} - CAP Central`;
+
+    const wrap = document.getElementById('PackDetailWrap');
+    wrap.style.display = 'block';
+
+    document.getElementById('PackDetailTitle').textContent = pack.title;
+    document.getElementById('PackDetailAuthor').textContent = `by ${pack.author || 'Unknown'}`;
+    document.getElementById('PackDetailCategory').textContent = pack.category || 'Other';
+
+    const desc = document.getElementById('PackDetailDescription');
+    desc.textContent = (pack.description && pack.description.length > 5)
+        ? pack.description : 'No description provided.';
+
+    document.getElementById('PackDetailDownload').href = pack.download_url || '#';
+
+    const icon = document.getElementById('PackDetailIcon');
+    icon.src = pack.icon || '/assets/img/Placeholder.png';
+    icon.onerror = function() { this.src = '/assets/img/Placeholder.png'; };
+
+    const { data: { session } } = await sb.auth.getSession();
+    currentUser = session?.user || null;
+
+    const form = document.getElementById('CommentForm');
+    const login = document.getElementById('LoginToComment');
+    if (currentUser) {
+        form.style.display = 'block';
+        login.style.display = 'none';
+    } else {
+        form.style.display = 'none';
+        login.style.display = 'block';
+    }
+
+    loadComments();
+}
+
+async function loadComments() {
+    if (!currentPack) return;
+    const list = document.getElementById('CommentList');
+    const count = document.getElementById('CommentCount');
+
+    const { data: comments, error } = await sb
+        .from('comments')
+        .select('id, user_id, username, content, created_at')
+        .eq('pack_id', currentPack.id)
+        .order('created_at', { ascending: false });
+
+    if (error) { list.innerHTML = '<p style="color:#c0392b;">Error loading comments.</p>'; return; }
+
+    count.textContent = `${comments.length} Comment${comments.length !== 1 ? 's' : ''}`;
+
+    if (!comments.length) {
+        list.innerHTML = '<p style="color:#9a9080;font-size:13px;padding:8px 0;">No comments yet.</p>';
+        return;
+    }
+
+    const userIds = [...new Set(comments.map(c => c.user_id).filter(Boolean))];
+    const { data: profiles } = await sb.from('profiles').select('id, avatar_url').in('id', userIds);
+    const avatars = {};
+    if (profiles) profiles.forEach(p => avatars[p.id] = p.avatar_url);
+
+    let canDelete = false;
+    if (currentUser) {
+        const { data: prof } = await sb.from('profiles').select('role').eq('id', currentUser.id).maybeSingle();
+        canDelete = prof?.role === 'admin' || prof?.role === 'moderator';
+    }
+
+    list.innerHTML = comments.map(c => `
+        <div class="CommentItem" id="comment-${c.id}">
+            <div class="CommentHead">
+                <div class="CommentAvatar">${avatars[c.user_id] ? `<img src="${esc(avatars[c.user_id])}" alt="">` : (c.username || '?')[0].toUpperCase()}</div>
+                <a href="/Pages/Profile/?u=${esc(c.username)}" class="CommentUsername">${esc(c.username)}</a>
+                <span class="CommentDate">${timeAgo(c.created_at)}</span>
+                ${canDelete ? `<button class="CommentDelete" onclick="deleteComment('${c.id}')">&times;</button>` : ''}
+            </div>
+            <div class="CommentBody">${esc(c.content)}</div>
+        </div>
+    `).join('');
+}
+
+async function postComment() {
+    const input = document.getElementById('CommentInput');
+    const btn = document.getElementById('CommentSubmitBtn');
+    const status = document.getElementById('CommentStatus');
+    const content = input.value.trim();
+
+    if (!content || content.length < 2) { status.textContent = 'Comment must be at least 2 characters.'; return; }
+    if (!currentUser || !currentPack) return;
+
+    btn.disabled = true;
+    status.textContent = 'Posting...';
+
+    const { data: profile } = await sb.from('profiles').select('username').eq('id', currentUser.id).maybeSingle();
+    const username = profile?.username || 'Unknown';
+
+    const { error } = await sb.from('comments').insert({
+        pack_id: currentPack.id,
+        user_id: currentUser.id,
+        username: username,
+        content: content,
+    });
+
+    if (error) {
+        status.textContent = 'Error: ' + error.message;
+        btn.disabled = false;
+        return;
+    }
+
+    input.value = '';
+    status.textContent = 'Comment posted!';
+    btn.disabled = false;
+    setTimeout(() => status.textContent = '', 2000);
+    loadComments();
+}
+
+async function deleteComment(commentId) {
+    if (!confirm('Delete this comment?')) return;
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { alert('Not authenticated.'); return; }
+    const { error } = await sb.from('comments').delete().eq('id', commentId);
+    if (error) { alert('Error: ' + error.message); return; }
+    loadComments();
+}
+
+function timeAgo(dateStr) {
+    const now = Date.now();
+    const d = new Date(dateStr).getTime();
+    const diff = Math.floor((now - d) / 1000);
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 2592000) return `${Math.floor(diff / 86400)}d ago`;
+    return new Date(dateStr).toLocaleDateString();
+}
+
+function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+</script>
+</div>
+</body>
+</html>

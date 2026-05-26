@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>Reset Password - CAP Central</title>
+    <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<div id="MainContainer">
+
+    <div id="HeaderWrapper"><div id="Header"></div></div>
+    <div id="Container">
+    <div id="Body">
+        <div id="MainContent">
+            <div class="FormPage">
+            <div class="FormCard" id="RequestCard">
+                <div class="box-header"><h2>Reset Password</h2></div>
+                <div class="box-body">
+                    <div class="form-group">
+                        <label for="resetEmail">Email</label>
+                        <input type="email" id="resetEmail" placeholder="you@gmail.com" autocomplete="off" />
+                        <p class="field-hint">We'll send a password reset link to this email.</p>
+                    </div>
+                    <button id="RequestBtn" onclick="handleRequestReset()">Send Reset Link</button>
+                    <div id="RequestStatus"></div>
+                </div>
+                <div class="form-footer">
+                    <a href="/Pages/Login/">Back to Login</a>
+                </div>
+            </div>
+
+            <div class="FormCard" id="ResetCard" style="display:none;">
+                <div class="box-header"><h2>Set New Password</h2></div>
+                <div class="box-body">
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" placeholder="Min. 6 characters" />
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" placeholder="Repeat your password" />
+                    </div>
+                    <button id="ResetBtn" onclick="handleResetPassword()">Update Password</button>
+                    <div id="ResetStatus"></div>
+                </div>
+                <div class="form-footer">
+                    <a href="/Pages/Login/">Back to Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+    <div id="FooterWrapper">
+    <div id="Footer"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/config.js"></script>
+<script>
+function setStatus(el, msg, type) {
+    el.textContent = msg;
+    el.className = type || '';
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const card = document.activeElement?.closest('.FormCard');
+    if (!card) return;
+    if (card.id === 'RequestCard') handleRequestReset();
+    else if (card.id === 'ResetCard') handleResetPassword();
+});
+
+// ---- REQUEST RESET ----
+async function handleRequestReset() {
+    const email = document.getElementById('resetEmail').value.trim();
+    const btn   = document.getElementById('RequestBtn');
+    const st    = document.getElementById('RequestStatus');
+
+    setStatus(st, '');
+    if (!email) return setStatus(st, 'Enter your email address.', 'error');
+
+    btn.disabled = true;
+    setStatus(st, 'Sending...', '');
+
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/Pages/ResetPassword/',
+    });
+
+    if (error) { btn.disabled = false; return setStatus(st, error.message, 'error'); }
+
+    setStatus(st, 'Check your email for the reset link. You can close this page.', 'success');
+}
+
+// ---- DETECT RECOVERY TOKEN ----
+sb.auth.onAuthStateChange((event) => {
+    if (event === 'PASSWORD_RECOVERY') {
+        document.getElementById('RequestCard').style.display = 'none';
+        document.getElementById('ResetCard').style.display = 'block';
+    }
+});
+
+// ---- CONFIRM RESET ----
+async function handleResetPassword() {
+    const password = document.getElementById('newPassword').value;
+    const confirm  = document.getElementById('confirmPassword').value;
+    const btn      = document.getElementById('ResetBtn');
+    const st       = document.getElementById('ResetStatus');
+
+    setStatus(st, '');
+    if (!password || !confirm) return setStatus(st, 'Fill in both fields.', 'error');
+    if (password.length < 6) return setStatus(st, 'Password must be at least 6 characters.', 'error');
+    if (password !== confirm) return setStatus(st, 'Passwords do not match.', 'error');
+
+    btn.disabled = true;
+    setStatus(st, 'Updating...', '');
+
+    const { error } = await sb.auth.updateUser({ password });
+
+    if (error) { btn.disabled = false; return setStatus(st, error.message, 'error'); }
+
+    setStatus(st, 'Password updated! Redirecting to login...', 'success');
+    setTimeout(() => window.location.href = '/Pages/Login/', 1500);
+}
+</script>
+</div>
+</body>
+</html>

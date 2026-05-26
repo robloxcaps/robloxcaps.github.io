@@ -8,11 +8,13 @@
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
+<div id="MainContainer">
 
-<div id="Header"></div>
-<div id="Container">
+    <div id="HeaderWrapper"><div id="Header"></div></div>
+    <div id="Container">
     <div id="Body">
-        <div class="FormPage">
+        <div id="MainContent">
+            <div class="FormPage">
             <div class="FormCard">
                 <div class="box-header"><h2>Create an Account</h2></div>
                 <div class="box-body">
@@ -44,7 +46,8 @@
         </div>
     </div>
 </div>
-<div id="FooterWrapper">
+</div>
+    <div id="FooterWrapper">
     <div id="Footer"></div>
 </div>
 
@@ -98,5 +101,6 @@ async function handleSignup() {
     btn.disabled = false;
 }
 </script>
+</div>
 </body>
 </html>

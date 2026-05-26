@@ -20,7 +20,7 @@
 
         .sub-row {
             display: flex; align-items: center; gap: 10px;
-            padding: 6px 10px; border-bottom: 1px solid #eee;
+            padding: 8px 14px; border-bottom: 1px solid #eee;
             font-size: 12px;
         }
         .sub-row:nth-child(odd)  { background: #f4f6fa; }
@@ -28,13 +28,20 @@
         .sub-row-icon { width: 36px; height: 36px; object-fit: cover; border: 1px solid #ccc; border-radius: 2px; flex-shrink: 0; }
         .sub-row-title { font-weight: bold; color: #2a3a5a; flex: 1; }
         .sub-row-meta  { font-size: 11px; color: #778; }
+
+        #UserPacksLoading,
+        #UserPacksEmpty { text-align:center; color:#778; font-size:12px; padding:8px; }
+        #SubHistoryLoading,
+        #SubHistoryEmpty { text-align:center; color:#778; font-size:12px; padding:12px; }
     </style>
 </head>
 <body>
+<div id="MainContainer">
 
-<div id="Header"></div>
-<div id="Container">
+    <div id="HeaderWrapper"><div id="Header"></div></div>
+    <div id="Container">
     <div id="Body">
+        <div id="MainContent">
 
         <div id="LoadingState" style="text-align:center;padding:50px;color:#778;">Loading profile...</div>
 
@@ -54,10 +61,12 @@
             <!-- PROFILE CARD -->
             <div id="ProfileCard">
                 <div id="ProfileHeader">
-                    <div id="ProfileAvatar">?</div>
+                    <div id="ProfileAvatarWrap">
+                        <div id="ProfileAvatar">?</div>
+                    </div>
                     <div>
-                        <div id="ProfileUsername" style="font-size:16px;font-weight:bold;color:#2a3a5a;"></div>
-                        <div id="ProfileBadge"    style="font-size:11px;color:#778;margin-top:2px;"></div>
+                        <div id="ProfileUsername"></div>
+                        <div id="ProfileBadge"></div>
                     </div>
                 </div>
                 <div id="ProfileBody">
@@ -81,34 +90,33 @@
             </div>
 
             <!-- SUBMITTED PACKS -->
-            <div style="margin-top:16px;">
-                <div class="CatHeader">
+            <div class="ProfileSection">
+                <div class="ProfileSection-header">
                     <h3 id="PacksSectionTitle">Submitted Packs</h3>
                 </div>
-                <div style="border:1px solid #ccc;border-top:none;background:#fff;padding:12px;">
-                    <div id="UserPacksLoading" style="text-align:center;color:#778;font-size:12px;padding:8px;">Loading packs...</div>
-                    <div id="UserPacksEmpty"   style="display:none;text-align:center;color:#778;font-size:12px;padding:8px;">No approved packs submitted yet.</div>
+                <div class="ProfileSection-body">
+                    <div id="UserPacksLoading">Loading packs...</div>
+                    <div id="UserPacksEmpty" style="display:none;">No approved packs submitted yet.</div>
                     <div class="PackGrid" id="UserPackGrid" style="display:none;"></div>
                 </div>
             </div>
 
             <!-- SUBMISSION HISTORY — only shown on own profile -->
-            <div id="SubmissionHistorySection" style="display:none;margin-top:16px;">
-                <div class="CatHeader">
+            <div id="SubmissionHistorySection" style="display:none;" class="ProfileSection">
+                <div class="ProfileSection-header">
                     <h3>Submission History</h3>
                 </div>
-                <div style="border:1px solid #ccc;border-top:none;background:#fff;">
-                    <div id="SubHistoryLoading" style="text-align:center;color:#778;font-size:12px;padding:12px;">Loading...</div>
-                    <div id="SubHistoryEmpty"   style="display:none;text-align:center;color:#778;font-size:12px;padding:12px;">No submissions yet.</div>
+                <div class="ProfileSection-body" style="padding:0;">
+                    <div id="SubHistoryLoading">Loading...</div>
+                    <div id="SubHistoryEmpty" style="display:none;">No submissions yet.</div>
                     <div id="SubHistoryList"></div>
                 </div>
             </div>
 
         </div>
+
+        </div>
     </div>
-</div>
-<div id="FooterWrapper">
-    <div id="Footer"></div>
 </div>
 
 <!-- MODAL -->
@@ -136,6 +144,9 @@
     </div>
 </div>
 
+    <div id="FooterWrapper">
+    <div id="Footer"></div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/config.js"></script>
 <script>
@@ -163,7 +174,7 @@ setTimeout(async () => {
 
     const { data: profile, error } = await sb
         .from('profiles')
-        .select('username, is_admin, is_banned, created_at')
+        .select('username, is_admin, is_banned, role, avatar_url, created_at')
         .eq('username', username)
         .maybeSingle();
 
@@ -173,22 +184,39 @@ setTimeout(async () => {
     if (!profile) { document.getElementById('NotFound').style.display = 'block'; return; }
 
     // Fill card
-    document.getElementById('ProfileAvatar').textContent   = profile.username.charAt(0).toUpperCase();
+    const avatarEl = document.getElementById('ProfileAvatar');
+    if (profile.avatar_url) {
+        avatarEl.textContent = '';
+        avatarEl.style.background = 'transparent';
+        const img = document.createElement('img');
+        img.src = profile.avatar_url;
+        img.alt = profile.username;
+        img.className = 'profile-avatar-img';
+        img.onerror = function() { this.style.display = 'none'; avatarEl.textContent = profile.username.charAt(0).toUpperCase(); avatarEl.style.background = ''; };
+        avatarEl.appendChild(img);
+    } else {
+        avatarEl.textContent = profile.username.charAt(0).toUpperCase();
+    }
     document.getElementById('ProfileUsername').textContent = profile.username;
     document.getElementById('InfoUsername').textContent    = profile.username;
     document.getElementById('InfoJoined').textContent      = new Date(profile.created_at).toLocaleDateString('en-US', {
         year: 'numeric', month: 'long', day: 'numeric'
     });
 
-    let role = 'User';
-    if (profile.is_banned) role = 'Banned';
-    else if (profile.is_admin) role = 'Admin';
-    document.getElementById('InfoRole').textContent = role;
+    let roleLabel = 'User';
+    if (profile.is_banned) roleLabel = 'Banned';
+    else if (profile.is_admin) roleLabel = 'Admin';
+    else if (profile.role === 'moderator') roleLabel = 'Moderator';
+    document.getElementById('InfoRole').textContent = roleLabel;
 
+    const badge = document.getElementById('ProfileBadge');
     if (profile.is_admin && !profile.is_banned) {
-        const badge = document.getElementById('ProfileBadge');
         badge.textContent = '★ Administrator';
         badge.style.color = '#e8a020';
+        badge.style.fontWeight = 'bold';
+    } else if (profile.role === 'moderator' && !profile.is_banned) {
+        badge.textContent = '★ Moderator';
+        badge.style.color = '#1a8a6e';
         badge.style.fontWeight = 'bold';
     }
 
@@ -201,6 +229,7 @@ setTimeout(async () => {
     await loadUserPacks(username);
 
     if (isOwnProfile) {
+        document.getElementById('SubmissionHistorySection').style.display = 'block';
         await loadSubmissionHistory(username);
     }
 
@@ -303,5 +332,6 @@ function showDetails(pack) {
 function closeModal() { document.getElementById('DescriptionModal').style.display = 'none'; }
 function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 </script>
+</div>
 </body>
 </html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>Settings - CAP Central</title>
+    <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .SettingsPage { max-width: 520px; margin: 0 auto; }
+        .SettingsInfo { font-size: 13px; color: #333; display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee; }
+        .SettingsInfo:last-of-type { border-bottom: none; }
+        .SettingsInfo-label { color: #888; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .SettingsInfo-value { color: #2a3a5a; }
+
+        .settings-avatar-wrap { display: flex; align-items: center; gap: 16px; }
+        .settings-avatar-preview { width: 64px; height: 64px; background: var(--c-accent); display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 700; font-size: 28px; color: #fff; overflow: hidden; flex-shrink: 0; }
+        .settings-avatar-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .settings-avatar-actions { display: flex; flex-direction: column; gap: 4px; }
+        .settings-upload-btn { padding: 4px 12px; font-size: 11px; font-weight: 700; cursor: pointer; background: var(--c-accent); color: #fff; border: none; border-radius: var(--radius); transition: background 0.12s; }
+        .settings-upload-btn:hover { background: var(--c-accent-hover); }
+        .settings-upload-btn:disabled { background: #aaa; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div id="MainContainer">
+
+    <div id="HeaderWrapper"><div id="Header"></div></div>
+    <div id="Container">
+        <div id="Body">
+            <div id="MainContent">
+                <div class="SettingsPage">
+
+                    <div id="LoadingState">Loading settings...</div>
+                    <div id="NotFound" style="display:none;">
+                        <h2>Not found</h2>
+                        <p>This page requires a logged-in account.</p>
+                        <a href="/" class="ProfileHomeBtn">Go Home</a>
+                    </div>
+
+                    <div id="SettingsContent" style="display:none;">
+
+                        <!-- YOUR INFO -->
+                        <div class="ProfileSection">
+                            <div class="ProfileSection-header"><h3>Your Info</h3></div>
+                            <div class="AccountSettings-body">
+                                <div class="SettingsInfo"><span class="SettingsInfo-label">Email</span><span class="SettingsInfo-value" id="SettingsEmail">—</span></div>
+                                <div class="SettingsInfo"><span class="SettingsInfo-label">Username</span><span class="SettingsInfo-value" id="SettingsUsername">—</span></div>
+                                <div class="SettingsInfo"><span class="SettingsInfo-label">Role</span><span class="SettingsInfo-value" id="SettingsRole">—</span></div>
+                            </div>
+                        </div>
+
+                        <!-- AVATAR -->
+                        <div class="ProfileSection">
+                            <div class="ProfileSection-header"><h3>Avatar</h3></div>
+                            <div class="AccountSettings-body">
+                                <div class="settings-avatar-wrap">
+                                    <div class="settings-avatar-preview" id="SettingsAvatarPreview">?</div>
+                                    <div class="settings-avatar-actions">
+                                        <input type="file" id="SettingsAvatarInput" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none;">
+                                        <button class="settings-upload-btn" onclick="document.getElementById('SettingsAvatarInput').click()">Choose Image</button>
+                                        <button class="settings-upload-btn" id="SettingsUploadBtn" style="display:none;" onclick="uploadAvatar()">Upload</button>
+                                        <div id="SettingsAvatarStatus" style="font-size:11px;color:#778;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CHANGE PASSWORD -->
+                        <div class="ProfileSection">
+                            <div class="ProfileSection-header"><h3>Change Password</h3></div>
+                            <div class="AccountSettings-body">
+                                <div class="form-group">
+                                    <label>New Password</label>
+                                    <input type="password" id="NewPasswordInput" placeholder="New password (min 6 characters)">
+                                </div>
+                                <div class="form-group">
+                                    <label>Confirm Password</label>
+                                    <input type="password" id="ConfirmPasswordInput" placeholder="Confirm new password">
+                                </div>
+                                <button id="UpdatePasswordBtn" onclick="updatePassword()">Update Password</button>
+                                <div id="PasswordStatus"></div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="FooterWrapper"><div id="Footer"></div></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/assets/js/config.js"></script>
+    <script>
+    function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+    const loadingEl  = document.getElementById('LoadingState');
+    const notFoundEl = document.getElementById('NotFound');
+    const contentEl  = document.getElementById('SettingsContent');
+
+    (async () => {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) {
+            loadingEl.style.display = 'none';
+            notFoundEl.style.display = 'block';
+            return;
+        }
+
+        const { data: profile, error } = await sb
+            .from('profiles')
+            .select('username, role, avatar_url')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+        if (error || !profile) {
+            loadingEl.style.display = 'none';
+            notFoundEl.style.display = 'block';
+            return;
+        }
+
+        document.getElementById('SettingsEmail').textContent    = session.user.email || '—';
+        document.getElementById('SettingsUsername').textContent = profile.username;
+
+        let roleLabel = 'User';
+        if (profile.role === 'moderator') roleLabel = 'Moderator';
+        document.getElementById('SettingsRole').textContent = roleLabel;
+
+        // Avatar preview
+        const preview = document.getElementById('SettingsAvatarPreview');
+        if (profile.avatar_url) {
+            preview.textContent = '';
+            preview.style.background = 'transparent';
+            const img = document.createElement('img');
+            img.src = profile.avatar_url;
+            img.alt = profile.username;
+            img.onerror = function() { this.style.display = 'none'; preview.textContent = profile.username.charAt(0).toUpperCase(); preview.style.background = ''; };
+            preview.appendChild(img);
+        } else {
+            preview.textContent = profile.username.charAt(0).toUpperCase();
+        }
+
+        loadingEl.style.display = 'none';
+        contentEl.style.display = 'block';
+
+        // Show upload button when file selected
+        document.getElementById('SettingsAvatarInput').addEventListener('change', function() {
+            const btn = document.getElementById('SettingsUploadBtn');
+            btn.style.display = this.files?.[0] ? '' : 'none';
+        });
+    })();
+
+    async function uploadAvatar() {
+        const input = document.getElementById('SettingsAvatarInput');
+        const file = input?.files?.[0];
+        const status = document.getElementById('SettingsAvatarStatus');
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) { status.textContent = 'Too large (max 2MB).'; status.style.color = '#cc2222'; return; }
+        if (!file.type.startsWith('image/')) { status.textContent = 'Not an image.'; status.style.color = '#cc2222'; return; }
+
+        status.textContent = 'Uploading...'; status.style.color = '#778';
+        document.getElementById('SettingsUploadBtn').disabled = true;
+
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { status.textContent = 'Not authenticated.'; status.style.color = '#cc2222'; document.getElementById('SettingsUploadBtn').disabled = false; return; }
+
+        const ext = file.name.split('.').pop();
+        const path = `${session.user.id}/avatar.${ext}`;
+
+        const { error: uploadErr } = await sb.storage.from('avatars').upload(path, file, { upsert: true });
+        if (uploadErr) { status.textContent = 'Upload error: ' + uploadErr.message; status.style.color = '#cc2222'; document.getElementById('SettingsUploadBtn').disabled = false; return; }
+
+        const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
+        const avatarUrl = urlData?.publicUrl;
+        if (!avatarUrl) { status.textContent = 'Failed to get URL.'; status.style.color = '#cc2222'; document.getElementById('SettingsUploadBtn').disabled = false; return; }
+
+        const { error: updateErr } = await sb.from('profiles').update({ avatar_url: avatarUrl }).eq('id', session.user.id);
+        if (updateErr) { status.textContent = 'Update error: ' + updateErr.message; status.style.color = '#cc2222'; document.getElementById('SettingsUploadBtn').disabled = false; return; }
+
+        status.textContent = 'Avatar updated!'; status.style.color = '#337722';
+        input.value = '';
+        document.getElementById('SettingsUploadBtn').disabled = false;
+        setTimeout(() => window.location.reload(), 1200);
+    }
+
+    async function updatePassword() {
+        const newPass = document.getElementById('NewPasswordInput').value;
+        const confirm = document.getElementById('ConfirmPasswordInput').value;
+        const status  = document.getElementById('PasswordStatus');
+
+        if (!newPass || !confirm) { status.textContent = 'Fill in both fields.'; status.style.color = '#cc2222'; return; }
+        if (newPass.length < 6) { status.textContent = 'Password must be at least 6 characters.'; status.style.color = '#cc2222'; return; }
+        if (newPass !== confirm) { status.textContent = 'Passwords do not match.'; status.style.color = '#cc2222'; return; }
+
+        status.textContent = 'Updating password...'; status.style.color = '#778';
+        document.getElementById('UpdatePasswordBtn').disabled = true;
+
+        const { error } = await sb.auth.updateUser({ password: newPass });
+
+        if (error) {
+            status.textContent = 'Error: ' + error.message;
+            status.style.color = '#cc2222';
+            document.getElementById('UpdatePasswordBtn').disabled = false;
+            return;
+        }
+
+        status.textContent = 'Password updated successfully!';
+        status.style.color = '#337722';
+        document.getElementById('NewPasswordInput').value = '';
+        document.getElementById('ConfirmPasswordInput').value = '';
+        document.getElementById('UpdatePasswordBtn').disabled = false;
+    }
+    </script>
+</div>
+</body>
+</html>

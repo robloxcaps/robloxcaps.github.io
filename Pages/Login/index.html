@@ -8,11 +8,13 @@
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
+<div id="MainContainer">
 
-<div id="Header"></div>
-<div id="Container">
+    <div id="HeaderWrapper"><div id="Header"></div></div>
+    <div id="Container">
     <div id="Body">
-        <div class="FormPage">
+        <div id="MainContent">
+            <div class="FormPage">
             <div class="FormCard">
                 <div class="box-header"><h2>Member Login</h2></div>
                 <div class="box-body">
@@ -23,7 +25,7 @@
                     <div class="form-group">
                         <label for="password">Password</label>
                         <input type="password" id="password" placeholder="Your password" />
-                        <p class="field-hint">Forgot your password? Contact us on <a href="https://discord.gg/wqvWd2zeMV" target="_blank">Discord</a>.</p>
+                        <p class="field-hint"><a href="/Pages/ResetPassword/">Forgot your password?</a></p>
                     </div>
                     <button id="LoginBtn" onclick="handleLogin()">Sign In</button>
                     <div id="StatusMsg"></div>
@@ -35,7 +37,8 @@
         </div>
     </div>
 </div>
-<div id="FooterWrapper">
+</div>
+    <div id="FooterWrapper">
     <div id="Footer"></div>
 </div>
 
@@ -90,5 +93,6 @@ async function handleLogin() {
     setTimeout(() => window.location.href = '/', 800);
 }
 </script>
+</div>
 </body>
 </html>
