@@ -24,9 +24,30 @@
 </div>
 
 <script>
-    const path = window.location.pathname;
+    const path = window.location.pathname.replace(/\/+$/, ''); // strip trailing slash
+    const search = window.location.search;
+
+    const legacyRedirects = {
+        '/Packs':    '/Pages/Packs/',
+        '/Pack':     '/Pages/Pack/',
+        '/Plugins':  '/Pages/Plugins/',
+        '/Submit':   '/Pages/Submit/',
+        '/Login':    '/Pages/Login/',
+        '/SignUp':   '/Pages/SignUp/',
+        '/Profile':  '/Pages/Profile/',
+        '/Settings': '/Pages/Settings/',
+        '/Admin':    '/Pages/Admin/',
+        '/Credits':  '/Pages/Credits/',
+        '/ResetPassword': '/Pages/ResetPassword/',
+    };
+
+    if (legacyRedirects[path]) {
+        const qs = path === '/Pack' ? search : '';
+        window.location.replace(legacyRedirects[path] + qs);
+    }
+
     if (path.startsWith('/users/')) {
-        const username = path.split('/users/')[1].replace(/\/$/, '');
+        const username = path.split('/users/')[1];
         if (username) window.location.replace('/Pages/Profile/?u=' + encodeURIComponent(username));
     }
 </script>
