@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sign Up - CAP Central</title>
+    <title>Sign Up - CAP Central</title><script>document.title = SITE_CONFIG.ui.pageTitles.signup + ' - ' + SITE_CONFIG.siteName;</script>
     <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
@@ -36,7 +36,7 @@
                         <label for="confirm">Confirm Password</label>
                         <input type="password" id="confirm" placeholder="Repeat your password" />
                     </div>
-                    <button id="SignupBtn" onclick="handleSignup()">Sign Up</button>
+                    <button id="SignupBtn" onclick="handleSignup()"><img src="/assets/img/icons/user_add.png" width="14" height="14" alt="" style="vertical-align:middle;"> Sign Up</button>
                     <div id="StatusMsg"></div>
                     <div class="form-footer">
                         Already have an account? <a href="/Login/">Log in here</a>

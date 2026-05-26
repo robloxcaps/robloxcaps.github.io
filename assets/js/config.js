@@ -17,10 +17,10 @@ const SITE_CONFIG = {
     splashLogoImg: '/assets/img/Logos/Logo.png',
 
     navLinks: [
-        { label: 'Packs',          href: '/Pages/Packs/'   },
-        { label: 'Plugins',        href: '/Pages/Plugins/' },
-        { label: 'Submit Packs',   href: '/Pages/Submit/'  },
-        { label: 'Special Thanks', href: '/Pages/Credits/' },
+        { label: 'Packs',          href: '/Pages/Packs/',   icon: 'pack' },
+        { label: 'Plugins',        href: '/Pages/Plugins/', icon: 'plugin' },
+        { label: 'Submit Packs',   href: '/Pages/Submit/',  icon: 'submit' },
+        { label: 'Special Thanks', href: '/Pages/Credits/', icon: 'credits' },
     ],
 
     home: {
@@ -39,10 +39,10 @@ const SITE_CONFIG = {
         { label: 'Discord', href: 'https://discord.gg/wqvWd2zeMV' },
     ],
     footerNavLinks: [
-        { label: 'Packs',   href: '/Pages/Packs/'   },
-        { label: 'Plugins', href: '/Pages/Plugins/' },
-        { label: 'Submit',  href: '/Pages/Submit/'  },
-        { label: 'Credits', href: '/Pages/Credits/' },
+        { label: 'Packs',   href: '/Pages/Packs/',   icon: 'package' },
+        { label: 'Plugins', href: '/Pages/Plugins/', icon: 'plugin' },
+        { label: 'Submit',  href: '/Pages/Submit/',  icon: 'page_white_add' },
+        { label: 'Credits', href: '/Pages/Credits/', icon: 'heart' },
     ],
     footerNote: '{year} {authors}. This site is not affiliated with ROBLOX in any way, shape or form.',
 
@@ -52,6 +52,205 @@ const SITE_CONFIG = {
         btnLabel: 'Go Home',
         btnHref:  '/',
     },
+
+    reportReasons: [
+        'Inappropriate content',
+        'Broken download link',
+        'Copyright violation',
+        'Spam',
+        'Harassment',
+        'Other',
+    ],
+
+    ui: {
+        loading:    'Loading...',
+        error:      'Error',
+        retry:      'Retry',
+        save:       'Save',
+        saving:     'Saving...',
+        saved:      'Saved!',
+        cancel:     'Cancel',
+        close:      'Close',
+        delete:     'Delete',
+        edit:       'Edit',
+        approve:    'Approve',
+        reject:     'Reject',
+        dismiss:    'Dismiss',
+        download:   'Download',
+        upload:     'Upload',
+        submit:     'Submit',
+        goHome:     'Go Home',
+        search:     'Search',
+        noResults:  'No results found.',
+        confirm:    'Are you sure?',
+
+        pageTitles: {
+            home:        'Home',
+            packs:       'Packs',
+            pack:        'Pack',
+            plugins:     'Plugins',
+            submit:      'Submit a Pack',
+            login:       'Log In',
+            signup:      'Sign Up',
+            admin:       'Admin',
+            profile:     'Profile',
+            settings:    'Settings',
+            credits:     'Credits',
+            reset:       'Reset Password',
+            notFound:    'Oops!',
+        },
+
+        admin: {
+            heading:       'Admin Panel',
+            accessDenied:  'Access Denied',
+            noPermission:  "You don't have permission to view this page.",
+            refresh:       'Refresh',
+            tabs:          ['Dashboard', 'Submissions', 'Packs', 'Users', 'Comments', 'Categories', 'Reports', 'Activity Log'],
+            pending:       'Pending',
+            allSubmissions:'All Submissions',
+            stats:         { users:'Users', pending:'Pending', packs:'Packs', submissions:'Submissions', comments:'Comments', reports:'Reports', banned:'Banned' },
+            sectionTitles: ['Delete User', 'Change Username', 'Admin Access', 'Ban User', 'Delete Category'],
+            noUsers:       'No users yet.',
+            noSubs:        'No submissions yet.',
+            noPacks:       'No packs yet.',
+            noComments:    'No comments yet.',
+            noReports:     'No reports found.',
+            noActivity:    'No activity logged yet.',
+            noPending:     'No pending submissions!',
+            emptyPacks:    'No packs found.',
+            emptySubs:     'No submissions found.',
+            emptyComments: 'No comments found.',
+            emptyReports:  'No reports found.',
+            editPack:      'Edit Pack',
+            labels:        { title:'Title', author:'Author', category:'Category', description:'Description', iconUrl:'Icon URL', downloadUrl:'Download URL', disableComments:'Disable Comments' },
+            placeholders:  { searchPacks:'Search by title or author...', username:'Username', reason:'Reason (optional)', currentUser:'Current username', newUser:'New username', catName:'New category name', filterUser:'Filter by username...', searchComment:'Search by username or content...' },
+            actionLabels:  {
+                approved_submission: 'Approved submission',
+                rejected_submission: 'Rejected submission',
+                deleted_pack:        'Deleted pack',
+                edited_pack:         'Edited pack',
+                deleted_comment:     'Deleted comment',
+                dismissed_report:    'Dismissed report',
+                banned_user:         'Banned user',
+                unbanned_user:       'Unbanned user',
+                changed_username:    'Changed username',
+                granted_admin:       'Granted admin',
+                removed_admin:       'Removed admin',
+                deleted_user:        'Deleted user',
+                deleted_category:    'Deleted category',
+            },
+        },
+
+        packs: {
+            heading:       'Packs',
+            loading:       'Loading packs...',
+            error:         'Error loading packs.',
+            searchPlace:   'Search packs...',
+            categoryLabel: 'Category:',
+            sortLabel:     'Sort:',
+            sortOptions:   ['Newest First', 'Oldest First', 'A → Z', 'Z → A', 'Author A → Z', 'Author Z → A'],
+            allOption:     'All',
+            noResults:     'No packs match your search.',
+            viewPage:      'View Page',
+        },
+
+        submit: {
+            heading:        'Submit a Pack',
+            loggedOutMsg:   'You need to be logged in to submit a pack.',
+            bannedMsg:      'Your account has been banned and cannot submit packs.',
+            guidelines:     'Submission Guidelines',
+            whatNext:       'What Happens Next?',
+            submitting:     'Submitting...',
+            success:        'Pack submitted! We\'ll review it...',
+            fillRequired:   'Please fill in all required fields.',
+            labels:         { packName:'Pack Name', authorName:'Author Name', downloadUrl:'Download URL', iconUrl:'Icon URL', category:'Category', description:'Description' },
+            placeholders:   { packName:'e.g. 2009 Roblox Pack', authorName:'e.g. Builderman', downloadUrl:'https://files.catbox.moe/...', iconUrl:'https://...', category:'e.g. Terrain, Props, Buildings...', description:'Describe your pack...' },
+        },
+
+        profile: {
+            heading:      'Profile',
+            notFound:     'User Not Found',
+            notFoundMsg:  "This profile doesn't exist or may have been removed.",
+            error:        'Something went wrong',
+            errorMsg:     "Couldn't load this profile. Try again later.",
+            labels:       { username:'Username', role:'Role', joined:'Joined', packs:'Packs' },
+            submittedPacks:'Submitted Packs',
+            subHistory:   'Submission History',
+            noPacks:      'No approved packs submitted yet.',
+            noSubs:       'No submissions yet.',
+            roles:        { user:'User', banned:'Banned', admin:'Admin', moderator:'Moderator' },
+        },
+
+        settings: {
+            heading:        'Settings',
+            notFound:       'Not found',
+            loginRequired:  'This page requires a logged-in account.',
+            yourInfo:       'Your Info',
+            avatar:         'Avatar',
+            changePassword: 'Change Password',
+            chooseImage:    'Choose Image',
+            updatePassword: 'Update Password',
+            newPass:        'New Password',
+            confirmPass:    'Confirm Password',
+            labels:         { email:'Email', username:'Username', role:'Role' },
+        },
+
+        login: {
+            heading:   'Member Login',
+            forgot:    'Forgot your password?',
+            signIn:    'Sign In',
+            notMember: 'Not a member? Sign Up',
+            emailPh:   'you@gmail.com',
+            passPh:    'Your password',
+        },
+
+        signup: {
+            heading:    'Create an Account',
+            signUp:     'Sign Up',
+            haveAccount:'Already have an account? Log in here',
+            usernamePh: 'e.g. cooluser123',
+            emailPh:    'you@gmail.com',
+            passPh:     'Min. 6 characters',
+            confirmPh:  'Repeat your password',
+        },
+
+        reset: {
+            heading:     'Reset Password',
+            sendLink:    'Send Reset Link',
+            backToLogin: 'Back to Login',
+            setNewPass:  'Set New Password',
+            updatePass:  'Update Password',
+        },
+
+        plugins: {
+            heading:       'Plugins',
+            loading:       'Loading plugins...',
+            error:         'Error loading plugins.',
+            searchPlace:   'Search plugins...',
+            categoryLabel: 'Category:',
+            sortLabel:     'Sort:',
+            sortOptions:   ['Newest First', 'Oldest First', 'A → Z', 'Z → A', 'Author A → Z', 'Author Z → A'],
+            details:       'Details',
+            descModal:     'Plugin Description',
+            noDesc:        'No description available.',
+            noResults:     'No plugins match your search.',
+        },
+
+        comments: {
+            heading:     'Comments',
+            placeholder: 'Leave a comment...',
+            post:        'Post Comment',
+            disabled:    'Comments are disabled for this pack.',
+            loginPrompt: 'Log in to leave a comment.',
+            noComments:  'No comments yet.',
+            errorLoad:   'Error loading comments.',
+            posted:      'Comment posted!',
+            posting:     'Posting...',
+            minChars:    'Comment must be at least 2 characters.',
+        },
+    },
+
+    discordWebhookUrl: '',  // set to your Discord webhook URL to auto-forward reports
 };
 
 
@@ -62,6 +261,24 @@ const SITE_CONFIG = {
 const { createClient } = supabase;
 const sb = createClient(SITE_CONFIG.supabaseUrl, SITE_CONFIG.supabaseKey);
 
+// ---- ICONS ----
+const NAV_ICONS = {
+    pack:    'package',
+    plugin:  'plugin',
+    submit:  'page_white_add',
+    credits: 'heart',
+    packs:   'package',
+    plugins: 'plugin',
+    profile: 'user',
+    settings:'wrench',
+    admin:   'shield',
+    home:    'house',
+};
+
+function icon(name) {
+    return `<img class="nav-icon" src="/assets/img/icons/${name}.png" alt="">`;
+}
+
 // ---- HEADER ----
 function buildHeader() {
     const header = document.getElementById('Header');
@@ -70,7 +287,8 @@ function buildHeader() {
 
     const links = SITE_CONFIG.navLinks.map(link => {
         const active = path.startsWith(link.href);
-        return `<a class="MenuItem${active ? ' Active' : ''}" href="${link.href}">${link.label}</a>`;
+        const ic = NAV_ICONS[link.icon] || 'bullet_go';
+        return `<a class="MenuItem${active ? ' Active' : ''}" href="${link.href}">${icon(ic)} ${link.label}</a>`;
     }).join('');
 
     header.innerHTML = `
@@ -95,8 +313,8 @@ function buildFooter() {
 
     footer.innerHTML = `
         <ul>
-            ${SITE_CONFIG.footerNavLinks.map(l => `<li><a href="${l.href}">${l.label}</a></li>`).join('')}
-            ${SITE_CONFIG.footerLinks.map(l => `<li><a href="${l.href}" target="_blank">${l.label}</a></li>`).join('')}
+            ${SITE_CONFIG.footerNavLinks.map(l => `<li><a href="${l.href}">${icon(l.icon || 'bullet_go')} ${l.label}</a></li>`).join('')}
+            ${SITE_CONFIG.footerLinks.map(l => `<li><a href="${l.href}" target="_blank">${icon('comments')} ${l.label}</a></li>`).join('')}
         </ul>
         <hr>
         <p class="Legalese">${note}</p>
@@ -114,6 +332,120 @@ function build404() {
         <p style="font-size:18px;font-weight:700;margin-bottom:14px;">${cfg.message}</p>
         <a href="${cfg.btnHref}" class="NoticeBtn">${cfg.btnLabel}</a>
     `;
+}
+
+// ---- REPORT MODAL ----
+function openReportModal(type, id, title) {
+    try { title = decodeURIComponent(title); } catch {}
+    const existing = document.getElementById('ReportModal');
+    if (existing) existing.remove();
+
+    const reasons = SITE_CONFIG.reportReasons.map(r =>
+        `<label style="display:block;font-size:11px;margin:3px 0;"><input type="radio" name="report_reason" value="${esc(r)}"> ${esc(r)}</label>`
+    ).join('');
+
+    const modal = document.createElement('div');
+    modal.id = 'ReportModal';
+    modal.innerHTML = `
+        <div style="position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:3000;display:flex;align-items:center;justify-content:center;">
+            <div style="background:#fff;border:2px solid var(--c-border);max-width:420px;width:90%;position:relative;">
+                <div style="padding:10px 14px;border-bottom:1px solid var(--c-border);background:var(--c-cat-bg);display:flex;align-items:center;justify-content:space-between;">
+                    <h3 style="margin:0;font-size:13px;font-weight:700;color:#334;">Report: ${esc(title)}</h3>
+                    <span id="ReportClose" style="cursor:pointer;font-size:18px;color:#888;line-height:1;">&times;</span>
+                </div>
+                <div style="padding:14px;">
+                    <p style="font-size:11px;color:#667;margin:0 0 10px;">Why are you reporting this ${type}?</p>
+                    <div style="margin-bottom:10px;">${reasons}</div>
+                    <textarea id="ReportDetails" placeholder="Additional details (optional)" style="width:100%;box-sizing:border-box;padding:6px 8px;font-size:11px;border:1px solid var(--c-border);font-family:var(--font);resize:vertical;min-height:50px;"></textarea>
+                    <div id="ReportStatus" style="font-size:11px;margin-top:6px;"></div>
+                    <div style="display:flex;gap:6px;margin-top:10px;">
+                        <button id="ReportSubmit" style="flex:1;padding:5px 14px;font-size:11px;background:var(--c-green);color:#fff;border:1px solid var(--c-green-border);cursor:pointer;font-family:var(--font);">Submit Report</button>
+                        <button id="ReportCancel" style="padding:5px 14px;font-size:11px;background:var(--c-btn);border:1px solid var(--c-btn-border);cursor:pointer;font-family:var(--font);">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const close = () => modal.remove();
+    modal.querySelector('#ReportClose').onclick = close;
+    modal.querySelector('#ReportCancel').onclick = close;
+    modal.querySelector('div[style*="position:fixed"]').onclick = e => { if (e.target === e.currentTarget) close(); };
+
+    modal.querySelector('#ReportSubmit').onclick = async function () {
+        const btn = this;
+        const selected = modal.querySelector('input[name="report_reason"]:checked');
+        if (!selected) {
+            modal.querySelector('#ReportStatus').textContent = 'Please select a reason.';
+            modal.querySelector('#ReportStatus').style.color = '#cc3333';
+            return;
+        }
+        const details = modal.querySelector('#ReportDetails').value.trim();
+        btn.disabled = true;
+        btn.textContent = 'Submitting...';
+
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) {
+            modal.querySelector('#ReportStatus').textContent = 'You must be logged in to report.';
+            modal.querySelector('#ReportStatus').style.color = '#cc3333';
+            btn.disabled = false;
+            btn.textContent = 'Submit Report';
+            return;
+        }
+
+        const payload = {
+            content_type: type,
+            content_id: id,
+            reason: selected.value,
+            details: details || null,
+            reported_by: session.user.id,
+        };
+
+        const { error } = await sb.from('reports').insert(payload);
+        if (error) {
+            modal.querySelector('#ReportStatus').textContent = 'Failed to submit report: ' + error.message;
+            modal.querySelector('#ReportStatus').style.color = '#cc3333';
+            btn.disabled = false;
+            btn.textContent = 'Submit Report';
+            return;
+        }
+
+        // Forward to Discord webhook if configured
+        if (SITE_CONFIG.discordWebhookUrl) {
+            try {
+                const userResp = await sb.from('profiles').select('username').eq('id', session.user.id).maybeSingle();
+                const username = userResp?.data?.username || 'Unknown';
+                const embed = {
+                    embeds: [{
+                        title: `Report: ${title}`,
+                        color: 0xcc3333,
+                        fields: [
+                            { name: 'Type', value: type, inline: true },
+                            { name: 'ID', value: id, inline: true },
+                            { name: 'Reason', value: selected.value, inline: true },
+                            { name: 'Details', value: details || 'None' },
+                            { name: 'Reported by', value: username },
+                        ],
+                        timestamp: new Date().toISOString(),
+                    }],
+                };
+                await fetch(SITE_CONFIG.discordWebhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(embed) });
+            } catch {}
+        }
+
+        modal.innerHTML = `
+            <div style="position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:3000;display:flex;align-items:center;justify-content:center;">
+                <div style="background:#fff;border:2px solid var(--c-border);max-width:380px;width:90%;padding:24px;text-align:center;">
+                    <img src="/assets/img/icons/accept.png" width="32" height="32" alt="" style="display:inline-block;">
+                    <h3 style="font-size:14px;margin:10px 0 4px;color:#334;">Report Submitted</h3>
+                    <p style="font-size:11px;color:#667;margin:0 0 14px;">Thank you. Our team will review this report.</p>
+                    <button id="ReportDone" style="padding:5px 20px;font-size:11px;background:var(--c-btn);border:1px solid var(--c-btn-border);cursor:pointer;font-family:var(--font);">Close</button>
+                </div>
+            </div>
+        `;
+        modal.querySelector('#ReportDone').onclick = () => modal.remove();
+    };
 }
 
 // ---- HOME SPLASH ----
@@ -166,9 +498,9 @@ async function loadNavAccount() {
 
     if (!session) {
         area.innerHTML = `
-            <a class="nav-signup" href="/Pages/SignUp/">Sign Up</a>
+            <a class="nav-signup" href="/Pages/SignUp/">${icon('user_add')} Sign Up</a>
             <span class="nav-or">or</span>
-            <a class="nav-login-btn" href="/Pages/Login/">Login</a>
+            <a class="nav-login-btn" href="/Pages/Login/">${icon('key')} Login</a>
         `;
         return;
     }
@@ -197,9 +529,9 @@ async function loadNavAccount() {
 
     area.innerHTML = `
         <a class="MenuItem${onProfile ? ' Active' : ''}" href="/Pages/Profile/?u=${encodeURIComponent(username)}">${avatarHtml} ${esc(username)}</a>
-        <a class="MenuItem${onSettings ? ' Active' : ''}" href="/Pages/Settings/">Settings</a>
-        ${showAdminLink ? `<a class="MenuItem admin-link${path.startsWith('/Pages/Admin/') ? ' Active' : ''}" href="/Pages/Admin/">Admin Panel</a>` : ''}
-        <a class="MenuItem" href="#" onclick="handleLogout(event)">Log Out</a>
+        <a class="MenuItem${onSettings ? ' Active' : ''}" href="/Pages/Settings/">${icon('wrench')} Settings</a>
+        ${showAdminLink ? `<a class="MenuItem admin-link${path.startsWith('/Pages/Admin/') ? ' Active' : ''}" href="/Pages/Admin/">${icon('shield')} Admin Panel</a>` : ''}
+        <a class="MenuItem" href="#" onclick="handleLogout(event)">${icon('door_out')} Log Out</a>
     `;
 }
 
@@ -252,6 +584,11 @@ async function handleHomeSignup() {
 
 // ---- HELPERS ----
 function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+function sanitizeUrl(url) {
+    if (!url) return '';
+    try { const u = new URL(url); return (u.protocol === 'http:' || u.protocol === 'https:') ? url : ''; }
+    catch { return ''; }
+}
 
 // ---- BOOT ----
 document.addEventListener('DOMContentLoaded', () => {

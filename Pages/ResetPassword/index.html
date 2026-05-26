@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
-    <title>Reset Password - CAP Central</title>
+    <title>Reset Password - CAP Central</title><script>document.title = SITE_CONFIG.ui.pageTitles.reset + ' - ' + SITE_CONFIG.siteName;</script>
     <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
@@ -24,7 +24,7 @@
                         <input type="email" id="resetEmail" placeholder="you@gmail.com" autocomplete="off" />
                         <p class="field-hint">We'll send a password reset link to this email.</p>
                     </div>
-                    <button id="RequestBtn" onclick="handleRequestReset()">Send Reset Link</button>
+                    <button id="RequestBtn" onclick="handleRequestReset()"><img src="/assets/img/icons/email_go.png" width="14" height="14" alt="" style="vertical-align:middle;"> Send Reset Link</button>
                     <div id="RequestStatus"></div>
                 </div>
                 <div class="form-footer">
@@ -43,7 +43,7 @@
                         <label for="confirmPassword">Confirm Password</label>
                         <input type="password" id="confirmPassword" placeholder="Repeat your password" />
                     </div>
-                    <button id="ResetBtn" onclick="handleResetPassword()">Update Password</button>
+                    <button id="ResetBtn" onclick="handleResetPassword()"><img src="/assets/img/icons/key.png" width="14" height="14" alt="" style="vertical-align:middle;"> Update Password</button>
                     <div id="ResetStatus"></div>
                 </div>
                 <div class="form-footer">

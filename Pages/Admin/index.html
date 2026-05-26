@@ -3,21 +3,21 @@
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1">
-   <title>Admin - CAP Central</title>
+   <title>Admin - CAP Central</title><script>document.title = SITE_CONFIG.ui.pageTitles.admin + ' - ' + SITE_CONFIG.siteName;</script>
    <link rel="icon" href="/assets/img/LogoShorten.png">
    <link rel="stylesheet" href="/assets/css/style.css">
    <style>
       .admin-section { margin-top: 16px; }
-      .tab-bar { display: flex; border-bottom: 2px solid #c0cce0; flex-wrap: wrap; }
+      .tab-bar { display: flex; border-bottom: 2px solid #b8d0a8; flex-wrap: wrap; }
       .tab-btn {
          padding: 6px 14px; font-size: 11px; font-weight: bold; font-family: inherit;
-         background: #e6ecf5; color: #2a3a5a;
-         border: 1px solid #c0cce0; border-bottom: none;
+         background: #e8f0e4; color: #2a4a2a;
+         border: 1px solid #b8d0a8; border-bottom: none;
          cursor: pointer; margin-right: 2px; margin-bottom: 0;
       }
       .tab-btn.active { background: #fff; border-bottom: 2px solid #fff; margin-bottom: -2px; }
-      .tab-btn:hover:not(.active) { background: #d8e2f0; }
-      .tab-panel { display: none; border: 1px solid #c0cce0; border-top: none; background: #fff; padding: 12px; }
+      .tab-btn:hover:not(.active) { background: #dce8d4; }
+      .tab-panel { display: none; border: 1px solid #b8d0a8; border-top: none; background: #fff; padding: 12px; }
       .tab-panel.active { display: block; }
       .user-input { padding: 3px 6px; border: 1px solid #bbb; font-size: 11px; font-family: inherit; width: 160px; }
       .user-section { margin-bottom: 14px; }
@@ -31,36 +31,37 @@
       }
       .edit-overlay.open { display: flex; }
       .edit-box { background: #fff; border: 1px solid #aaa; width: 90%; max-width: 480px; }
-      .edit-box-header { background: #e6ecf5; border-bottom: 1px solid #c0cce0; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; }
-      .edit-box-header h3 { font-size: 12px; font-weight: bold; color: #2a3a5a; }
+      .edit-box-header { background: #e8f0e4; border-bottom: 1px solid #b8d0a8; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; }
+      .edit-box-header h3 { font-size: 12px; font-weight: bold; color: #2a4a2a; }
       .edit-box-body { padding: 14px; }
       .edit-box-body .form-group { margin-bottom: 10px; }
       .edit-box-body label { display: block; font-size: 11px; font-weight: bold; color: #445; margin-bottom: 3px; }
       .edit-box-body input { width: 100%; padding: 4px 6px; border: 1px solid #bbb; font-size: 12px; font-family: inherit; }
       .edit-box-footer { padding: 8px 14px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 8px; }
       .list-row { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #eee; font-size: 12px; }
-      .list-row:nth-child(odd) { background: #f4f6fa; }
+      .list-row:nth-child(odd) { background: var(--c-row-alt); }
       .list-row:last-child { border-bottom: none; }
-      .list-row-icon { width: 36px; height: 36px; object-fit: cover; border: 1px solid #ccc; flex-shrink: 0; }
-      .list-row-title { font-weight: bold; color: #2a3a5a; }
-      .list-row-meta { font-size: 11px; color: #778; }
+      .list-row-icon { width: 36px; height: 36px; object-fit: cover; border: 1px solid var(--c-border); flex-shrink: 0; }
+      .list-row-title { font-weight: bold; color: #2a4a2a; }
+      .list-row-meta { font-size: 11px; color: #6a7a6a; }
       .admin-card {
-         background: #fff; border: 1px solid #c0cce0;
+         background: #fff; border: 1px solid #b8d0a8;
          padding: 10px 14px; margin-bottom: 10px;
+      }
+      .admin-card-title { font-size: 11px; font-weight: bold; color: #2a4a2a; margin-bottom: 8px; }
+      .admin-tag {
+         display: inline-block; font-size: 10px; padding: 1px 6px;
+         background: #e8f0e4; color: #2a4a2a; border: 1px solid #b8d0a8;
       }
       .admin-card-title { font-size: 11px; font-weight: bold; color: #445; margin-bottom: 8px; }
       .recent-list { font-size: 11px; }
       .recent-item { padding: 3px 0; border-bottom: 1px solid #f0f0f0; color: #555; }
       .recent-item:last-child { border-bottom: none; }
-      .admin-tag {
-         display: inline-block; font-size: 10px; padding: 1px 6px;
-         background: #e6ecf5; color: #2a3a5a; border: 1px solid #c0cce0;
-      }
       .cat-row {
          display: flex; align-items: center; gap: 10px;
          padding: 5px 8px; border-bottom: 1px solid #eee; font-size: 12px;
       }
-      .cat-row:nth-child(odd) { background: #f4f6fa; }
+      .cat-row:nth-child(odd) { background: var(--c-row-alt); }
    </style>
 </head>
 <body>
@@ -77,54 +78,57 @@
          </div>
          <div id="AdminPanel" style="display:none;">
             <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
-               <span>Admin Panel</span>
-               <button onclick="refreshAll()" class="btn-modal btn-modal-secondary" style="font-size:11px;height:28px;padding:4px 14px;">Refresh</button>
+               <span id="AdminPanelHeading">Admin Panel</span>
+               <button onclick="refreshAll()" class="btn-modal btn-modal-secondary" style="font-size:11px;height:28px;padding:4px 14px;"><img src="/assets/img/icons/bullet_go.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="AdminRefreshBtn">Refresh</span></button>
             </div>
             <div id="StatsBar">
-               <div class="stat-card"><div class="stat-number" id="StatUsers">—</div><div class="stat-label">Users</div></div>
-               <div class="stat-card"><div class="stat-number" id="StatPending">—</div><div class="stat-label">Pending</div></div>
-               <div class="stat-card"><div class="stat-number" id="StatApproved">—</div><div class="stat-label">Packs</div></div>
-               <div class="stat-card"><div class="stat-number" id="StatTotalSubs">—</div><div class="stat-label">Submissions</div></div>
-               <div class="stat-card"><div class="stat-number" id="StatComments">—</div><div class="stat-label">Comments</div></div>
-               <div class="stat-card"><div class="stat-number" id="StatBanned">—</div><div class="stat-label">Banned</div></div>
+<div class="stat-card"><div class="stat-number" id="StatUsers">—</div><div class="stat-label"><span id="StatLabelUsers">Users</span></div></div>
+               <div class="stat-card"><div class="stat-number" id="StatPending">—</div><div class="stat-label"><span id="StatLabelPending">Pending</span></div></div>
+               <div class="stat-card"><div class="stat-number" id="StatApproved">—</div><div class="stat-label"><span id="StatLabelPacks">Packs</span></div></div>
+               <div class="stat-card"><div class="stat-number" id="StatTotalSubs">—</div><div class="stat-label"><span id="StatLabelSubs">Submissions</span></div></div>
+                 <div class="stat-card"><div class="stat-number" id="StatComments">—</div><div class="stat-label"><span id="StatLabelComments">Comments</span></div></div>
+                 <div class="stat-card"><div class="stat-number" id="StatReports">—</div><div class="stat-label"><span id="StatLabelReports">Reports</span></div></div>
+                 <div class="stat-card"><div class="stat-number" id="StatBanned">—</div><div class="stat-label"><span id="StatLabelBanned">Banned</span></div></div>
             </div>
             <div class="admin-section">
                <div class="tab-bar">
-                  <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
-                  <button class="tab-btn" onclick="switchTab('submissions')">Submissions</button>
-                  <button class="tab-btn" onclick="switchTab('packs')">Packs</button>
-                  <button class="tab-btn" onclick="switchTab('users')">Users</button>
-                  <button class="tab-btn" onclick="switchTab('comments')">Comments</button>
-                  <button class="tab-btn" onclick="switchTab('categories')">Categories</button>
+                   <button class="tab-btn active" onclick="switchTab('dashboard')"><img src="/assets/img/icons/house.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabDashboard">Dashboard</span></button>
+                   <button class="tab-btn" onclick="switchTab('submissions')"><img src="/assets/img/icons/page_white_add.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabSubmissions">Submissions</span></button>
+                   <button class="tab-btn" onclick="switchTab('packs')"><img src="/assets/img/icons/package.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabPacks">Packs</span></button>
+                   <button class="tab-btn" onclick="switchTab('users')"><img src="/assets/img/icons/user.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabUsers">Users</span></button>
+                   <button class="tab-btn" onclick="switchTab('comments')"><img src="/assets/img/icons/comments.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabComments">Comments</span></button>
+                   <button class="tab-btn" onclick="switchTab('categories')"><img src="/assets/img/icons/package.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabCategories">Categories</span></button>
+                   <button class="tab-btn" onclick="switchTab('reports')"><img src="/assets/img/icons/flag_red.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabReports">Reports</span></button>
+                   <button class="tab-btn" onclick="switchTab('activity')"><img src="/assets/img/icons/shield.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="TabActivity">Activity Log</span></button>
                </div>
 
                <!-- DASHBOARD -->
                <div id="tab-dashboard" class="tab-panel active">
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                     <div class="admin-card">
-                        <div class="admin-card-title">Recent Sign-Ups</div>
-                        <div id="RecentUsers" class="recent-list"><span style="color:#778;">Loading...</span></div>
-                     </div>
-                     <div class="admin-card">
-                        <div class="admin-card-title">Recent Submissions</div>
-                        <div id="RecentSubs" class="recent-list"><span style="color:#778;">Loading...</span></div>
-                     </div>
-                     <div class="admin-card">
-                        <div class="admin-card-title">Recent Comments</div>
-                        <div id="RecentComments" class="recent-list"><span style="color:#778;">Loading...</span></div>
-                     </div>
-                     <div class="admin-card">
-                        <div class="admin-card-title">Recent Packs</div>
-                        <div id="RecentPacks" class="recent-list"><span style="color:#778;">Loading...</span></div>
-                     </div>
+                      <div class="admin-card">
+                         <div class="admin-card-title"><span id="CardRecentUsers">Recent Sign-Ups</span></div>
+                         <div id="RecentUsers" class="recent-list"><span id="LoadingUsers" style="color:#778;">Loading...</span></div>
+                      </div>
+                      <div class="admin-card">
+                         <div class="admin-card-title"><span id="CardRecentSubs">Recent Submissions</span></div>
+                         <div id="RecentSubs" class="recent-list"><span id="LoadingSubs" style="color:#778;">Loading...</span></div>
+                      </div>
+                      <div class="admin-card">
+                         <div class="admin-card-title"><span id="CardRecentComments">Recent Comments</span></div>
+                         <div id="RecentComments" class="recent-list"><span id="LoadingComments" style="color:#778;">Loading...</span></div>
+                      </div>
+                      <div class="admin-card">
+                         <div class="admin-card-title"><span id="CardRecentPacks">Recent Packs</span></div>
+                         <div id="RecentPacks" class="recent-list"><span id="LoadingPacks" style="color:#778;">Loading...</span></div>
+                      </div>
                   </div>
                </div>
 
                <!-- SUBMISSIONS -->
                <div id="tab-submissions" class="tab-panel">
                   <div style="margin-bottom:10px;display:flex;gap:6px;">
-                     <button class="tab-btn active" id="subTabPending" onclick="switchSubTab('pending')">Pending</button>
-                     <button class="tab-btn" id="subTabAll" onclick="switchSubTab('all')">All Submissions</button>
+                    <button class="tab-btn active" id="subTabPending" onclick="switchSubTab('pending')"><img src="/assets/img/icons/bullet_go.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="SubTabPending">Pending</span></button>
+                    <button class="tab-btn" id="subTabAll" onclick="switchSubTab('all')"><img src="/assets/img/icons/page_white_add.png" width="12" height="12" alt="" style="vertical-align:middle;"> <span id="SubTabAll">All Submissions</span></button>
                   </div>
                   <div id="subTab-pending">
                      <div id="SubmissionsList"><div id="LoadingMessage">Loading...</div></div>
@@ -149,7 +153,7 @@
                      <div class="user-section-title">Delete User</div>
                      <div class="user-section-row">
                         <input class="user-input" type="text" id="DeleteUsernameInput" placeholder="Username">
-                        <button class="btn-reject" onclick="deleteUser()">Delete User</button>
+                        <button class="btn-reject" onclick="deleteUser()"><img src="/assets/img/icons/flag_red.png" width="12" height="12" alt="" style="vertical-align:middle;"> Delete User</button>
                      </div>
                      <div class="user-section-status" id="DeleteUserStatus"></div>
                   </div>
@@ -159,8 +163,8 @@
                      <div class="user-section-row">
                         <input class="user-input" type="text" id="BanUsernameInput" placeholder="Username">
                         <input class="user-input" type="text" id="BanReasonInput" placeholder="Reason (optional)" style="width:180px;">
-                        <button class="btn-approve" onclick="banUser()">Ban</button>
-                        <button class="btn-reject"  onclick="unbanUser()">Unban</button>
+                        <button class="btn-approve" onclick="banUser()"><img src="/assets/img/icons/shield.png" width="12" height="12" alt="" style="vertical-align:middle;"> Ban</button>
+                        <button class="btn-reject"  onclick="unbanUser()"><img src="/assets/img/icons/accept.png" width="12" height="12" alt="" style="vertical-align:middle;"> Unban</button>
                      </div>
                      <div class="user-section-status" id="BanStatus"></div>
                   </div>
@@ -170,7 +174,7 @@
                      <div class="user-section-row">
                         <input class="user-input" type="text" id="UsernameCurrent" placeholder="Current username">
                         <input class="user-input" type="text" id="UsernameNew"     placeholder="New username">
-                        <button class="btn-approve" onclick="changeUsername()">Change</button>
+                        <button class="btn-approve" onclick="changeUsername()"><img src="/assets/img/icons/bullet_go.png" width="12" height="12" alt="" style="vertical-align:middle;"> Change</button>
                      </div>
                      <div class="user-section-status" id="UsernameStatus"></div>
                   </div>
@@ -179,8 +183,8 @@
                      <div class="user-section-title">Admin Access</div>
                      <div class="user-section-row">
                         <input class="user-input" type="text" id="AdminUsernameInput" placeholder="Username">
-                        <button class="btn-approve" onclick="makeAdmin()">Make Admin</button>
-                        <button class="btn-reject"  onclick="removeAdmin()">Remove Admin</button>
+                        <button class="btn-approve" onclick="makeAdmin()"><img src="/assets/img/icons/shield.png" width="12" height="12" alt="" style="vertical-align:middle;"> Make Admin</button>
+                        <button class="btn-reject"  onclick="removeAdmin()"><img src="/assets/img/icons/shield.png" width="12" height="12" alt="" style="vertical-align:middle;"> Remove Admin</button>
                      </div>
                      <div class="user-section-status" id="AdminActionStatus"></div>
                      <div style="margin-top:10px;">
@@ -213,12 +217,34 @@
                   <div style="margin-bottom:8px;">
                      <div class="user-section-row">
                         <input class="user-input" type="text" id="NewCategoryInput" placeholder="New category name">
-                        <button class="btn-approve" onclick="addCategory()">Add</button>
+                        <button class="btn-approve" onclick="addCategory()"><img src="/assets/img/icons/accept.png" width="12" height="12" alt="" style="vertical-align:middle;"> Add</button>
                      </div>
                      <div class="user-section-status" id="CategoryStatus"></div>
                   </div>
                   <hr style="margin:8px 0;">
                   <div id="CategoriesList"><div style="color:#778;font-size:12px;">Loading...</div></div>
+               </div>
+
+               <!-- REPORTS -->
+               <div id="tab-reports" class="tab-panel">
+                  <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                     <select id="ReportTypeFilter" onchange="loadReports()" style="padding:3px 6px;border:1px solid #bbb;font-size:11px;font-family:inherit;">
+                        <option value="">All Types</option>
+                        <option value="pack">Packs</option>
+                        <option value="plugin">Plugins</option>
+                        <option value="comment">Comments</option>
+                     </select>
+                     <span id="ReportCount" style="font-size:11px;color:#778;"></span>
+                  </div>
+                  <div id="ReportsList"><div style="color:#778;font-size:12px;">Loading...</div></div>
+               </div>
+
+               <!-- ACTIVITY LOG -->
+               <div id="tab-activity" class="tab-panel">
+                  <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                     <span id="LogCount" style="font-size:11px;color:#778;"></span>
+                  </div>
+                  <div id="ActivityList"><div style="color:#778;font-size:12px;">Loading...</div></div>
                </div>
 
             </div>
@@ -234,18 +260,23 @@
             <h3>Edit Pack</h3>
             <button class="close" onclick="closeEditModal()">&times;</button>
          </div>
-         <div class="edit-box-body">
-            <input type="hidden" id="editPackId">
-            <div class="form-group"><label>Title</label><input type="text" id="editTitle" maxlength="80"></div>
-            <div class="form-group"><label>Author</label><input type="text" id="editAuthor" maxlength="60"></div>
-            <div class="form-group"><label>Category</label><input type="text" id="editCategory" maxlength="40"></div>
-            <div class="form-group"><label>Icon URL</label><input type="url" id="editIcon"></div>
-            <div class="form-group"><label>Download URL</label><input type="url" id="editDownload"></div>
-            <div id="EditStatus" style="font-size:11px;min-height:14px;"></div>
-         </div>
+             <div class="edit-box-body">
+                <input type="hidden" id="editPackId">
+                <div class="form-group"><label>Title</label><input type="text" id="editTitle" maxlength="80"></div>
+                <div class="form-group"><label>Author</label><input type="text" id="editAuthor" maxlength="60"></div>
+                <div class="form-group"><label>Category</label><input type="text" id="editCategory" maxlength="40"></div>
+                <div class="form-group"><label>Description</label><textarea id="editDescription" style="width:100%;padding:4px 6px;border:1px solid #bbb;font-size:12px;font-family:var(--font);resize:vertical;min-height:60px;"></textarea></div>
+                <div class="form-group"><label>Icon URL</label><input type="url" id="editIcon"></div>
+                <div class="form-group"><label>Download URL</label><input type="url" id="editDownload"></div>
+                <div class="form-group" style="display:flex;align-items:center;gap:8px;">
+                   <label style="margin:0;white-space:nowrap;">Disable Comments</label>
+                   <input type="checkbox" id="editCommentsDisabled">
+                </div>
+                <div id="EditStatus" style="font-size:11px;min-height:14px;"></div>
+             </div>
          <div class="edit-box-footer">
-            <button class="btn-modal btn-modal-secondary" onclick="closeEditModal()">Cancel</button>
-            <button class="btn-modal btn-modal-primary"   onclick="savePackEdit()">Save</button>
+             <button class="btn-modal btn-modal-secondary" onclick="closeEditModal()">Cancel</button>
+             <button class="btn-modal btn-modal-primary"   onclick="savePackEdit()"><img src="/assets/img/icons/disk.png" width="12" height="12" alt="" style="vertical-align:middle;"> Save</button>
          </div>
       </div>
    </div>
@@ -261,9 +292,10 @@
                const role = profile?.role || null;
                if (role !== 'admin' && role !== 'moderator') { document.getElementById('AccessDenied').style.display = 'block'; return; }
                window.userRole = role;
-               document.getElementById('AdminPanel').style.display = 'block';
-               applyRoleRestrictions(role);
-               refreshAll();
+                document.getElementById('AdminPanel').style.display = 'block';
+                loadAdminUI();
+                applyRoleRestrictions(role);
+                refreshAll();
            }, 100);
 
            document.getElementById('EditPackOverlay').addEventListener('click', e => {
@@ -271,20 +303,56 @@
            });
        });
 
-       function refreshAll() {
-           loadStats();
-           loadSubmissions();
-           loadAllSubmissions();
-           loadAllPacks();
-           loadAdminList();
-           loadUserList();
-           loadAllComments();
-           loadCategories();
-           loadRecentActivity();
-       }
+        function loadAdminUI() {
+             const U = SITE_CONFIG.ui.admin;
+             document.getElementById('AdminPanelHeading').textContent = U.heading;
+             document.getElementById('AdminRefreshBtn').textContent = SITE_CONFIG.ui.refresh;
+             const statKeys = ['Users','Pending','Packs','Subs','Comments','Reports','Banned'];
+             const statMap  = { Users:'users', Pending:'pending', Packs:'packs', Subs:'submissions', Comments:'comments', Reports:'reports', Banned:'banned' };
+             statKeys.forEach(k => {
+                 const el = document.getElementById('StatLabel'+k);
+                 if (el) el.textContent = U.stats[statMap[k]] || el.textContent;
+             });
+             document.getElementById('TabDashboard').textContent    = U.tabs[0];
+             document.getElementById('TabSubmissions').textContent  = U.tabs[1];
+             document.getElementById('TabPacks').textContent        = U.tabs[2];
+             document.getElementById('TabUsers').textContent        = U.tabs[3];
+             document.getElementById('TabComments').textContent     = U.tabs[4];
+             document.getElementById('TabCategories').textContent   = U.tabs[5];
+             document.getElementById('TabReports').textContent      = U.tabs[6];
+             document.getElementById('TabActivity').textContent     = U.tabs[7];
+             document.getElementById('SubTabPending').textContent   = U.pending;
+             document.getElementById('SubTabAll').textContent       = U.allSubmissions;
+             document.getElementById('CardRecentUsers').textContent    = 'Recent Sign-Ups';
+             document.getElementById('CardRecentSubs').textContent     = 'Recent Submissions';
+             document.getElementById('CardRecentComments').textContent = 'Recent Comments';
+             document.getElementById('CardRecentPacks').textContent    = 'Recent Packs';
+             document.getElementById('LoadingUsers').textContent    = SITE_CONFIG.ui.loading;
+             document.getElementById('LoadingSubs').textContent     = SITE_CONFIG.ui.loading;
+             document.getElementById('LoadingComments').textContent = SITE_CONFIG.ui.loading;
+             document.getElementById('LoadingPacks').textContent    = SITE_CONFIG.ui.loading;
+             document.getElementById('PackSearchInput').placeholder = U.placeholders.searchPacks;
+             document.querySelector('#AccessDenied h2').textContent = U.accessDenied;
+             document.querySelector('#AccessDenied p').textContent  = U.noPermission;
+             document.querySelector('#AccessDenied a').textContent  = SITE_CONFIG.ui.goHome;
+        }
 
-       function switchTab(tab) {
-           const tabs = ['dashboard','submissions','packs','users','comments','categories'];
+        function refreshAll() {
+             loadStats();
+             loadSubmissions();
+             loadAllSubmissions();
+            loadAllPacks();
+            loadAdminList();
+            loadUserList();
+            loadAllComments();
+            loadCategories();
+            loadRecentActivity();
+            loadReports();
+            loadActivityLog();
+        }
+
+        function switchTab(tab) {
+            const tabs = ['dashboard','submissions','packs','users','comments','categories','reports','activity'];
            document.querySelectorAll('.tab-bar > .tab-btn').forEach((btn, i) => {
                btn.classList.toggle('active', tabs[i] === tab);
            });
@@ -301,7 +369,7 @@
 
        function applyRoleRestrictions(role) {
            if (role === 'admin') return;
-           const hideTitles = ['Delete User', 'Change Username', 'Admin Access'];
+            const hideTitles = ['Delete User', 'Change Username', 'Admin Access', 'Ban User', 'Delete Category'];
            document.querySelectorAll('.user-section').forEach(section => {
                const title = section.querySelector('.user-section-title');
                if (title && hideTitles.includes(title.textContent.trim())) {
@@ -318,21 +386,23 @@
        }
 
        // ---- STATS ----
-       async function loadStats() {
-           const { count: users }    = await sb.from('profiles').select('*', { count: 'exact', head: true });
-           const { count: pending }  = await sb.from('submissions').select('*', { count: 'exact', head: true }).or('status.eq.pending,status.is.null');
-           const { count: approved } = await sb.from('packs').select('*', { count: 'exact', head: true });
-           const { count: totalSubs }= await sb.from('submissions').select('*', { count: 'exact', head: true });
-           const { count: comments } = await sb.from('comments').select('*', { count: 'exact', head: true });
-           const { count: banned }   = await sb.from('profiles').select('*', { count: 'exact', head: true }).eq('is_banned', true);
+        async function loadStats() {
+            const { count: users }    = await sb.from('profiles').select('*', { count: 'exact', head: true });
+            const { count: pending }  = await sb.from('submissions').select('*', { count: 'exact', head: true }).or('status.eq.pending,status.is.null');
+            const { count: approved } = await sb.from('packs').select('*', { count: 'exact', head: true });
+            const { count: totalSubs }= await sb.from('submissions').select('*', { count: 'exact', head: true });
+            const { count: comments } = await sb.from('comments').select('*', { count: 'exact', head: true });
+            const { count: reports }  = await sb.from('reports').select('*', { count: 'exact', head: true });
+            const { count: banned }   = await sb.from('profiles').select('*', { count: 'exact', head: true }).eq('is_banned', true);
 
-           document.getElementById('StatUsers').textContent    = users    ?? '—';
-           document.getElementById('StatPending').textContent  = pending  ?? '—';
-           document.getElementById('StatApproved').textContent = approved ?? '—';
-           document.getElementById('StatTotalSubs').textContent = totalSubs ?? '—';
-           document.getElementById('StatComments').textContent = comments ?? '—';
-           document.getElementById('StatBanned').textContent   = banned   ?? '—';
-       }
+            document.getElementById('StatUsers').textContent    = users    ?? '—';
+            document.getElementById('StatPending').textContent  = pending  ?? '—';
+            document.getElementById('StatApproved').textContent = approved ?? '—';
+            document.getElementById('StatTotalSubs').textContent = totalSubs ?? '—';
+            document.getElementById('StatComments').textContent = comments ?? '—';
+            document.getElementById('StatReports').textContent  = reports  ?? '—';
+            document.getElementById('StatBanned').textContent   = banned   ?? '—';
+        }
 
        // ---- DASHBOARD ----
        async function loadRecentActivity() {
@@ -388,22 +458,29 @@
                        <strong>Download:</strong> <a href="${esc(sub.download_url)}" target="_blank">View File</a> &nbsp;
                        <strong>Icon:</strong> <a href="${esc(sub.icon)}" target="_blank">View Image</a>
                    </div>
-                   <div class="submission-actions">
-                       <button class="btn-approve" onclick="approveSubmission('${sub.id}')">Approve</button>
-                       <button class="btn-reject"  onclick="rejectSubmission('${sub.id}')">Reject</button>
-                   </div>
+                    <div class="submission-actions">
+                        <button class="btn-approve" onclick="approveSubmission('${sub.id}')"><img src="/assets/img/icons/accept.png" width="12" height="12" alt="" style="vertical-align:middle;"> Approve</button>
+                        <button class="btn-reject"  onclick="rejectSubmission('${sub.id}')"><img src="/assets/img/icons/flag_red.png" width="12" height="12" alt="" style="vertical-align:middle;"> Reject</button>
+                    </div>
                </div>
            `;
            return div;
        }
 
-       async function requireAdmin() {
-           const { data: { session } } = await sb.auth.getSession();
-           if (!session) throw new Error('Not authenticated');
-           const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
-           const role = profile?.role || null;
-           if (role !== 'admin' && role !== 'moderator') throw new Error('Moderator or admin privileges required');
-       }
+        async function requireAdmin() {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) throw new Error('Not authenticated');
+            const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+            const role = profile?.role || null;
+            if (role !== 'admin' && role !== 'moderator') throw new Error('Moderator or admin privileges required');
+        }
+
+        async function requireAdminOnly() {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) throw new Error('Not authenticated');
+            const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+            if (profile?.role !== 'admin') throw new Error('Admin privileges required');
+        }
 
        async function approveSubmission(id) {
            try { await requireAdmin(); } catch(e) { alert(e.message); return; }
@@ -417,9 +494,10 @@
                category: sub.category, submitted_by: sub.submitted_by,
                description: sub.description || null,
            });
-           if (insertErr) { alert('Error approving: ' + insertErr.message); card.querySelectorAll('button').forEach(b => b.disabled = false); return; }
-           await sb.from('submissions').update({ status: 'approved' }).eq('id', id);
-           card.remove();
+            if (insertErr) { alert('Error approving: ' + insertErr.message); card.querySelectorAll('button').forEach(b => b.disabled = false); return; }
+            await sb.from('submissions').update({ status: 'approved' }).eq('id', id);
+            logAdminAction('approve', `Approved "${sub.title}"`, 'submission', id);
+            card.remove();
            loadStats();
            loadAllSubmissions();
        }
@@ -429,9 +507,10 @@
            if (!confirm('Reject this submission?')) return;
            const card = document.getElementById(`sub-${id}`);
            card.querySelectorAll('button').forEach(b => b.disabled = true);
-           const { error } = await sb.from('submissions').update({ status: 'rejected' }).eq('id', id);
-           if (error) { alert('Error: ' + error.message); card.querySelectorAll('button').forEach(b => b.disabled = false); return; }
-           card.remove();
+            const { error } = await sb.from('submissions').update({ status: 'rejected' }).eq('id', id);
+            if (error) { alert('Error: ' + error.message); card.querySelectorAll('button').forEach(b => b.disabled = false); return; }
+            logAdminAction('reject', `Rejected submission`, 'submission', id);
+            card.remove();
            loadStats();
            loadAllSubmissions();
        }
@@ -487,58 +566,65 @@
                    <img class="list-row-icon" src="${esc(pack.icon||'')}" alt="" onerror="this.src='/img/Placeholder.png'">
                    <div style="flex:1;"><div class="list-row-title">${esc(pack.title)}</div>
                    <div class="list-row-meta">by ${esc(pack.author)} · ${esc(pack.category||'Other')}</div></div>
-                   <div style="display:flex;gap:6px;flex-shrink:0;">
-                       ${window.userRole === 'admin' ? `<button class="btn-modal btn-modal-secondary" style="font-size:10px;padding:2px 8px;" onclick='openEditModal(${JSON.stringify(pack)})'>Edit</button>` : ''}
-                       <button class="btn-reject" style="font-size:10px;padding:2px 8px;" onclick="deletePack('${pack.id}')">Delete</button>
-                   </div>
+                    <div style="display:flex;gap:6px;flex-shrink:0;">
+                        ${window.userRole === 'admin' ? `<button class="btn-modal btn-modal-secondary" style="font-size:10px;padding:2px 8px;" onclick='openEditModal(${JSON.stringify(pack)})'><img src="/assets/img/icons/wrench.png" width="10" height="10" alt="" style="vertical-align:middle;"> Edit</button>` : ''}
+                        <button class="btn-reject" style="font-size:10px;padding:2px 8px;" onclick="deletePack('${pack.id}')"><img src="/assets/img/icons/flag_red.png" width="10" height="10" alt="" style="vertical-align:middle;"> Delete</button>
+                    </div>
                `;
                list.appendChild(row);
            });
        }
 
-       function openEditModal(pack) {
-           document.getElementById('editPackId').value   = pack.id;
-           document.getElementById('editTitle').value    = pack.title || '';
-           document.getElementById('editAuthor').value   = pack.author || '';
-           document.getElementById('editCategory').value = pack.category || '';
-           document.getElementById('editIcon').value     = pack.icon || '';
-           document.getElementById('editDownload').value = pack.download_url || '';
-           document.getElementById('EditStatus').textContent = '';
-           document.getElementById('EditPackOverlay').classList.add('open');
-       }
+        function openEditModal(pack) {
+            document.getElementById('editPackId').value   = pack.id;
+            document.getElementById('editTitle').value    = pack.title || '';
+            document.getElementById('editAuthor').value   = pack.author || '';
+            document.getElementById('editCategory').value = pack.category || '';
+            document.getElementById('editDescription').value = pack.description || '';
+            document.getElementById('editIcon').value     = pack.icon || '';
+            document.getElementById('editDownload').value = pack.download_url || '';
+            document.getElementById('editCommentsDisabled').checked = pack.comments_disabled === true;
+            document.getElementById('EditStatus').textContent = '';
+            document.getElementById('EditPackOverlay').classList.add('open');
+        }
 
        function closeEditModal() { document.getElementById('EditPackOverlay').classList.remove('open'); }
 
-       async function savePackEdit() {
-           try { await requireAdmin(); } catch(e) { alert(e.message); return; }
-           const id = document.getElementById('editPackId').value;
-           const title = document.getElementById('editTitle').value.trim();
-           const author = document.getElementById('editAuthor').value.trim();
-           const category = document.getElementById('editCategory').value.trim();
-           const icon = document.getElementById('editIcon').value.trim();
-           const download = document.getElementById('editDownload').value.trim();
-           const statusEl = document.getElementById('EditStatus');
-           if (!title || !author) { statusEl.textContent = 'Title and author required.'; statusEl.style.color = '#cc2222'; return; }
-           statusEl.textContent = 'Saving...'; statusEl.style.color = '#778';
-           const { error } = await sb.from('packs').update({ title, author, category, icon, download_url: download }).eq('id', id);
-           if (error) { statusEl.textContent = 'Error: ' + error.message; statusEl.style.color = '#cc2222'; return; }
-           statusEl.textContent = 'Saved!'; statusEl.style.color = '#337722';
-           setTimeout(closeEditModal, 800);
-           loadAllPacks();
-       }
+        async function savePackEdit() {
+            try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+            const id = document.getElementById('editPackId').value;
+            const title = document.getElementById('editTitle').value.trim();
+            const author = document.getElementById('editAuthor').value.trim();
+            const category = document.getElementById('editCategory').value.trim();
+            const description = document.getElementById('editDescription').value.trim();
+            const icon = document.getElementById('editIcon').value.trim();
+            const download = document.getElementById('editDownload').value.trim();
+            const commentsDisabled = document.getElementById('editCommentsDisabled').checked;
+            const statusEl = document.getElementById('EditStatus');
+            if (!title || !author) { statusEl.textContent = 'Title and author required.'; statusEl.style.color = '#cc2222'; return; }
+            statusEl.textContent = 'Saving...'; statusEl.style.color = '#778';
+            const { error } = await sb.from('packs').update({ title, author, category, description: description || null, icon, download_url: download, comments_disabled: commentsDisabled }).eq('id', id);
+            if (error) { statusEl.textContent = 'Error: ' + error.message; statusEl.style.color = '#cc2222'; return; }
+            logAdminAction('edit_pack', `Edited "${title}"`, 'pack', id);
+            statusEl.textContent = 'Saved!'; statusEl.style.color = '#337722';
+            setTimeout(closeEditModal, 800);
+            loadAllPacks();
+        }
 
-       async function deletePack(id) {
-           try { await requireAdmin(); } catch(e) { alert(e.message); return; }
-           if (!confirm('Delete this pack permanently?')) return;
-           const { error } = await sb.from('packs').delete().eq('id', id);
-           if (error) { alert('Error: ' + error.message); return; }
-           loadAllPacks();
-           loadStats();
-       }
+        async function deletePack(id) {
+            try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+            if (!confirm('Delete this pack permanently?')) return;
+            const { data: pack } = await sb.from('packs').select('title').eq('id', id).maybeSingle();
+            const { error } = await sb.from('packs').delete().eq('id', id);
+            if (error) { alert('Error: ' + error.message); return; }
+            logAdminAction('delete_pack', `Deleted pack "${pack?.title||id}"`, 'pack', id);
+            loadAllPacks();
+            loadStats();
+        }
 
        // ---- DELETE USER ----
-       async function deleteUser() {
-           try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+        async function deleteUser() {
+            try { await requireAdminOnly(); } catch(e) { alert(e.message); return; }
            const username = document.getElementById('DeleteUsernameInput').value.trim();
            if (!username) { setStatus('DeleteUserStatus', 'Enter a username.', false); return; }
            if (!confirm(`Permanently delete user "${username}"? This cannot be undone.`)) return;
@@ -550,46 +636,49 @@
                body: JSON.stringify({ username, requesting_uid: session.user.id }),
            });
            const result = await res.json();
-           if (!res.ok || result.error) { setStatus('DeleteUserStatus', 'Error: ' + (result.error || 'Unknown error'), false); return; }
-           setStatus('DeleteUserStatus', `User "${username}" has been deleted.`, true);
+            if (!res.ok || result.error) { setStatus('DeleteUserStatus', 'Error: ' + (result.error || 'Unknown error'), false); return; }
+            logAdminAction('delete_user', `Deleted user "${username}"`, 'user', username);
+            setStatus('DeleteUserStatus', `User "${username}" has been deleted.`, true);
            document.getElementById('DeleteUsernameInput').value = '';
            loadUserList();
            loadStats();
        }
 
        // ---- BAN / UNBAN ----
-       async function banUser() {
-           try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+        async function banUser() {
+            try { await requireAdminOnly(); } catch(e) { alert(e.message); return; }
            const username = document.getElementById('BanUsernameInput').value.trim();
            const reason = document.getElementById('BanReasonInput').value.trim();
            if (!username) { setStatus('BanStatus', 'Enter a username.', false); return; }
            if (!confirm(`Ban user "${username}"${reason ? ' ('+reason+')' : ''}?`)) return;
            setStatus('BanStatus', 'Banning...', true);
            const { data, error } = await sb.from('profiles').update({ is_banned: true, ban_reason: reason || null }).eq('username', username).select('username').maybeSingle();
-           if (error || !data) { setStatus('BanStatus', error ? error.message : `User "${username}" not found.`, false); return; }
-           setStatus('BanStatus', `${username} has been banned.`, true);
+            if (error || !data) { setStatus('BanStatus', error ? error.message : `User "${username}" not found.`, false); return; }
+            logAdminAction('ban', `Banned "${username}"${reason ? ': '+reason : ''}`, 'user', username);
+            setStatus('BanStatus', `${username} has been banned.`, true);
            document.getElementById('BanUsernameInput').value = '';
            document.getElementById('BanReasonInput').value = '';
            loadUserList();
            loadStats();
        }
 
-       async function unbanUser() {
-           try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+        async function unbanUser() {
+            try { await requireAdminOnly(); } catch(e) { alert(e.message); return; }
            const username = document.getElementById('BanUsernameInput').value.trim();
            if (!username) { setStatus('BanStatus', 'Enter a username.', false); return; }
            if (!confirm(`Unban user "${username}"?`)) return;
            setStatus('BanStatus', 'Unbanning...', true);
            const { data, error } = await sb.from('profiles').update({ is_banned: false, ban_reason: null }).eq('username', username).select('username').maybeSingle();
-           if (error || !data) { setStatus('BanStatus', error ? error.message : `User "${username}" not found.`, false); return; }
-           setStatus('BanStatus', `${username} has been unbanned.`, true);
+            if (error || !data) { setStatus('BanStatus', error ? error.message : `User "${username}" not found.`, false); return; }
+            logAdminAction('unban', `Unbanned "${username}"`, 'user', username);
+            setStatus('BanStatus', `${username} has been unbanned.`, true);
            document.getElementById('BanUsernameInput').value = '';
            loadUserList();
        }
 
        // ---- CHANGE USERNAME ----
-       async function changeUsername() {
-           try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+        async function changeUsername() {
+            try { await requireAdminOnly(); } catch(e) { alert(e.message); return; }
            const current = document.getElementById('UsernameCurrent').value.trim();
            const newName = document.getElementById('UsernameNew').value.trim();
            if (!current || !newName) { setStatus('UsernameStatus', 'Fill in both fields.', false); return; }
@@ -599,8 +688,9 @@
            const { data: existing } = await sb.from('profiles').select('username').eq('username', newName).maybeSingle();
            if (existing) { setStatus('UsernameStatus', 'That username is already taken.', false); return; }
            const { data, error } = await sb.from('profiles').update({ username: newName }).eq('username', current).select('username').maybeSingle();
-           if (error || !data) { setStatus('UsernameStatus', error ? error.message : `User "${current}" not found.`, false); return; }
-           setStatus('UsernameStatus', `Changed "${current}" to "${newName}".`, true);
+            if (error || !data) { setStatus('UsernameStatus', error ? error.message : `User "${current}" not found.`, false); return; }
+            logAdminAction('change_username', `Changed "${current}" → "${newName}"`, 'user', newName);
+            setStatus('UsernameStatus', `Changed "${current}" to "${newName}".`, true);
            document.getElementById('UsernameCurrent').value = '';
            document.getElementById('UsernameNew').value = '';
            loadUserList();
@@ -611,15 +701,16 @@
        async function makeAdmin()   { await setAdminStatus(true); }
        async function removeAdmin() { await setAdminStatus(false); }
 
-       async function setAdminStatus(status) {
-           try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+        async function setAdminStatus(status) {
+            try { await requireAdminOnly(); } catch(e) { alert(e.message); return; }
            const username = document.getElementById('AdminUsernameInput').value.trim();
            if (!username) { setStatus('AdminActionStatus', 'Enter a username.', false); return; }
            if (!confirm(`${status ? 'Grant admin to' : 'Remove admin from'} "${username}"?`)) return;
            setStatus('AdminActionStatus', 'Updating...', true);
            const { data, error } = await sb.from('profiles').update({ is_admin: status }).eq('username', username).select('username').maybeSingle();
-           if (error || !data) { setStatus('AdminActionStatus', error ? error.message : `User "${username}" not found.`, false); return; }
-           setStatus('AdminActionStatus', status ? `${username} is now an admin.` : `${username} is no longer an admin.`, true);
+            if (error || !data) { setStatus('AdminActionStatus', error ? error.message : `User "${username}" not found.`, false); return; }
+            logAdminAction(status ? 'grant_admin' : 'remove_admin', `${status ? 'Granted' : 'Removed'} admin ${status ? 'to' : 'from'} "${username}"`, 'user', username);
+            setStatus('AdminActionStatus', status ? `${username} is now an admin.` : `${username} is no longer an admin.`, true);
            document.getElementById('AdminUsernameInput').value = '';
            loadAdminList();
            loadUserList();
@@ -655,91 +746,232 @@
            `).join('');
        }
 
-       // ---- ALL COMMENTS ----
-       async function loadAllComments() {
-           const list = document.getElementById('AllCommentsList');
-           const count = document.getElementById('CommentCount');
-           const filter = document.getElementById('CommentSearchInput').value.trim().toLowerCase();
+        // ---- ALL COMMENTS ----
+        async function loadAllComments() {
+            const list = document.getElementById('AllCommentsList');
+            const count = document.getElementById('CommentCount');
+            const filter = document.getElementById('CommentSearchInput').value.trim().toLowerCase();
 
-           list.innerHTML = '<div style="color:#778;font-size:12px;">Loading...</div>';
+            list.innerHTML = '<div style="color:#778;font-size:12px;">Loading...</div>';
 
-           let query = sb.from('comments').select('id, username, content, created_at, pack_id', { count: 'exact' }).order('created_at', { ascending: false });
-           const { data, count: total, error } = await query;
-           if (error || !data) { list.innerHTML = '<div style="color:#778;font-size:12px;padding:8px;">Error loading comments.</div>'; return; }
+            let query = sb.from('comments').select('id, username, content, created_at, pack_id', { count: 'exact' }).order('created_at', { ascending: false });
+            const { data, count: total, error } = await query;
+            if (error || !data) { list.innerHTML = '<div style="color:#778;font-size:12px;padding:8px;">Error loading comments.</div>'; return; }
 
-           let filtered = data;
-           if (filter) filtered = data.filter(c => (c.username||'').toLowerCase().includes(filter) || (c.content||'').toLowerCase().includes(filter));
+            let filtered = data;
+            if (filter) filtered = data.filter(c => (c.username||'').toLowerCase().includes(filter) || (c.content||'').toLowerCase().includes(filter));
 
-           count.textContent = `${filtered.length} comment${filtered.length !== 1 ? 's' : ''}`;
-           if (!filtered.length) { list.innerHTML = '<div style="color:#778;font-size:12px;padding:8px;">No comments found.</div>'; return; }
+            count.textContent = `${filtered.length} comment${filtered.length !== 1 ? 's' : ''}`;
+            if (!filtered.length) { list.innerHTML = '<div style="color:#778;font-size:12px;padding:8px;">No comments found.</div>'; return; }
 
-           list.innerHTML = filtered.map(c => `
-               <div class="list-row" id="acomment-${c.id}">
-                   <div style="flex:1;">
-                       <div style="font-weight:bold;color:#2a3a5a;font-size:12px;">${esc(c.username)}</div>
-                       <div style="font-size:11px;color:#555;">${esc(c.content.length > 120 ? c.content.slice(0,120)+'...' : c.content)}</div>
-                       <div style="font-size:10px;color:#aaa;">${new Date(c.created_at).toLocaleDateString()}</div>
-                   </div>
-                   <button class="btn-reject" style="font-size:10px;padding:2px 8px;flex-shrink:0;" onclick="deleteComment('${c.id}')">Delete</button>
-               </div>
-           `).join('');
-       }
+            list.innerHTML = filtered.map(c => `
+                <div class="list-row" id="acomment-${c.id}">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:bold;color:#2a4a2a;font-size:12px;">${esc(c.username)}</div>
+                        <div style="font-size:11px;color:#555;word-break:break-word;">${esc(c.content)}</div>
+                        <div style="font-size:10px;color:#aaa;margin-top:2px;">
+                            ${new Date(c.created_at).toLocaleDateString()}
+                            ${c.pack_id ? ` · <a href="/Pages/Pack/?id=${c.pack_id}" target="_blank" style="color:var(--c-green);">View Pack</a>` : ''}
+                        </div>
+                    </div>
+                    <button class="btn-reject" style="font-size:10px;padding:2px 8px;flex-shrink:0;" onclick="deleteComment('${c.id}')"><img src="/assets/img/icons/flag_red.png" width="10" height="10" alt="" style="vertical-align:middle;"> Delete</button>
+                </div>
+            `).join('');
+        }
 
-       async function deleteComment(id) {
-           try { await requireAdmin(); } catch(e) { alert(e.message); return; }
-           if (!confirm('Delete this comment?')) return;
-           const { error } = await sb.from('comments').delete().eq('id', id);
-           if (error) { alert('Error: ' + error.message); return; }
-           loadAllComments();
-           loadStats();
-       }
+        async function deleteComment(id) {
+            try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+            if (!confirm('Delete this comment?')) return;
+            const { error } = await sb.from('comments').delete().eq('id', id);
+            if (error) { alert('Error: ' + error.message); return; }
+            logAdminAction('delete_comment', 'Deleted comment', 'comment', id);
+            loadAllComments();
+            loadStats();
+        }
 
-       // ---- CATEGORIES ----
-       async function loadCategories() {
-           const list = document.getElementById('CategoriesList');
-           list.innerHTML = '<div style="color:#778;font-size:12px;">Loading...</div>';
+        // ---- CATEGORIES ----
+        async function loadCategories() {
+            const list = document.getElementById('CategoriesList');
+            list.innerHTML = '<div style="color:#778;font-size:12px;">Loading...</div>';
 
-           const { data: packs, error: pErr } = await sb.from('packs').select('category');
-           if (pErr) { list.innerHTML = '<div style="color:#c0392b;font-size:12px;">Error loading categories.</div>'; return; }
+            const { data: packs, error: pErr } = await sb.from('packs').select('category');
+            if (pErr) { list.innerHTML = '<div style="color:#c0392b;font-size:12px;">Error loading categories.</div>'; return; }
 
-           const catCounts = {};
-           (packs || []).forEach(p => {
-               const cat = p.category || 'Other';
-               catCounts[cat] = (catCounts[cat] || 0) + 1;
-           });
+            const catCounts = {};
+            (packs || []).forEach(p => {
+                const cat = p.category || 'Other';
+                catCounts[cat] = (catCounts[cat] || 0) + 1;
+            });
 
-           const entries = Object.entries(catCounts).sort((a, b) => b[1] - a[1]);
+            const entries = Object.entries(catCounts).sort((a, b) => b[1] - a[1]);
 
-           if (!entries.length) { list.innerHTML = '<div style="color:#778;font-size:12px;padding:8px;">No categories found.</div>'; return; }
+            if (!entries.length) { list.innerHTML = '<div style="color:#778;font-size:12px;padding:8px;">No categories found.</div>'; return; }
 
-           list.innerHTML = entries.map(([cat, count]) => `
-               <div class="cat-row">
-                   <span style="font-weight:600;flex:1;">${esc(cat)}</span>
-                   <span class="admin-tag">${count} pack${count !== 1 ? 's' : ''}</span>
-                   <button class="btn-reject" style="font-size:10px;padding:1px 6px;" onclick="deleteCategory('${esc(cat)}')">Delete</button>
-               </div>
-           `).join('');
-       }
+            list.innerHTML = entries.map(([cat, count]) => `
+                <div class="cat-row">
+                    <span style="font-weight:600;flex:1;">${esc(cat)}</span>
+                    <span class="admin-tag">${count} pack${count !== 1 ? 's' : ''}</span>
+                    <button class="btn-reject" style="font-size:10px;padding:1px 6px;" onclick="deleteCategory('${esc(cat)}')"><img src="/assets/img/icons/flag_red.png" width="10" height="10" alt="" style="vertical-align:middle;"> Delete</button>
+                </div>
+            `).join('');
+        }
 
-       async function addCategory() {
-           try { await requireAdmin(); } catch(e) { alert(e.message); return; }
-           const name = document.getElementById('NewCategoryInput').value.trim();
-           if (!name) { setStatus('CategoryStatus', 'Enter a category name.', false); return; }
-           setStatus('CategoryStatus', 'Categories are auto-managed from packs. Reorganize your packs instead.', false);
-           document.getElementById('NewCategoryInput').value = '';
-       }
+        async function addCategory() {
+            try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+            const name = document.getElementById('NewCategoryInput').value.trim();
+            if (!name) { setStatus('CategoryStatus', 'Enter a category name.', false); return; }
+            setStatus('CategoryStatus', 'Categories are auto-managed from packs. Reorganize your packs instead.', false);
+            document.getElementById('NewCategoryInput').value = '';
+        }
 
-       async function deleteCategory(category) {
-           try { await requireAdmin(); } catch(e) { alert(e.message); return; }
-           if (!confirm(`Delete all packs in "${category}"? This will permanently remove them.`)) return;
-           const { error } = await sb.from('packs').delete().eq('category', category);
-           if (error) { alert('Error: ' + error.message); return; }
-           loadCategories();
-           loadAllPacks();
-           loadStats();
-       }
+         async function deleteCategory(category) {
+             try { await requireAdminOnly(); } catch(e) { alert(e.message); return; }
+            if (!confirm(`Delete all packs in "${category}"? This will permanently remove them.`)) return;
+            const { error } = await sb.from('packs').delete().eq('category', category);
+            if (error) { alert('Error: ' + error.message); return; }
+            logAdminAction('delete_category', `Deleted category "${category}"`, 'category', category);
+            loadCategories();
+            loadAllPacks();
+            loadStats();
+        }
 
-       function esc(text) {
+        // ---- REPORTS QUEUE ----
+        async function loadReports() {
+            const list = document.getElementById('ReportsList');
+            const count = document.getElementById('ReportCount');
+            const typeFilter = document.getElementById('ReportTypeFilter').value;
+
+            list.innerHTML = '<div style="color:#778;font-size:12px;">Loading...</div>';
+
+            let query = sb.from('reports').select('*', { count: 'exact' }).order('created_at', { ascending: false });
+            if (typeFilter) query = query.eq('content_type', typeFilter);
+
+            const { data, count: total, error } = await query;
+            if (error || !data) { list.innerHTML = '<div style="color:#778;font-size:12px;padding:8px;">Error loading reports.</div>'; return; }
+
+            count.textContent = `${total || data.length} report${(total || data.length) !== 1 ? 's' : ''}`;
+            if (!data.length) { list.innerHTML = '<div style="color:#778;font-size:12px;padding:8px;">No reports found.</div>'; return; }
+
+            // Fetch reporter usernames
+            const userIds = [...new Set(data.map(r => r.reported_by).filter(Boolean))];
+            const { data: profiles } = await sb.from('profiles').select('id, username').in('id', userIds);
+            const usernames = {};
+            if (profiles) profiles.forEach(p => usernames[p.id] = p.username);
+
+            list.innerHTML = data.map(r => `
+                <div class="list-row" id="report-${r.id}">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:bold;color:#2a4a2a;font-size:12px;">
+                            <span class="admin-tag" style="background:var(--c-danger);color:#fff;border-color:#a03020;">${esc(r.content_type)}</span>
+                            ${esc(r.reason)}
+                        </div>
+                        <div style="font-size:11px;color:#555;word-break:break-word;">${esc(r.details||'No details')}</div>
+                        <div style="font-size:10px;color:#aaa;margin-top:2px;">
+                            Reported by ${esc(usernames[r.reported_by]||'Unknown')} · ${new Date(r.created_at).toLocaleDateString()}
+                            ${r.content_id ? ` · ID: ${esc(r.content_id)}` : ''}
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:4px;flex-shrink:0;">
+                        ${r.content_type === 'pack' ? `<button class="btn-reject" style="font-size:10px;padding:2px 8px;" onclick="deleteReportedPack('${r.content_id}', '${r.id}')"><img src="/assets/img/icons/flag_red.png" width="10" height="10" alt="" style="vertical-align:middle;"> Delete</button>` : ''}
+                        ${r.content_type === 'comment' ? `<button class="btn-reject" style="font-size:10px;padding:2px 8px;" onclick="deleteReportedComment('${r.content_id}', '${r.id}')"><img src="/assets/img/icons/flag_red.png" width="10" height="10" alt="" style="vertical-align:middle;"> Delete</button>` : ''}
+                        <button class="btn-approve" style="font-size:10px;padding:2px 8px;" onclick="dismissReport('${r.id}')"><img src="/assets/img/icons/accept.png" width="10" height="10" alt="" style="vertical-align:middle;"> Dismiss</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function dismissReport(id) {
+            try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+            if (!confirm('Dismiss this report?')) return;
+            const { error } = await sb.from('reports').delete().eq('id', id);
+            if (error) { alert('Error: ' + error.message); return; }
+            logAdminAction('dismiss_report', 'Dismissed a report', 'report', id);
+            loadReports();
+            loadStats();
+        }
+
+        async function deleteReportedPack(packId, reportId) {
+            try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+            if (!confirm('Delete this pack permanently? The report will also be dismissed.')) return;
+            const { data: pack } = await sb.from('packs').select('title').eq('id', packId).maybeSingle();
+            const { error } = await sb.from('packs').delete().eq('id', packId);
+            if (error) { alert('Error deleting pack: ' + error.message); return; }
+            await sb.from('reports').delete().eq('id', reportId);
+            logAdminAction('delete_pack', `Deleted pack "${pack?.title||packId}" from report`, 'pack', packId);
+            loadReports();
+            loadStats();
+        }
+
+        async function deleteReportedComment(commentId, reportId) {
+            try { await requireAdmin(); } catch(e) { alert(e.message); return; }
+            if (!confirm('Delete this comment permanently? The report will also be dismissed.')) return;
+            const { error } = await sb.from('comments').delete().eq('id', commentId);
+            if (error) { alert('Error deleting comment: ' + error.message); return; }
+            await sb.from('reports').delete().eq('id', reportId);
+            logAdminAction('delete_comment', 'Deleted comment from report', 'comment', commentId);
+            loadReports();
+            loadStats();
+        }
+
+        // ---- ACTIVITY LOG ----
+        async function logAdminAction(action, details, targetType, targetId) {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) return;
+            const { data: profile } = await sb.from('profiles').select('username').eq('id', session.user.id).maybeSingle();
+            if (!profile) return;
+            try {
+                await sb.from('admin_logs').insert({
+                    admin_username: profile.username,
+                    action, details: details || null,
+                    target_type: targetType || null, target_id: targetId || null
+                });
+            } catch {}
+        }
+
+        async function loadActivityLog() {
+            const list = document.getElementById('ActivityList');
+            const count = document.getElementById('LogCount');
+
+            list.innerHTML = '<div style="color:#778;font-size:12px;">Loading...</div>';
+
+            const { data, count: total, error } = await sb.from('admin_logs').select('*', { count: 'exact' }).order('created_at', { ascending: false }).limit(100);
+            if (error || !data) { list.innerHTML = '<div style="color:#778;font-size:12px;padding:8px;">Error loading activity log.</div>'; return; }
+
+            count.textContent = `${total || data.length} action${(total || data.length) !== 1 ? 's' : ''}`;
+            if (!data.length) { list.innerHTML = '<div style="color:#778;font-size:12px;padding:8px;">No activity logged yet.</div>'; return; }
+
+            const actionLabels = {
+                approve: 'Approved submission',
+                reject: 'Rejected submission',
+                delete_pack: 'Deleted pack',
+                edit_pack: 'Edited pack',
+                delete_comment: 'Deleted comment',
+                dismiss_report: 'Dismissed report',
+                ban: 'Banned user',
+                unban: 'Unbanned user',
+                change_username: 'Changed username',
+                grant_admin: 'Granted admin',
+                remove_admin: 'Removed admin',
+                delete_user: 'Deleted user',
+                delete_category: 'Deleted category',
+            };
+
+            list.innerHTML = data.map(log => `
+                <div class="list-row">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:bold;color:#2a4a2a;font-size:12px;">
+                            ${esc(actionLabels[log.action] || log.action)}
+                        </div>
+                        <div style="font-size:11px;color:#555;">${esc(log.details||'')}</div>
+                        <div style="font-size:10px;color:#aaa;margin-top:2px;">
+                            by ${esc(log.admin_username)} · ${new Date(log.created_at).toLocaleDateString()} ${new Date(log.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function esc(text) {
            if (!text) return '';
            const d = document.createElement('div');
            d.textContent = text;

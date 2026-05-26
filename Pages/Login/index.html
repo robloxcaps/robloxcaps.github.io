@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Log In - CAP Central</title>
+    <title>Log In - CAP Central</title><script>document.title = SITE_CONFIG.ui.pageTitles.login + ' - ' + SITE_CONFIG.siteName;</script>
     <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
@@ -27,7 +27,7 @@
                         <input type="password" id="password" placeholder="Your password" />
                         <p class="field-hint"><a href="/Pages/ResetPassword/">Forgot your password?</a></p>
                     </div>
-                    <button id="LoginBtn" onclick="handleLogin()">Sign In</button>
+                    <button id="LoginBtn" onclick="handleLogin()"><img src="/assets/img/icons/key.png" width="14" height="14" alt="" style="vertical-align:middle;"> Sign In</button>
                     <div id="StatusMsg"></div>
                     <div class="form-footer">
                         Not a member? <a href="/Pages/SignUp/">Sign Up</a>

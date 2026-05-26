@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Plugins - CAP Central</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plugins - CAP Central</title><script>document.title = SITE_CONFIG.ui.pageTitles.plugins + ' - ' + SITE_CONFIG.siteName;</script>
 <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
 <link rel="stylesheet" href="/assets/css/style.css">
 <meta name="author" content="OGMelodii & Jakyro">
@@ -18,19 +19,19 @@
     <div id="Body">
         <div id="MainContent">
 
-            <div id="LoadingMessage">Loading plugins...</div>
+            <div id="LoadingMessage"><span id="PluginsLoading">Loading plugins...</span></div>
 
             <div id="ErrorMessage" style="display:none; text-align:center; padding:20px;">
-                <p style="color:var(--danger);font-weight:700;">Error loading plugins.</p>
-                <button onclick="loadPlugins()" type="button" class="RetryButton" style="margin-top:10px;">Retry</button>
+                <p style="color:var(--danger);font-weight:700;"><span id="PluginsError">Error loading plugins.</span></p>
+                <button onclick="loadPlugins()" type="button" class="RetryButton" style="margin-top:10px;"><span id="PluginsRetry">Retry</span></button>
             </div>
 
             <div id="SortFilterBar" style="display:none;">
-                <label for="SearchInput"><i data-lucide="search" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;"></i>Search:</label>
+                <label for="SearchInput"><span id="PluginsSearchLabel">Search</span>:</label>
                 <input type="text" id="SearchInput" placeholder="Search plugins..." oninput="applyFilters()">
-                <label for="CategoryFilter" style="margin-left:8px;">Category:</label>
+                <label for="CategoryFilter" style="margin-left:8px;"><span id="PluginsCategoryLabel">Category</span>:</label>
                 <select id="CategoryFilter" onchange="applyFilters()"><option value="">All</option></select>
-                <label for="SortSelect" style="margin-left:8px;">Sort:</label>
+                <label for="SortSelect" style="margin-left:8px;"><span id="PluginsSortLabel">Sort</span>:</label>
                 <select id="SortSelect" onchange="applyFilters()">
                     <option value="newest">Newest First</option>
                     <option value="oldest">Oldest First</option>
@@ -42,7 +43,7 @@
                 <span id="ResultCount"></span>
             </div>
 
-            <div id="LastUpdated" style="display:none; text-align:center; font-size:var(--text-xs); color:var(--text-muted); margin-bottom:8px;">
+            <div id="LastUpdated" style="display:none; text-align:center; font-size:11px; color:var(--text-muted); margin-bottom:8px;">
                 Last updated: <span id="UpdateTime"></span>
             </div>
 
@@ -55,8 +56,7 @@
             <div class="PluginGrid" id="PluginGrid" style="display:none;"></div>
 
             <div id="NoResults" style="display:none; text-align:center; padding:30px; color:var(--text-muted);">
-                <i data-lucide="search-x" style="width:32px;height:32px;margin-bottom:10px;display:block;margin:0 auto 10px;"></i>
-                No plugins match your search.
+                <span id="PluginsNoResults">No plugins match your search.</span>
             </div>
 
         </div>
@@ -66,7 +66,7 @@
 <div id="DescriptionModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2 id="modalTitle">Plugin Description</h2>
+            <h2 id="modalTitle"><span id="PluginDescTitle">Plugin Description</span></h2>
             <span class="close">&times;</span>
         </div>
         <div class="modal-body">
@@ -86,12 +86,28 @@ let filteredPlugins = [];
 
 document.addEventListener('DOMContentLoaded', function () {
     loadPlugins();
+    loadPluginsUI();
     document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
     document.getElementById('nextPage').addEventListener('click', () => changePage(1));
     const modal = document.getElementById('DescriptionModal');
     document.querySelector('.close').onclick = () => modal.style.display = 'none';
     window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
 });
+
+function loadPluginsUI() {
+    const U = SITE_CONFIG.ui.plugins;
+    document.getElementById('PluginsLoading').textContent     = U.loading;
+    document.getElementById('PluginsError').textContent       = U.error;
+    document.getElementById('PluginsRetry').textContent       = SITE_CONFIG.ui.retry;
+    document.getElementById('PluginsSearchLabel').textContent = SITE_CONFIG.ui.search.replace(':', '').trim();
+    document.getElementById('PluginsCategoryLabel').textContent = U.categoryLabel.replace(':', '').trim();
+    document.getElementById('PluginsSortLabel').textContent   = U.sortLabel.replace(':', '').trim();
+    document.getElementById('SearchInput').placeholder        = U.searchPlace;
+    document.getElementById('PluginsNoResults').textContent   = U.noResults;
+    document.getElementById('PluginDescTitle').textContent    = U.descModal;
+    const sortOpts = document.querySelectorAll('#SortSelect option');
+    sortOpts.forEach((o, i) => { if (U.sortOptions[i]) o.textContent = U.sortOptions[i]; });
+}
 
 function loadPlugins() {
     const loading = document.getElementById('LoadingMessage');
@@ -166,7 +182,6 @@ function displayPlugins() {
     pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
     document.getElementById('prevPage').disabled = currentPage === 1;
     document.getElementById('nextPage').disabled = currentPage === totalPages;
-    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 function changePage(delta) {
@@ -191,15 +206,20 @@ function createPluginItem(plugin) {
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">${esc(plugin.category||'Other')} · v${esc(plugin.version||'N/A')}</div>
         <div class="PluginButtons">
             <a href="${esc(safeDownloadUrl)}" class="PluginDownload" target="_blank" download>
-                <i data-lucide="download" style="width:11px;height:11px;"></i> Download
+                <img src="/assets/img/icons/disk.png" width="11" height="11" alt="" style="vertical-align:middle;"> Download
             </a>
             <button class="PluginSeeMore" data-title="${esc(plugin.title)}" data-description="${esc(description)}">
-                <i data-lucide="info" style="width:11px;height:11px;"></i> Details
+                <img src="/assets/img/icons/bullet_go.png" width="11" height="11" alt="" style="vertical-align:middle;"> Details
             </button>
+            <a href="#" class="ReportBtn" title="Report this plugin" data-title="${encodeURIComponent(plugin.title)}"><img src="/assets/img/icons/flag_red.png" width="14" height="14" alt="Report"></a>
         </div>
     `;
     div.querySelector('.PluginSeeMore').addEventListener('click', function () {
         showDescription(this.dataset.title, this.dataset.description);
+    });
+    div.querySelector('.ReportBtn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        openReportModal('plugin', this.dataset.title, this.dataset.title);
     });
     return div;
 }
@@ -210,20 +230,12 @@ function showDescription(title, description) {
     document.getElementById('DescriptionModal').style.display = 'block';
 }
 
-function esc(text) { if (!text) return ''; const d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
-function sanitizeUrl(url) {
-    if (!url) return '';
-    url = url.trim();
-    try { const u = new URL(url); return (u.protocol === 'http:' || u.protocol === 'https:') ? url : ''; }
-    catch { return ''; }
-}
 function cacheData(plugins) { try { localStorage.setItem('pluginsCache', JSON.stringify({plugins, timestamp: new Date().toISOString()})); } catch(e){} }
 function getCachedData() { try { const c = localStorage.getItem('pluginsCache'); return c ? JSON.parse(c) : null; } catch(e){ return null; } }
 function isCacheExpired(ts) { return Date.now() - new Date(ts).getTime() > CACHE_DURATION; }
 </script>
 
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/config.js"></script>
 
     <div id="FooterWrapper">

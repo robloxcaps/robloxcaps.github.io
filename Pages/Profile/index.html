@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
-    <title>Profile - CAP Central</title>
+    <title>Profile - CAP Central</title><script>document.title = SITE_CONFIG.ui.pageTitles.profile + ' - ' + SITE_CONFIG.siteName;</script>
     <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/assets/css/style.css">
     <style>
@@ -15,7 +15,7 @@
             border: 1px solid #ccc;
         }
         .sub-status-badge.pending  { background: #fef8e0; border-color: #d4aa30; color: #664400; }
-        .sub-status-badge.approved { background: #4a7fc1; color: #fff; border-color: #3060a0; }
+        .sub-status-badge.approved { background: var(--c-green); color: #fff; border-color: var(--c-green-border); }
         .sub-status-badge.rejected { background: #fff4f4; color: #cc2222; border-color: #cc2222; }
 
         .sub-row {
@@ -309,7 +309,7 @@ function createPackCard(pack) {
         </div>
         <div class="PackButtons">
             <a href="${esc(pack.download_url||'#')}" target="_blank" rel="noopener noreferrer" class="PackDownload">Download</a>
-            <button class="PackSeeMore">Details</button>
+            <button class="PackSeeMore"><img src="/assets/img/icons/package_go.png" width="14" height="14" alt="" style="vertical-align:middle;"> Details</button>
         </div>
     `;
     div.querySelector('.PackSeeMore').addEventListener('click', () => showDetails(pack));

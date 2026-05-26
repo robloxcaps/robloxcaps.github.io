@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
-    <title>Settings - CAP Central</title>
+    <title>Settings - CAP Central</title><script>document.title = SITE_CONFIG.ui.pageTitles.settings + ' - ' + SITE_CONFIG.siteName;</script>
     <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/assets/css/style.css">
     <style>
@@ -15,12 +15,12 @@
         .SettingsInfo-value { color: #2a3a5a; }
 
         .settings-avatar-wrap { display: flex; align-items: center; gap: 16px; }
-        .settings-avatar-preview { width: 64px; height: 64px; background: var(--c-accent); display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 700; font-size: 28px; color: #fff; overflow: hidden; flex-shrink: 0; }
+        .settings-avatar-preview { width: 64px; height: 64px; background: var(--c-cat-bg); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 28px; color: #fff; overflow: hidden; flex-shrink: 0; border: 1px solid var(--c-border); }
         .settings-avatar-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .settings-avatar-actions { display: flex; flex-direction: column; gap: 4px; }
-        .settings-upload-btn { padding: 4px 12px; font-size: 11px; font-weight: 700; cursor: pointer; background: var(--c-accent); color: #fff; border: none; border-radius: var(--radius); transition: background 0.12s; }
-        .settings-upload-btn:hover { background: var(--c-accent-hover); }
-        .settings-upload-btn:disabled { background: #aaa; cursor: not-allowed; }
+        .settings-upload-btn { padding: 4px 12px; font-size: 11px; font-weight: 700; cursor: pointer; background: var(--c-btn); color: #333; border: 1px solid var(--c-btn-border); font-family: var(--font); }
+        .settings-upload-btn:hover { background: var(--c-btn-hover); }
+        .settings-upload-btn:disabled { background: #aaa; color: #fff; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -59,8 +59,8 @@
                                     <div class="settings-avatar-preview" id="SettingsAvatarPreview">?</div>
                                     <div class="settings-avatar-actions">
                                         <input type="file" id="SettingsAvatarInput" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none;">
-                                        <button class="settings-upload-btn" onclick="document.getElementById('SettingsAvatarInput').click()">Choose Image</button>
-                                        <button class="settings-upload-btn" id="SettingsUploadBtn" style="display:none;" onclick="uploadAvatar()">Upload</button>
+                                        <button class="settings-upload-btn" onclick="document.getElementById('SettingsAvatarInput').click()"><img src="/assets/img/icons/user.png" width="12" height="12" alt="" style="vertical-align:middle;"> Choose Image</button>
+                                        <button class="settings-upload-btn" id="SettingsUploadBtn" style="display:none;" onclick="uploadAvatar()"><img src="/assets/img/icons/bullet_go.png" width="12" height="12" alt="" style="vertical-align:middle;"> Upload</button>
                                         <div id="SettingsAvatarStatus" style="font-size:11px;color:#778;"></div>
                                     </div>
                                 </div>
@@ -79,7 +79,7 @@
                                     <label>Confirm Password</label>
                                     <input type="password" id="ConfirmPasswordInput" placeholder="Confirm new password">
                                 </div>
-                                <button id="UpdatePasswordBtn" onclick="updatePassword()">Update Password</button>
+                                <button id="UpdatePasswordBtn" onclick="updatePassword()"><img src="/assets/img/icons/key.png" width="14" height="14" alt="" style="vertical-align:middle;"> Update Password</button>
                                 <div id="PasswordStatus"></div>
                             </div>
                         </div>

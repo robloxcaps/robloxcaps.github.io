@@ -6,7 +6,7 @@
     <meta name="author" content="OGMelodii & Jakyro">
     <meta name="description" content="Browse classic Roblox asset packs.">
     <meta name="robots" content="all">
-    <title>Packs - CAP Central</title>
+    <title>Packs - CAP Central</title><script>document.title = SITE_CONFIG.ui.pageTitles.packs + ' - ' + SITE_CONFIG.siteName;</script>
     <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/assets/css/style.css">
     <style>
@@ -29,37 +29,13 @@
             flex: 1;
             font-size: 10px; padding: 3px 6px;
             font-weight: bold;
-            border: 1px solid #c0cce0;
+            border: 1px solid var(--c-cat-border);
             cursor: pointer; font-family: inherit;
-            background: #e6ecf5; color: #2a3a5a;
-            border-radius: 2px;
+            background: var(--c-cat-bg); color: var(--c-cat-text);
         }
-        .btn-favorite.favorited { background: #e8a020; color: #fff; border-color: #c07800; }
-        .btn-favorite:hover { background: #d0d8e8; }
-        .btn-favorite.favorited:hover { background: #c07800; }
-
-        .pack-downloads { font-size: 10px; color: #889; margin-top: 2px; }
-
-        .PackButtons > a.PackSeeMore {
-            flex: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            padding: 5px 8px;
-            font-weight: 400;
-            background: #e8e2d8;
-            border: 1px solid var(--c-border);
-            font-family: var(--font);
-            color: #555;
-            text-decoration: none;
-        }
-        .PackButtons > a.PackSeeMore:hover {
-            background: #e0dace;
-            border-color: var(--c-accent);
-            color: var(--c-accent);
-            text-decoration: none;
-        }
+        .btn-favorite.favorited { background: var(--c-gold); color: #fff; border-color: var(--c-gold-border); }
+        .btn-favorite:hover { background: var(--c-cat-border); }
+        .btn-favorite.favorited:hover { background: var(--c-gold-hover); }
     </style>
 </head>
 <body>
@@ -69,19 +45,19 @@
     <div id="Body">
         <div id="MainContent">
 
-            <div id="LoadingMessage">Loading packs...</div>
+            <div id="LoadingMessage"><span id="PacksLoading">Loading packs...</span></div>
 
             <div id="ErrorMessage" style="display:none; text-align:center; padding:20px;">
-                <p style="color:#cc2222;font-weight:700;">Error loading packs.</p>
-                <button onclick="loadPacks()" type="button" class="RetryButton" style="margin-top:10px;">Retry</button>
+                <p style="color:#cc2222;font-weight:700;"><span id="PacksError">Error loading packs.</span></p>
+                <button onclick="loadPacks()" type="button" class="RetryButton" style="margin-top:10px;"><span id="PacksRetry">Retry</span></button>
             </div>
 
             <div id="SortFilterBar" style="display:none;">
-                <label for="SearchInput">Search:</label>
+                <label for="SearchInput"><span id="PacksSearchLabel">Search</span>:</label>
                 <input type="text" id="SearchInput" placeholder="Search packs..." oninput="applyFilters()" autocomplete="off">
-                <label for="CategoryFilter" style="margin-left:8px;">Category:</label>
+                <label for="CategoryFilter" style="margin-left:8px;"><span id="PacksCategoryLabel">Category</span>:</label>
                 <select id="CategoryFilter" onchange="applyFilters()"><option value="">All</option></select>
-                <label for="SortSelect" style="margin-left:8px;">Sort:</label>
+                <label for="SortSelect" style="margin-left:8px;"><span id="PacksSortLabel">Sort</span>:</label>
                 <select id="SortSelect" onchange="applyFilters()">
                     <option value="newest">Newest First</option>
                     <option value="oldest">Oldest First</option>
@@ -89,7 +65,6 @@
                     <option value="za">Z → A</option>
                     <option value="author_az">Author A → Z</option>
                     <option value="author_za">Author Z → A</option>
-                    <option value="downloads">Most Downloaded</option>
                 </select>
                 <span id="ResultCount"></span>
             </div>
@@ -103,7 +78,7 @@
             <div class="PackGrid" id="PackGrid" style="display:none;"></div>
 
             <div id="NoResults" style="display:none; text-align:center; padding:30px; color:#778;">
-                No packs match your search.
+                <span id="PacksNoResults">No packs match your search.</span>
             </div>
 
         </div>
@@ -124,7 +99,24 @@ let filteredPacks    = [];
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
     document.getElementById('nextPage').addEventListener('click', () => changePage(1));
+    loadPacksUI();
 });
+
+function loadPacksUI() {
+    const U = SITE_CONFIG.ui.packs;
+    document.getElementById('PacksLoading').textContent   = U.loading;
+    document.getElementById('PacksError').textContent     = U.error;
+    document.getElementById('PacksRetry').textContent     = SITE_CONFIG.ui.retry;
+    document.getElementById('PacksSearchLabel').textContent   = SITE_CONFIG.ui.search.replace(':', '').trim();
+    document.getElementById('PacksCategoryLabel').textContent = U.categoryLabel.replace(':', '');
+    document.getElementById('PacksSortLabel').textContent     = U.sortLabel.replace(':', '');
+    document.getElementById('SearchInput').placeholder = U.searchPlace;
+    document.getElementById('PacksNoResults').textContent = U.noResults;
+    const sortOpts = document.querySelectorAll('#SortSelect option');
+    const sortVals = ['newest', 'oldest', 'az', 'za', 'author_az', 'author_za'];
+    const sortKeys = [0,1,2,3,4,5];
+    sortKeys.forEach(i => { if (sortOpts[i]) sortOpts[i].textContent = U.sortOptions[i]; });
+}
 
 setTimeout(async () => {
     await loadPacks();
@@ -180,7 +172,6 @@ function applyFilters() {
             case 'za':        return (b.title||'').localeCompare(a.title||'', 'en', {sensitivity:'base'});
             case 'author_az': return (a.author||'').localeCompare(b.author||'', 'en', {sensitivity:'base'});
             case 'author_za': return (b.author||'').localeCompare(a.author||'', 'en', {sensitivity:'base'});
-            case 'downloads': return (b.downloads||0) - (a.downloads||0);
             default: return 0;
         }
     });
@@ -233,7 +224,7 @@ function createPackItem(pack) {
     const dl    = pack.downloads || 0;
 
     div.innerHTML = `
-        ${window.isAdmin ? `<button class="btn-delete-pack" title="Delete pack" onclick="deletePack('${pack.id}', this)">&times;</button>` : ''}
+        ${window.isAdmin ? `<button class="btn-delete-pack" title="Delete pack" data-id="${pack.id}">&times;</button>` : ''}
         <div class="PackContentGroup">
             <img class="PackIcon" src="${esc(pack.icon||'/img/Placeholder.png')}" alt="${esc(pack.title)}" loading="lazy" onerror="this.src='/img/Placeholder.png'">
             <div class="PackTitle">${esc(pack.title)}</div>
@@ -242,10 +233,22 @@ function createPackItem(pack) {
             <div class="pack-downloads" style="font-size:10px;color:#889;margin-top:2px;">${dl} download${dl !== 1 ? 's' : ''}</div>
         </div>
         <div class="PackButtons">
-            <a href="${esc(pack.download_url||'#')}" target="_blank" rel="noopener noreferrer" class="PackDownload" onclick="incrementDownload('${pack.id}')">Download</a>
-            <a href="/Pages/Pack/?id=${pack.id}" class="PackSeeMore">View Page</a>
+            <a href="${sanitizeUrl(pack.download_url)||'#'}" target="_blank" rel="noopener noreferrer" class="PackDownload" data-id="${pack.id}"><img src="/assets/img/icons/disk.png" width="14" height="14" alt="" style="vertical-align:middle;"> Download</a>
+            <a href="/Pages/Pack/?id=${pack.id}" class="PackSeeMore"><img src="/assets/img/icons/package_go.png" width="14" height="14" alt="" style="vertical-align:middle;"> View Page</a>
+            <a href="#" class="ReportBtn" title="Report this pack" data-id="${pack.id}" data-title="${encodeURIComponent(pack.title)}"><img src="/assets/img/icons/flag_red.png" width="14" height="14" alt="Report"></a>
         </div>
     `;
+
+    div.querySelector('.btn-delete-pack')?.addEventListener('click', function() {
+        deletePack(this.dataset.id, this);
+    });
+    div.querySelector('.PackDownload')?.addEventListener('click', function(e) {
+        incrementDownload(this.dataset.id);
+    });
+    div.querySelector('.ReportBtn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        openReportModal('pack', this.dataset.id, this.dataset.title);
+    });
 
     return div;
 }
@@ -265,7 +268,7 @@ async function deletePack(id, btn) {
 }
 
 async function incrementDownload(id) {
-    try { const { data } = await sb.from('packs').select('downloads').eq('id', id).single(); await sb.from('packs').update({ downloads: (data?.downloads||0)+1 }).eq('id', id); }
+    try { await sb.rpc('increment_downloads', { pack_id: id }); }
     catch { /* silently fail */ }
 }
 function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }

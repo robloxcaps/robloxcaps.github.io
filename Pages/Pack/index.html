@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
-    <title>Pack - CAP Central</title>
+    <title>Pack - CAP Central</title><script>document.title = SITE_CONFIG.ui.pageTitles.pack + ' - ' + SITE_CONFIG.siteName;</script>
     <link rel="icon" href="/assets/img/FaviIcon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/assets/css/style.css">
     <style>
@@ -34,7 +34,7 @@
             color: #222; margin-bottom: 4px;
         }
         #PackDetailAuthor {
-            font-size: 14px; color: #8a8070; margin-bottom: 8px;
+            font-size: 14px; color: #6a7a6a; margin-bottom: 8px;
         }
         #PackDetailMeta {
             display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
@@ -48,17 +48,18 @@
         }
         #PackDetailActions { display: flex; gap: 8px; }
         #PackDetailActions a, #PackDetailActions button { height: 34px; padding: 6px 20px; font-size: 13px; }
+        #PackDetailActions .ReportBtn { width: 34px; padding: 6px 0; font-size: 13px; }
 
         #PackDetailDescription {
             font-size: 14px; line-height: 1.7;
-            color: #4a4040; margin-bottom: 24px;
+            color: #444; margin-bottom: 24px;
             padding: 16px;
             border: 1px solid var(--c-border);
             background: var(--c-row-alt);
         }
 
-        #NoPack { text-align: center; padding: 60px 20px; color: #9a9080; }
-        #NoPack h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #4a4040; }
+        #NoPack { text-align: center; padding: 60px 20px; color: #7a8a7a; }
+        #NoPack h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #444; }
 
         .CommentCount {
             font-size: 15px; font-weight: 600;
@@ -101,7 +102,7 @@
         }
         .CommentBody {
             font-size: 13px; line-height: 1.5;
-            color: #4a4040;
+            color: #444;
         }
         .CommentDelete {
             margin-left: auto;
@@ -142,19 +143,19 @@
             height: 32px;
             padding: 0 18px;
             font-size: 13px; font-weight: 400;
-            background: var(--c-btn);
+            background: var(--c-green);
             color: #fff;
-            border: 1px solid var(--c-btn-border);
+            border: 1px solid var(--c-green-border);
             cursor: pointer;
         }
-        #CommentForm button:hover { background: var(--c-btn-hover); }
-        #CommentForm button:disabled { background: #9a9080; cursor: not-allowed; }
-        #CommentStatus { font-size: 12px; color: #8a8070; margin-top: 6px; }
+        #CommentForm button:hover { background: var(--c-green-hover); }
+        #CommentForm button:disabled { background: #8a9a8a; border-color: #6a7a6a; cursor: not-allowed; }
+        #CommentStatus { font-size: 12px; color: #6a7a6a; margin-top: 6px; }
 
         #LoginToComment {
             text-align: center; padding: 16px;
             border: 1px solid var(--c-border);
-            color: #8a8070; font-size: 13px;
+            color: #6a7a6a; font-size: 13px;
         }
     </style>
 </head>
@@ -182,8 +183,9 @@
                         <span id="PackDetailCategory">Category</span>
                     </div>
                     <div id="PackDetailActions">
-                        <a href="#" id="PackDetailDownload" class="PackDownload" style="flex:0;padding:6px 24px;" target="_blank" rel="noopener noreferrer">Download</a>
-                        <a href="/Pages/Packs/" class="btn-modal-secondary" style="display:inline-flex;align-items:center;padding:6px 16px;font-size:13px;text-decoration:none;">&larr; Back</a>
+                        <a href="#" id="PackDetailDownload" class="PackDownload" style="flex:0;padding:6px 24px;" target="_blank" rel="noopener noreferrer"><img src="/assets/img/icons/disk.png" width="14" height="14" alt="" style="vertical-align:middle;"> Download</a>
+                        <a href="/Pages/Packs/" class="btn-modal-secondary" style="display:inline-flex;align-items:center;padding:6px 16px;font-size:13px;text-decoration:none;"><img src="/assets/img/icons/bullet_go.png" width="14" height="14" alt="" style="vertical-align:middle;"> Back</a>
+                        <a href="#" class="ReportBtn" title="Report this pack" onclick="openReportModal('pack', currentPack.id, currentPack.title);return false;"><img src="/assets/img/icons/flag_red.png" width="14" height="14" alt="Report"></a>
                     </div>
                 </div>
             </div>
@@ -256,7 +258,20 @@ async function loadPack(packId) {
 
     const form = document.getElementById('CommentForm');
     const login = document.getElementById('LoginToComment');
-    if (currentUser) {
+    const commentsSection = document.getElementById('CommentsSection');
+
+    if (pack.comments_disabled) {
+        form.style.display = 'none';
+        login.style.display = 'none';
+        const disabledMsg = document.getElementById('CommentsDisabled');
+        if (!disabledMsg) {
+            const msg = document.createElement('div');
+            msg.id = 'CommentsDisabled';
+            msg.style.cssText = 'text-align:center;padding:16px;border:1px solid var(--c-border);color:#6a7a6a;font-size:13px;';
+            msg.textContent = 'Comments are disabled for this pack.';
+            commentsSection.appendChild(msg);
+        }
+    } else if (currentUser) {
         form.style.display = 'block';
         login.style.display = 'none';
     } else {
@@ -350,6 +365,19 @@ async function deleteComment(commentId) {
     if (!confirm('Delete this comment?')) return;
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { alert('Not authenticated.'); return; }
+
+    const { data: comment } = await sb.from('comments').select('user_id').eq('id', commentId).maybeSingle();
+    if (!comment) { alert('Comment not found.'); return; }
+
+    const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+    const isOwner = comment.user_id === session.user.id;
+    const isMod = profile?.role === 'admin' || profile?.role === 'moderator';
+
+    if (!isOwner && !isMod) {
+        alert('You can only delete your own comments.');
+        return;
+    }
+
     const { error } = await sb.from('comments').delete().eq('id', commentId);
     if (error) { alert('Error: ' + error.message); return; }
     loadComments();

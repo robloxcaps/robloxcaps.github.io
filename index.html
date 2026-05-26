@@ -4,35 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Home - CAP Central</title>
+    <script>document.title = SITE_CONFIG.ui.pageTitles.home + ' - ' + SITE_CONFIG.siteName;</script>
     <link rel="icon" href="assets/img/FaviIcon.ico" type="image/x-icon">
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        /* Logged-out browse CTA strip */
         #BrowseStrip {
-            background: var(--c-accent);
-            color: #fff;
+            background: var(--c-nav-bg);
+            color: var(--c-nav-text);
             text-align: center;
-            padding: 10px 20px;
+            padding: 8px 20px;
             font-size: 12px;
-            border-bottom: 1px solid var(--c-accent-hover);
             display: none;
         }
 
         #BrowseStrip a {
             color: #fff;
-            font-weight: bold;
+            font-weight: 600;
             text-decoration: underline;
-            margin-left: 8px;
+            margin-left: 6px;
         }
 
-        #BrowseStrip a:hover { color: #ddeeff; }
+        #BrowseStrip a:hover { color: #8ab8f0; }
 
-        /* Make the active nav item obvious */
-        #Navigation a.MenuItem.Active {
-            border-bottom: 2px solid var(--c-accent);
-        }
-
-        /* Quicklinks below splash for logged out users */
         .quicklinks {
             display: flex;
             gap: 8px;
@@ -41,36 +34,37 @@
         }
 
         .quicklink-btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
             padding: 5px 14px;
             font-size: 11px;
-            font-weight: bold;
-            border-radius: 2px;
+            font-weight: 600;
             text-decoration: none;
             border: 1px solid;
         }
 
         .quicklink-btn.primary {
-            background: var(--c-accent);
-            color: #fff;
-            border-color: var(--c-accent-hover);
+            background: var(--c-green);
+            color: #fff !important;
+            border-color: var(--c-green-border);
         }
 
         .quicklink-btn.primary:hover {
-            background: var(--c-accent-hover);
-            text-decoration: none;
+            background: var(--c-green-hover);
+            text-decoration: none !important;
             color: #fff;
         }
 
         .quicklink-btn.secondary {
-            background: var(--c-cat-bg);
-            color: var(--c-cat-text);
-            border-color: var(--c-cat-border);
+            background: var(--c-btn);
+            color: #333 !important;
+            border-color: var(--c-btn-border);
         }
 
         .quicklink-btn.secondary:hover {
-            background: #d8e0f0;
-            text-decoration: none;
+            background: var(--c-btn-hover);
+            text-decoration: none !important;
         }
     </style>
 </head>
@@ -130,9 +124,9 @@
                         <p>${SITE_CONFIG.home.blurbText}</p>
                     </div>
                     <div class="quicklinks">
-                        <a href="/Pages/Packs/" class="quicklink-btn primary">Browse Packs</a>
-                        <a href="/Pages/Submit/" class="quicklink-btn secondary">Submit a Pack</a>
-                        <a href="/Pages/Profile/?u=${encodeURIComponent(username)}" class="quicklink-btn secondary">My Profile</a>
+                        <a href="/Pages/Packs/" class="quicklink-btn primary"><img src="/assets/img/icons/package.png" width="16" height="16" alt=""> Browse Packs</a>
+                        <a href="/Pages/Submit/" class="quicklink-btn secondary"><img src="/assets/img/icons/page_white_add.png" width="16" height="16" alt=""> Submit a Pack</a>
+                        <a href="/Pages/Profile/?u=${encodeURIComponent(username)}" class="quicklink-btn secondary"><img src="/assets/img/icons/user.png" width="16" height="16" alt=""> My Profile</a>
                     </div>
                 </div>
                 <div id="SignInArea">
@@ -141,8 +135,8 @@
                         <div class="box-body">
                             <div style="font-size:12px;color:#555;margin-bottom:10px;line-height:1.5;" id="DashInfo">Loading...</div>
                             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                                <a href="/Pages/Settings/" class="quicklink-btn secondary" style="flex:1;text-align:center;font-size:10px;">Settings</a>
-                                <a href="/Pages/Submit/" class="quicklink-btn primary" style="flex:1;text-align:center;font-size:10px;">New Submission</a>
+                                <a href="/Pages/Settings/" class="quicklink-btn secondary" style="flex:1;text-align:center;font-size:10px;"><img src="/assets/img/icons/wrench.png" width="14" height="14" alt="" style="vertical-align:middle;"> Settings</a>
+                                <a href="/Pages/Submit/" class="quicklink-btn primary" style="flex:1;text-align:center;font-size:10px;"><img src="/assets/img/icons/page_white_add.png" width="14" height="14" alt="" style="vertical-align:middle;"> New Submission</a>
                             </div>
                         </div>
                     </div>
@@ -161,8 +155,8 @@
                         <p>${SITE_CONFIG.home.blurbText}</p>
                     </div>
                     <div class="quicklinks">
-                        <a href="/Pages/Packs/" class="quicklink-btn primary">Browse Packs</a>
-                        <a href="/Pages/Plugins/" class="quicklink-btn secondary">Browse Plugins</a>
+                        <a href="/Pages/Packs/" class="quicklink-btn primary"><img src="/assets/img/icons/package.png" width="16" height="16" alt=""> Browse Packs</a>
+                        <a href="/Pages/Plugins/" class="quicklink-btn secondary"><img src="/assets/img/icons/plugin.png" width="16" height="16" alt=""> Browse Plugins</a>
                     </div>
                 </div>
                 <div id="SignInArea">
@@ -181,7 +175,7 @@
                                 <label>Password</label>
                                 <input id="hw_password" type="password" placeholder="${SITE_CONFIG.home.passwordPh}">
                             </div>
-                            <button onclick="handleHomeSignup()">${SITE_CONFIG.home.signupBtn}</button>
+                            <button onclick="handleHomeSignup()" style="display:inline-flex;align-items:center;gap:4px;justify-content:center;padding:6px 20px;font-size:12px;font-family:var(--font);background:var(--c-green);color:#fff;border:1px solid var(--c-green-border);cursor:pointer;margin-top:6px;"><img src="/assets/img/icons/user_add.png" width="14" height="14" alt="" style="vertical-align:middle;"> ${SITE_CONFIG.home.signupBtn}</button>
                             <div id="hw_status"></div>
                         </div>
                         <div class="box-footer">
@@ -254,7 +248,7 @@
         if (!packs || packs.length === 0) return;
 
         section.innerHTML = `
-            <div style="padding:20 0px 20px;">
+            <div style="padding:20px 0 20px 0;">
                 <div class="CatHeader">
                     <h3>Recently Added</h3>
                     <a href="/Pages/Packs/">View all &rarr;</a>
@@ -275,8 +269,8 @@
                     <div class="PackCategory">${esc(pack.category||'Other')}</div>
                 </div>
                 <div class="PackButtons">
-                    <a href="${esc(pack.download_url||'#')}" target="_blank" rel="noopener noreferrer" class="PackDownload">Download</a>
-                    <a href="/Pages/Packs/" class="pack-browse-btn" style="flex:1;font-size:10px;padding:3px 6px;font-weight:bold;background:var(--c-cat-bg);border:1px solid var(--c-border-dark);cursor:pointer;font-family:inherit;color:var(--c-cat-text);border-radius:2px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;">Browse More</a>
+                    <a href="${sanitizeUrl(pack.download_url)||'#'}" target="_blank" rel="noopener noreferrer" class="PackDownload"><img src="/assets/img/icons/disk.png" width="14" height="14" alt=""> Download</a>
+                    <a href="/Pages/Packs/" class="PackSeeMore" style="flex:1;display:inline-flex;align-items:center;gap:4px;justify-content:center;font-size:11px;padding:4px 8px;font-weight:400;background:var(--c-btn);border:1px solid var(--c-btn-border);font-family:var(--font);color:#333;text-decoration:none;"><img src="/assets/img/icons/package.png" width="14" height="14" alt=""> Browse More</a>
                 </div>
             `;
             grid.appendChild(div);
